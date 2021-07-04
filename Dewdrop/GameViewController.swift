@@ -14,29 +14,22 @@ class GameViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    // Load 'GameScene.sks' as a GKScene. This provides gameplay related
-    // content including entities and graphs.
-    if let scene = GKScene(fileNamed: "GameScene") {
+    if let sceneNode = SKScene(fileNamed: "GameSceneSK") {
 
-      // Get the SKScene from the loaded GKScene
-      if let sceneNode = scene.rootNode as! GameScene? {
+      sceneNode.scaleMode = .resizeFill
 
-        // Copy gameplay related content over to the scene
-        sceneNode.entities = scene.entities
-        sceneNode.graphs = scene.graphs
+      let playerNode = PlayerNode()
+      playerNode.position = CGPoint(x: 0, y: 200)
+      playerNode.addToScene(scene: sceneNode)
 
-        // Set the scale mode to scale to fit the window
-        sceneNode.scaleMode = .aspectFill
+      // Present the scene
+      if let view = self.view as! SKView? {
+        view.presentScene(sceneNode)
 
-        // Present the scene
-        if let view = self.view as! SKView? {
-          view.presentScene(sceneNode)
+        view.ignoresSiblingOrder = true
 
-          view.ignoresSiblingOrder = true
-
-          view.showsFPS = true
-          view.showsNodeCount = true
-        }
+        view.showsFPS = true
+        view.showsNodeCount = true
       }
     }
   }
