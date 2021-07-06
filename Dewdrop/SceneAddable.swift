@@ -11,5 +11,5 @@ import SpriteKit
 protocol SceneAddable {
   /// Add self to the given `scene`
   /// - Returns: `true` if the object was sucessfully added, `false` otherwise
-  func addToScene(scene: SKScene) -> Void
+  func addToScene(scene: SKScene) throws -> Void
 }

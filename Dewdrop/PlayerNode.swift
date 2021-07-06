@@ -8,17 +8,23 @@
 import Foundation
 import SpriteKit
 
-class PlayerNode: SKEffectNode, SceneAddable {
+enum AddToSceneError: Error {
+  /// Player must be added to the scene before being repositioned. The
+  /// `wetChildren` do not spawn correctly if the player is anywhere but (0,0).
+  case notAtOrigin
+}
 
+class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: Constants
 
-  let PD_RADIUS: CGFloat = 2.0
-  let PD_CONNECTIONS_MAX = 5
-  let PD_COUNT_INIT = 10
-  let PD_COUNT_MAX = 20
+  static let PLAYER_RADIUS: CGFloat = 15.0
+  let PD_RADIUS: CGFloat = 4.2
+  let PD_COUNT_INIT = 22
+  let PD_COUNT_MAX = 40
 
   // MARK: State
 
+  let mainCircle = SKShapeNode(circleOfRadius: PlayerNode.PLAYER_RADIUS)
   var wetChildren = Set<SKNode>()
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
 
@@ -34,61 +40,81 @@ class PlayerNode: SKEffectNode, SceneAddable {
 
   // MARK: protocol SceneAddable
 
-  func addToScene(scene: SKScene) {
+  func addToScene(scene: SKScene) throws {
+    guard position.equalTo(CGPoint(x: 0, y: 0)) else {
+      throw AddToSceneError.notAtOrigin
+    }
+
     scene.addChild(self)
+    initMainCircle()
     initChildren()
+  }
+
+  func initChildren() {
+    for i in 0..<PD_COUNT_INIT {
+      let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
+
+      wetChild.name = "PD \(name ?? "unnamed") \(i)"
+
+      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
+      let offsetX = cos(angle) * PlayerNode.PLAYER_RADIUS
+      let offsetY = sin(angle) * PlayerNode.PLAYER_RADIUS
+
+      wetChild.position = CGPoint(
+        x: mainCircle.position.x + offsetX,
+        y: mainCircle.position.y + offsetY)
+      wetChild.name = "PD \(i)"
+
+      baptiseWetChild(newChild: wetChild)
+    }
+  }
+
+  func initMainCircle() {
+    mainCircle.name = name
+
+    let physicsBody = SKPhysicsBody(circleOfRadius: PlayerNode.PLAYER_RADIUS)
+
+    physicsBody.isDynamic = true
+    physicsBody.affectedByGravity = false
+    physicsBody.mass = 4.0
+
+    mainCircle.physicsBody = physicsBody
+
+    addChild(mainCircle)
   }
 
   // MARK: Helpers
 
-  func addWetChild(newChild: SKShapeNode) {
+  func baptiseWetChild(newChild: SKShapeNode) {
     if wetChildren.contains(newChild) {
       return;
     }
 
+    let physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
+
+    physicsBody.isDynamic = true
+    physicsBody.affectedByGravity = true
+    physicsBody.mass = 2 / CGFloat(PD_COUNT_INIT)
+
+    newChild.physicsBody = physicsBody
+
     addChild(newChild)
 
-    let closestWetChildren = wetChildren.reduce(
-      into: Array<SKNode>(),
-      { wc, child in
-        let newDistance = distance(child.position, newChild.position)
-        let insertionIndex = wc.firstIndex(where: { c in
-          newDistance < distance(c.position, newChild.position)
-        }) ?? wc.endIndex
-        wc.insert(child, at: insertionIndex)
+    let joint = SKPhysicsJointSpring.joint(
+      withBodyA: mainCircle.physicsBody!,
+      bodyB: newChild.physicsBody!,
+      anchorA: mainCircle.position,
+      anchorB: newChild.position)
 
-        if (wc.count > PD_CONNECTIONS_MAX) {
-          wc.removeLast()
-        }
-      }
-    )
+    joint.damping = 1.5
+    joint.frequency = 4.0
 
-    if (newChild.position.x.isNaN) {
-      print("ass")
-    }
-
-    print(newChild.position, "closest", closestWetChildren.map({ c in c.position }))
-
-    var jointsForWetChild = Set<SKPhysicsJointSpring>()
-    joints[newChild] = jointsForWetChild
-
-    for otherChild in closestWetChildren {
-      let joint = SKPhysicsJointSpring.joint(
-        withBodyA: newChild.physicsBody!,
-        bodyB: otherChild.physicsBody!,
-        anchorA: newChild.position,
-        anchorB: otherChild.position
-      )
-
-      jointsForWetChild.insert(joint)
-      joints[otherChild]?.insert(joint)
-      scene?.physicsWorld.add(joint)
-    }
+    scene!.physicsWorld.add(joint)
 
     wetChildren.insert(newChild)
   }
 
-  func removeWetChild(wetChild: SKShapeNode) {
+  func banishWetChild(wetChild: SKShapeNode) {
     if wetChildren.remove(wetChild) != nil {
       if let jointsForWetChild = joints.removeValue(forKey: wetChild) {
         for joint in jointsForWetChild {
@@ -101,25 +127,6 @@ class PlayerNode: SKEffectNode, SceneAddable {
           scene!.physicsWorld.remove(joint)
         }
       }
-    }
-  }
-
-  func initChildren() {
-    for n in 1...PD_COUNT_INIT {
-      let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
-      wetChild.name = "PD \(name ?? "unnamed") \(n-1)"
-
-      let distance = log2(CGFloat(n))
-      let rotation = distance * CGFloat.pi
-
-      wetChild.position = CGPoint(
-        x: cos(rotation) * distance * 2,
-        y: sin(rotation) * distance * 2
-      )
-
-      wetChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
-
-      addWetChild(newChild: wetChild)
     }
   }
 
