@@ -9,12 +9,16 @@ import UIKit
 import SpriteKit
 import GameplayKit
 
-class GameViewController: UIViewController {
+class DDViewController: UIViewController {
+
+  var scene: Optional<DDScene> = .none
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    if let sceneNode = SKScene(fileNamed: "GameSceneSK") {
+    if let sceneNode = DDScene(fileNamed: "DDScene") {
+      scene = sceneNode
+      print("scene", scene!)
       let playerNode = PlayerNode()
       do {
         try playerNode.addToScene(scene: sceneNode)
@@ -27,6 +31,8 @@ class GameViewController: UIViewController {
       // Present the scene
       if let view = self.view as! SKView? {
         view.presentScene(sceneNode)
+
+        playerNode.start()
 
         view.ignoresSiblingOrder = true
 
@@ -50,5 +56,25 @@ class GameViewController: UIViewController {
 
   override var prefersStatusBarHidden: Bool {
     return true
+  }
+
+  // MARK: Touch handling
+
+  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    scene?.touchesBegan(touches, with: event)
+  }
+
+  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    scene?.touchesMoved(touches, with: event)
+  }
+
+  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    scene?.touchesEnded(touches, with: event)
+  }
+
+  override func touchesCancelled(
+    _ touches: Set<UITouch>, with event: UIEvent?
+  ) {
+    scene?.touchesCancelled(touches, with: event)
   }
 }

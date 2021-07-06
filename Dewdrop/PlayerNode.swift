@@ -18,6 +18,8 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: Constants
 
   static let PLAYER_RADIUS: CGFloat = 15.0
+  static let TICK_FOLLOW: TimeInterval = 0.1
+
   let PD_RADIUS: CGFloat = 4.2
   let PD_COUNT_INIT = 22
   let PD_COUNT_MAX = 40
@@ -48,39 +50,6 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     scene.addChild(self)
     initMainCircle()
     initChildren()
-  }
-
-  func initChildren() {
-    for i in 0..<PD_COUNT_INIT {
-      let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
-
-      wetChild.name = "PD \(name ?? "unnamed") \(i)"
-
-      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
-      let offsetX = cos(angle) * PlayerNode.PLAYER_RADIUS
-      let offsetY = sin(angle) * PlayerNode.PLAYER_RADIUS
-
-      wetChild.position = CGPoint(
-        x: mainCircle.position.x + offsetX,
-        y: mainCircle.position.y + offsetY)
-      wetChild.name = "PD \(i)"
-
-      baptiseWetChild(newChild: wetChild)
-    }
-  }
-
-  func initMainCircle() {
-    mainCircle.name = name
-
-    let physicsBody = SKPhysicsBody(circleOfRadius: PlayerNode.PLAYER_RADIUS)
-
-    physicsBody.isDynamic = true
-    physicsBody.affectedByGravity = false
-    physicsBody.mass = 4.0
-
-    mainCircle.physicsBody = physicsBody
-
-    addChild(mainCircle)
   }
 
   // MARK: Helpers
@@ -130,7 +99,51 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     }
   }
 
+  func initChildren() {
+    for i in 0..<PD_COUNT_INIT {
+      let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
+
+      wetChild.name = "PD \(name ?? "unnamed") \(i)"
+
+      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
+      let offsetX = cos(angle) * PlayerNode.PLAYER_RADIUS
+      let offsetY = sin(angle) * PlayerNode.PLAYER_RADIUS
+
+      wetChild.position = CGPoint(
+        x: mainCircle.position.x + offsetX,
+        y: mainCircle.position.y + offsetY)
+      wetChild.name = "PD \(i)"
+
+      baptiseWetChild(newChild: wetChild)
+    }
+  }
+
+  func initMainCircle() {
+    mainCircle.name = name
+
+    let physicsBody = SKPhysicsBody(circleOfRadius: PlayerNode.PLAYER_RADIUS)
+
+    physicsBody.isDynamic = true
+    physicsBody.affectedByGravity = false
+    physicsBody.mass = 4.0
+
+    mainCircle.physicsBody = physicsBody
+
+    addChild(mainCircle)
+  }
+
   func distance(_ p: CGPoint, _ q: CGPoint) -> CGFloat {
     return sqrt(pow(q.x - p.x, 2) + pow(q.y - p.y, 2))
+  }
+
+  // MARK: Game loops
+
+  func start() {
+    followFirstTouch()
+  }
+
+  func followFirstTouch() {
+    
+    SKAction.wait(forDuration: PlayerNode.TICK_FOLLOW)
   }
 }
