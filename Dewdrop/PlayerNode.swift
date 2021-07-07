@@ -26,9 +26,10 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   // MARK: State
 
+  var ddScene: Optional<DDScene> = .none
+  var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   let mainCircle = SKShapeNode(circleOfRadius: PlayerNode.PLAYER_RADIUS)
   var wetChildren = Set<SKNode>()
-  var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
 
   // MARK: Initialisation
 
@@ -42,14 +43,19 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   // MARK: protocol SceneAddable
 
-  func addToScene(scene: SKScene) throws {
+  func addToScene(scene: DDScene) throws {
     guard position.equalTo(CGPoint(x: 0, y: 0)) else {
       throw AddToSceneError.notAtOrigin
     }
 
     scene.addChild(self)
+    scene.playerNode = self
+    ddScene = scene
+
     initMainCircle()
     initChildren()
+
+    start()
   }
 
   // MARK: Helpers
@@ -143,7 +149,27 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   }
 
   func followFirstTouch() {
-    
-    SKAction.wait(forDuration: PlayerNode.TICK_FOLLOW)
+    guard let ddScene = ddScene else {
+      return
+    }
+
+    guard ddScene.movementTouchNode.fingerDown else {
+      return run(SKAction.wait(forDuration: PlayerNode.TICK_FOLLOW)) {
+        self.followFirstTouch()
+      }
+    }
+
+    let mainCirclePosition = mainCircle.position
+    let touchNodePosition = ddScene.movementTouchNode.position
+
+    let diffX = touchNodePosition.x - mainCirclePosition.x
+
+    let applyForce = SKAction.applyForce(
+      CGVector(dx: diffX * 10, dy: 0),
+      duration: PlayerNode.TICK_FOLLOW)
+
+    mainCircle.run(applyForce) {
+      self.followFirstTouch()
+    }
   }
 }

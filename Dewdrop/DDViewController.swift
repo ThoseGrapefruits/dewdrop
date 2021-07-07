@@ -18,8 +18,9 @@ class DDViewController: UIViewController {
 
     if let sceneNode = DDScene(fileNamed: "DDScene") {
       scene = sceneNode
-      print("scene", scene!)
+
       let playerNode = PlayerNode()
+
       do {
         try playerNode.addToScene(scene: sceneNode)
       } catch {

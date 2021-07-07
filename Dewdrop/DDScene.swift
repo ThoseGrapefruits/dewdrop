@@ -12,9 +12,11 @@ class DDScene: SKScene {
 
   var graphs = [String : GKGraph]()
   var movementTouch: Optional<UITouch> = .none
-  var movementTouchNode: SKNode = SKNode()
+  var movementTouchNode: DDMovementTouchNode = DDMovementTouchNode()
+  var playerNode: Optional<PlayerNode> = .none
 
   override func sceneDidLoad() {
+    movementTouchNode.name = "Movement touch"
     addChild(movementTouchNode)
   }
 
@@ -36,12 +38,14 @@ class DDScene: SKScene {
   override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     if let mt = movementTouch, touches.contains(mt) {
       movementTouch = .none
+      updateMovementTouchPosition()
     }
   }
 
   override func touchesCancelled(_ touches: Set<UITouch>, with _: UIEvent?) {
     if let mt = movementTouch, touches.contains(mt) {
       movementTouch = .none
+      updateMovementTouchPosition()
     }
   }
 
@@ -53,9 +57,13 @@ class DDScene: SKScene {
       movementTouchNode.position = CGPoint(
         x: touchPosition.x,
         y: touchPosition.y)
+      movementTouchNode.fingerDown = true
     } else if let camera = camera {
       movementTouchNode.position = CGPoint(
         x: camera.position.x, y: camera.position.y)
+      movementTouchNode.fingerDown = false
+    } else {
+      movementTouchNode.fingerDown = false
     }
   }
 }
