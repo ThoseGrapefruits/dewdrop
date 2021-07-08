@@ -17,9 +17,13 @@ enum AddToSceneError: Error {
 class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: Constants
 
+  static let ACTION_CHARGE_SHOT = "charge-shot"
+
   static let PLAYER_RADIUS: CGFloat = 15.0
+  static let TICK_CHARGE_SHOT: TimeInterval = 0.5
   static let TICK_FOLLOW: TimeInterval = 0.1
 
+  let PD_MASS: CGFloat = 0.2
   let PD_RADIUS: CGFloat = 4.2
   let PD_COUNT_INIT = 22
   let PD_COUNT_MAX = 40
@@ -69,7 +73,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = true
-    physicsBody.mass = 2 / CGFloat(PD_COUNT_INIT)
+    physicsBody.mass = PD_MASS
 
     newChild.physicsBody = physicsBody
 
@@ -153,23 +157,33 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
       return
     }
 
-    guard ddScene.movementTouchNode.fingerDown else {
+    guard ddScene.moveTouchNode.fingerDown else {
       return run(SKAction.wait(forDuration: PlayerNode.TICK_FOLLOW)) {
         self.followFirstTouch()
       }
     }
 
     let mainCirclePosition = mainCircle.position
-    let touchNodePosition = ddScene.movementTouchNode.position
+    let touchNodePosition = ddScene.moveTouchNode.position
 
     let diffX = touchNodePosition.x - mainCirclePosition.x
 
     let applyForce = SKAction.applyForce(
-      CGVector(dx: diffX * 10, dy: 0),
+      CGVector(dx: max(min(diffX * 100, 3000), -3000), dy: 0),
       duration: PlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) {
       self.followFirstTouch()
     }
+  }
+
+  // MARK: Combat
+
+  func chamberDroplet() {
+    mainCircle.strokeColor = SKColor.red
+  }
+
+  func fireDroplet() {
+    mainCircle.strokeColor = SKColor.white
   }
 }
