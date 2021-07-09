@@ -58,24 +58,4 @@ class DDViewController: UIViewController {
   override var prefersStatusBarHidden: Bool {
     return true
   }
-
-  // MARK: Touch handling
-
-//  override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//    scene?.touchesBegan(touches, with: event)
-//  }
-//
-//  override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-//    scene?.touchesMoved(touches, with: event)
-//  }
-//
-//  override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-//    scene?.touchesEnded(touches, with: event)
-//  }
-//
-//  override func touchesCancelled(
-//    _ touches: Set<UITouch>, with event: UIEvent?
-//  ) {
-//    scene?.touchesCancelled(touches, with: event)
-//  }
 }

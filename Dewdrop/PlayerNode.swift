@@ -7,6 +7,7 @@
 
 import Foundation
 import SpriteKit
+import SceneKit
 
 enum AddToSceneError: Error {
   /// Player must be added to the scene before being repositioned. The
@@ -42,11 +43,13 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   var ddScene: Optional<DDScene> = .none
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   let mainCircle = SKShapeNode(circleOfRadius: PlayerNode.PLAYER_RADIUS)
-  let gun = SKShapeNode(
+  let gun = DDGun(
     points: UnsafeMutablePointer(mutating: PlayerNode.GUN_SHAPE),
     count: PlayerNode.GUN_SHAPE.count)
   let gunJoint = SKNode()
-  var wetChildren = Set<SKNode>()
+  var wetChildren = Set<DDPlayerDroplet>()
+
+  var chamberDropletAction: Optional<SKAction> = .none
 
   // MARK: Accessor overrides
 
@@ -72,7 +75,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: protocol SceneAddable
 
   func addToScene(scene: DDScene) throws {
-    guard super.position.equalTo(CGPoint(x: 0, y: 0)) else {
+    guard super.position.equalTo(CGPoint.zero) else {
       throw AddToSceneError.notAtOrigin
     }
 
@@ -89,7 +92,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   // MARK: Helpers
 
-  func baptiseWetChild(newChild: SKShapeNode) {
+  func baptiseWetChild(newChild: DDPlayerDroplet) {
     if wetChildren.contains(newChild) {
       return;
     }
@@ -99,6 +102,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = true
     physicsBody.mass = PD_MASS
+    physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
 
     newChild.physicsBody = physicsBody
 
@@ -118,7 +122,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     wetChildren.insert(newChild)
   }
 
-  func banishWetChild(wetChild: SKShapeNode) {
+  func banishWetChild(wetChild: DDPlayerDroplet) {
     if wetChildren.remove(wetChild) != nil {
       if let jointsForWetChild = joints.removeValue(forKey: wetChild) {
         for joint in jointsForWetChild {
@@ -136,7 +140,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   func initWetChildren() {
     for i in 0..<PD_COUNT_INIT {
-      let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
+      let wetChild = DDPlayerDroplet(circleOfRadius: PD_RADIUS)
 
       wetChild.name = "PD \(name ?? "unnamed") \(i)"
 
@@ -156,12 +160,27 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   func initGun() {
     gunJoint.name = "\(name ?? "unnamed") gun joint"
 
+    gunJoint.physicsBody = SKPhysicsBody(
+      rectangleOf: CGSize(width: 16.0, height: 4),
+      center: CGPoint(x: 8.0, y: 0.0))
+
+    gunJoint.physicsBody!.pinned = true
+
     gun.name = "\(name ?? "unnamed") gun"
     gun.fillColor = .white
     gun.strokeColor = .green
 
+    gun.physicsBody = SKPhysicsBody(
+      rectangleOf: CGSize(width: 16.0, height: 4),
+      center: CGPoint(x: 8.0, y: 0.0))
+
+    gun.physicsBody!.pinned = true
+    gun.physicsBody!.categoryBitMask = CategoryBitmask.PLAYER_GUN
+    gun.physicsBody!.collisionBitMask =
+    CategoryBitmask.all ^ CategoryBitmask.PLAYER_DROPLET
+
     gunJoint.addChild(gun)
-    gun.position = CGPoint(x: 5, y: 0)
+    gun.position = CGPoint(x: 4.0, y: 0.0)
     mainCircle.addChild(gunJoint)
   }
 
@@ -173,6 +192,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = false
     physicsBody.mass = 4.0
+    physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
 
     mainCircle.physicsBody = physicsBody
 
@@ -254,9 +274,38 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   func chamberDroplet() {
     gun.strokeColor = .red
+
+    let closest: Optional<DDPlayerDroplet> = wetChildren.reduce(
+      .none
+    ) { closestChild, child in
+      guard let closestChild = closestChild else {
+        return child;
+      }
+
+      let closestDistance = getDistance(gun.position, closestChild.position)
+      let distance =        getDistance(gun.position, child.position)
+      return distance < closestDistance
+        ? child
+        : closestChild
+    }
+
+    guard let closest = closest else {
+      return
+    }
+
+    banishWetChild(wetChild: closest)
+    gun.chamberDroplet(closest)
   }
 
   func fireDroplet() {
+    let angle = gun.zRotation - mainCircle.zRotation
+
     gun.strokeColor = .green
+  }
+
+  // MARK: Utility
+
+  func getDistance(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
+    return sqrt(pow(p2.x - p1.x, 2.0) + pow(p2.y - p2.y, 2.0))
   }
 }
