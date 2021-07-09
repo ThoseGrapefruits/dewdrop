@@ -21,13 +21,13 @@ class DDViewController: UIViewController {
 
       let playerNode = PlayerNode()
 
+      playerNode.position = CGPoint(x: 0, y: 160)
+
       do {
         try playerNode.addToScene(scene: sceneNode)
       } catch {
         print(error)
       }
-
-      playerNode.position = CGPoint(x: 0, y: 160)
 
       // Present the scene
       if let view = self.view as! SKView? {

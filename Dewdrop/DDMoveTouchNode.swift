@@ -8,6 +8,6 @@
 import Foundation
 import SpriteKit
 
-class DDMovementTouchNode : SKNode {
+class DDMoveTouchNode : SKNode {
   var fingerDown = false
 }

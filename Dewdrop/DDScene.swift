@@ -13,10 +13,10 @@ class DDScene: SKScene {
   static let AIM_OFFSET: CGFloat = 20
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
-  var moveTouchNode: DDMovementTouchNode = DDMovementTouchNode()
+  var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
 
   var aimTouch: Optional<UITouch> = .none
-  var aimTouchNode: SKNode = SKNode()
+  var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
 
   var playerNode: Optional<PlayerNode> = .none
 
@@ -99,7 +99,9 @@ class DDScene: SKScene {
       aimTouchNode.position = CGPoint(
         x: touchPosition.x,
         y: touchPosition.y + DDScene.AIM_OFFSET)
+      aimTouchNode.fingerDown = true
     } else {
+      aimTouchNode.fingerDown = false
       playerNode?.fireDroplet()
     }
   }

@@ -18,8 +18,17 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: Constants
 
   static let ACTION_CHARGE_SHOT = "charge-shot"
-
+  static let GUN_SHAPE = [
+    CGPoint(x: 0.0, y:  0.5),
+    CGPoint(x: 10.0, y:  2.0),
+    CGPoint(x: 16.0, y:  4.0),
+    CGPoint(x: 14.0, y: -4.0),
+    CGPoint(x: 10.0, y: -2.0),
+    CGPoint(x: 0.0, y: -0.5),
+  ]
+  static let MOVEMENT_FORCE_LIMIT: CGFloat = 3000.0
   static let PLAYER_RADIUS: CGFloat = 15.0
+  static let TICK_AIM: TimeInterval = 0.1
   static let TICK_CHARGE_SHOT: TimeInterval = 0.5
   static let TICK_FOLLOW: TimeInterval = 0.1
 
@@ -33,7 +42,22 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   var ddScene: Optional<DDScene> = .none
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   let mainCircle = SKShapeNode(circleOfRadius: PlayerNode.PLAYER_RADIUS)
+  let gun = SKShapeNode(
+    points: UnsafeMutablePointer(mutating: PlayerNode.GUN_SHAPE),
+    count: PlayerNode.GUN_SHAPE.count)
+  let gunJoint = SKNode()
   var wetChildren = Set<SKNode>()
+
+  // MARK: Accessor overrides
+
+  override var position: CGPoint {
+    get {
+      return mainCircle.position
+    }
+    set {
+      mainCircle.position = newValue
+    }
+  }
 
   // MARK: Initialisation
 
@@ -48,7 +72,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: protocol SceneAddable
 
   func addToScene(scene: DDScene) throws {
-    guard position.equalTo(CGPoint(x: 0, y: 0)) else {
+    guard super.position.equalTo(CGPoint(x: 0, y: 0)) else {
       throw AddToSceneError.notAtOrigin
     }
 
@@ -57,7 +81,8 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     ddScene = scene
 
     initMainCircle()
-    initChildren()
+    initGun()
+    initWetChildren()
 
     start()
   }
@@ -109,7 +134,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     }
   }
 
-  func initChildren() {
+  func initWetChildren() {
     for i in 0..<PD_COUNT_INIT {
       let wetChild = SKShapeNode(circleOfRadius: PD_RADIUS)
 
@@ -128,8 +153,20 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     }
   }
 
+  func initGun() {
+    gunJoint.name = "\(name ?? "unnamed") gun joint"
+
+    gun.name = "\(name ?? "unnamed") gun"
+    gun.fillColor = .white
+    gun.strokeColor = .green
+
+    gunJoint.addChild(gun)
+    gun.position = CGPoint(x: 5, y: 0)
+    mainCircle.addChild(gunJoint)
+  }
+
   func initMainCircle() {
-    mainCircle.name = name
+    mainCircle.name = "\(name ?? "unnamed") main circle"
 
     let physicsBody = SKPhysicsBody(circleOfRadius: PlayerNode.PLAYER_RADIUS)
 
@@ -150,6 +187,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   func start() {
     followFirstTouch()
+    trackAim()
   }
 
   func followFirstTouch() {
@@ -167,9 +205,14 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     let touchNodePosition = ddScene.moveTouchNode.position
 
     let diffX = touchNodePosition.x - mainCirclePosition.x
+    let dx = min(
+      max(
+        diffX * 100,
+        -PlayerNode.MOVEMENT_FORCE_LIMIT),
+      PlayerNode.MOVEMENT_FORCE_LIMIT)
 
     let applyForce = SKAction.applyForce(
-      CGVector(dx: max(min(diffX * 100, 3000), -3000), dy: 0),
+      CGVector(dx: dx, dy: 0),
       duration: PlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) {
@@ -177,13 +220,43 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     }
   }
 
+  func trackAim() {
+    guard let ddScene = ddScene else {
+      return
+    }
+
+    guard ddScene.aimTouchNode.fingerDown else {
+      let action = SKAction.rotate(
+        toAngle: -mainCircle.zRotation,
+        duration: PlayerNode.TICK_AIM,
+        shortestUnitArc: true)
+      return gunJoint.run(action) {
+        self.trackAim()
+      }
+    }
+
+    let selfPosition = mainCircle.position
+    let targetPosition = ddScene.aimTouchNode.position
+    let dY = targetPosition.y - selfPosition.y
+    let dX = targetPosition.x - selfPosition.x
+    let angle = atan2(dY, dX)
+
+    let action = SKAction.rotate(
+      toAngle: angle - mainCircle.zRotation,
+      duration: PlayerNode.TICK_AIM,
+      shortestUnitArc: true)
+    return gunJoint.run(action) {
+      self.trackAim()
+    }
+  }
+
   // MARK: Combat
 
   func chamberDroplet() {
-    mainCircle.strokeColor = SKColor.red
+    gun.strokeColor = .red
   }
 
   func fireDroplet() {
-    mainCircle.strokeColor = SKColor.white
+    gun.strokeColor = .green
   }
 }
