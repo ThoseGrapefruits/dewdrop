@@ -14,6 +14,17 @@ class DDGun : SKShapeNode {
   var chambered: Optional<DDPlayerDroplet> = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
 
+  override init() {
+    super.init()
+
+    fillColor = .systemGreen
+    strokeColor = .green
+  }
+
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+  }
+
   func chamberDroplet(_ droplet: DDPlayerDroplet) {
     chambered = droplet
     strokeColor = .white

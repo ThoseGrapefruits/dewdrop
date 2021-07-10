@@ -26,6 +26,12 @@ class PIDController {
     self.kDerivative = Double(kD);
   }
 
+  func step(error: CGFloat, deltaTime: TimeInterval) -> CGFloat {
+    let time = deltaTime + (lastTime ?? TimeInterval.zero)
+
+    return step(error: error, currentTime: time)
+  }
+
   func step(error: CGFloat, currentTime: TimeInterval) -> CGFloat {
     let errorDouble = Double(error);
     let secondsElapsed = currentTime.distance(to: lastTime ?? currentTime);

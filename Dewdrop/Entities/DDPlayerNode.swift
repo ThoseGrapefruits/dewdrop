@@ -9,12 +9,6 @@ import Foundation
 import SpriteKit
 import SceneKit
 
-enum AddToSceneError: Error {
-  /// Player must be added to the scene before being repositioned. The
-  /// `wetChildren` do not spawn correctly if the player is anywhere but (0,0).
-  case notAtOrigin
-}
-
 class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Constants
 
@@ -28,10 +22,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   ]
   static let MOVEMENT_FORCE_LIMIT: CGFloat = 8000.0
   static let PLAYER_RADIUS: CGFloat = 15.0
-  static let TICK_AIM: TimeInterval = 0.1
+  static let TICK_AIM: TimeInterval = 0.05
   static let TICK_CHARGE_SHOT: TimeInterval = 0.5
   static let TICK_FOLLOW: TimeInterval = 0.1
 
+  let GUN_MASS: CGFloat = 2.0
   let PD_MASS: CGFloat = 0.5
   let PD_RADIUS: CGFloat = 4.2
   let PD_COUNT_INIT = 22
@@ -73,11 +68,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   // MARK: protocol SceneAddable
 
-  func addToScene(scene: DDScene) throws {
-    guard super.position.equalTo(CGPoint.zero) else {
-      throw AddToSceneError.notAtOrigin
-    }
-
+  func addToScene(scene: DDScene) {
     scene.addChild(self)
     scene.playerNode = self
     ddScene = scene
@@ -103,6 +94,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     physicsBody.friction = 0.5
     physicsBody.mass = PD_MASS
     physicsBody.categoryBitMask = DDBitmask.PLAYER_DROPLET
+    physicsBody.collisionBitMask = DDBitmask.all ^ DDBitmask.PLAYER_GUN
 
     newChild.physicsBody = physicsBody
 
@@ -160,27 +152,25 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   func initGun() {
     gunJoint.name = "\(name ?? "unnamed") gun joint"
 
-    gunJoint.physicsBody = SKPhysicsBody(circleOfRadius: 1)
+    gunJoint.physicsBody = SKPhysicsBody(circleOfRadius: 10)
 
-
-    gunJoint.physicsBody!.angularDamping = 8
+    gunJoint.physicsBody!.angularDamping = 200
     gunJoint.physicsBody!.pinned = true
+    gunJoint.physicsBody!.mass = 4
     gunJoint.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
     gunJoint.physicsBody!.collisionBitMask = DDBitmask.none
 
     gun.name = "\(name ?? "unnamed") gun"
-    gun.fillColor = .white
-    gun.strokeColor = .green
 
     gun.physicsBody = SKPhysicsBody(
       rectangleOf: CGSize(width: 24.0, height: 4),
       center: CGPoint(x: 12.0, y: 0.0))
 
-    gun.physicsBody!.angularDamping = 8
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
     gun.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
     gun.physicsBody!.collisionBitMask = DDBitmask.none
+    gun.physicsBody!.mass = GUN_MASS
 
     gunJoint.addChild(gun)
     gun.position = CGPoint(x: 4.0, y: 0.0)
@@ -245,34 +235,38 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
-  func trackAim() {
+  func trackAim(
+    pid: PIDController = PIDController(kP: 0.5, kI: 0.01, kD: 0.05)
+  ) {
     guard let ddScene = ddScene else {
       return
     }
 
-    guard ddScene.aimTouchNode.fingerDown else {
-      let action = SKAction.rotate(
-        toAngle: -mainCircle.zRotation,
-        duration: DDPlayerNode.TICK_AIM,
-        shortestUnitArc: true)
-      return gunJoint.run(action) {
-        self.trackAim()
+    let offsetAngle = gunJoint.zRotation + mainCircle.zRotation
+
+    let targetAngle: CGFloat = {
+      guard ddScene.aimTouchNode.fingerDown else {
+        return 0
       }
-    }
 
-    let selfPosition = mainCircle.position
-    let targetPosition = ddScene.aimTouchNode.position
-    let dY = targetPosition.y - selfPosition.y
-    let dX = targetPosition.x - selfPosition.x
-    let angle = atan2(dY, dX)
+      let selfPosition = mainCircle.position
+      let targetPosition = ddScene.aimTouchNode.position
+      let dY = targetPosition.y - selfPosition.y
+      let dX = targetPosition.x - selfPosition.x
 
-    let action = SKAction.rotate(
-      // TODO: this angle isn't right
-      toAngle: angle - mainCircle.zRotation,
-      duration: DDPlayerNode.TICK_AIM,
-      shortestUnitArc: true)
+      return atan2(dY, dX)
+    }()
+
+    let impulse = pid.step(
+      error: targetAngle - offsetAngle,
+      deltaTime: DDPlayerNode.TICK_AIM)
+
+    let action = SKAction.applyAngularImpulse(
+      impulse,
+      duration: DDPlayerNode.TICK_AIM)
+
     return gunJoint.run(action) {
-      self.trackAim()
+      self.trackAim(pid: pid)
     }
   }
 
