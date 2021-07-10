@@ -9,7 +9,8 @@ import Foundation
 import SceneKit
 
 class CategoryBitmask {
-  static let all: UInt32 = 0b11111111111111111111111111111111
+  static let all: UInt32 =  0b11111111111111111111111111111111
+  static let none: UInt32 = 0b00000000000000000000000000000000
 
   static let GROUND: UInt32 = 0x1 << 1
   static let PLAYER_GUN: UInt32 = 0x1 << 2

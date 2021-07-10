@@ -21,19 +21,19 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   static let ACTION_CHARGE_SHOT = "charge-shot"
   static let GUN_SHAPE = [
     CGPoint(x: 0.0, y:  0.5),
-    CGPoint(x: 10.0, y:  2.0),
-    CGPoint(x: 16.0, y:  4.0),
-    CGPoint(x: 14.0, y: -4.0),
-    CGPoint(x: 10.0, y: -2.0),
+    CGPoint(x: 18.0, y:  2.0),
+    CGPoint(x: 25.0, y:  4.0),
+    CGPoint(x: 23.0, y: -4.0),
+    CGPoint(x: 18.0, y: -2.0),
     CGPoint(x: 0.0, y: -0.5),
   ]
-  static let MOVEMENT_FORCE_LIMIT: CGFloat = 3000.0
+  static let MOVEMENT_FORCE_LIMIT: CGFloat = 8000.0
   static let PLAYER_RADIUS: CGFloat = 15.0
   static let TICK_AIM: TimeInterval = 0.1
   static let TICK_CHARGE_SHOT: TimeInterval = 0.5
   static let TICK_FOLLOW: TimeInterval = 0.1
 
-  let PD_MASS: CGFloat = 0.2
+  let PD_MASS: CGFloat = 0.5
   let PD_RADIUS: CGFloat = 4.2
   let PD_COUNT_INIT = 22
   let PD_COUNT_MAX = 40
@@ -101,6 +101,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = true
+    physicsBody.friction = 0.5
     physicsBody.mass = PD_MASS
     physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
 
@@ -160,24 +161,27 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   func initGun() {
     gunJoint.name = "\(name ?? "unnamed") gun joint"
 
-    gunJoint.physicsBody = SKPhysicsBody(
-      rectangleOf: CGSize(width: 16.0, height: 4),
-      center: CGPoint(x: 8.0, y: 0.0))
+    gunJoint.physicsBody = SKPhysicsBody(circleOfRadius: 1)
 
+
+    gunJoint.physicsBody!.angularDamping = 8
     gunJoint.physicsBody!.pinned = true
+    gunJoint.physicsBody!.categoryBitMask = CategoryBitmask.PLAYER_GUN
+    gunJoint.physicsBody!.collisionBitMask = CategoryBitmask.none
 
     gun.name = "\(name ?? "unnamed") gun"
     gun.fillColor = .white
     gun.strokeColor = .green
 
     gun.physicsBody = SKPhysicsBody(
-      rectangleOf: CGSize(width: 16.0, height: 4),
-      center: CGPoint(x: 8.0, y: 0.0))
+      rectangleOf: CGSize(width: 24.0, height: 4),
+      center: CGPoint(x: 12.0, y: 0.0))
 
+    gun.physicsBody!.angularDamping = 8
     gun.physicsBody!.pinned = true
+    gun.physicsBody!.allowsRotation = false
     gun.physicsBody!.categoryBitMask = CategoryBitmask.PLAYER_GUN
-    gun.physicsBody!.collisionBitMask =
-    CategoryBitmask.all ^ CategoryBitmask.PLAYER_DROPLET
+    gun.physicsBody!.collisionBitMask = CategoryBitmask.none
 
     gunJoint.addChild(gun)
     gun.position = CGPoint(x: 4.0, y: 0.0)
@@ -191,8 +195,10 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = false
-    physicsBody.mass = 4.0
+    physicsBody.mass = 14.0
     physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
+    physicsBody.collisionBitMask =
+      CategoryBitmask.all ^ CategoryBitmask.PLAYER_GUN
 
     mainCircle.physicsBody = physicsBody
 
@@ -227,7 +233,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     let diffX = touchNodePosition.x - mainCirclePosition.x
     let dx = min(
       max(
-        diffX * 100,
+        diffX * 200,
         -PlayerNode.MOVEMENT_FORCE_LIMIT),
       PlayerNode.MOVEMENT_FORCE_LIMIT)
 
@@ -262,6 +268,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     let angle = atan2(dY, dX)
 
     let action = SKAction.rotate(
+      // TODO: this angle isn't right
       toAngle: angle - mainCircle.zRotation,
       duration: PlayerNode.TICK_AIM,
       shortestUnitArc: true)
@@ -273,21 +280,18 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   // MARK: Combat
 
   func chamberDroplet() {
-    gun.strokeColor = .red
+    let closest: Optional<DDPlayerDroplet> =
+      wetChildren.reduce(.none) { closestChild, child in
+        guard let closestChild = closestChild else {
+          return child;
+        }
 
-    let closest: Optional<DDPlayerDroplet> = wetChildren.reduce(
-      .none
-    ) { closestChild, child in
-      guard let closestChild = closestChild else {
-        return child;
+        let closestDistance = getDistance(gun.position, closestChild.position)
+        let distance =        getDistance(gun.position, child.position)
+        return distance < closestDistance
+          ? child
+          : closestChild
       }
-
-      let closestDistance = getDistance(gun.position, closestChild.position)
-      let distance =        getDistance(gun.position, child.position)
-      return distance < closestDistance
-        ? child
-        : closestChild
-    }
 
     guard let closest = closest else {
       return
@@ -298,9 +302,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   }
 
   func fireDroplet() {
-    let angle = gun.zRotation - mainCircle.zRotation
-
-    gun.strokeColor = .green
+    gun.fireDroplet()
   }
 
   // MARK: Utility
