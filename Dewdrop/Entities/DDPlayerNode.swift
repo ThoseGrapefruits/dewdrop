@@ -15,10 +15,9 @@ enum AddToSceneError: Error {
   case notAtOrigin
 }
 
-class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
+class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Constants
 
-  static let ACTION_CHARGE_SHOT = "charge-shot"
   static let GUN_SHAPE = [
     CGPoint(x: 0.0, y:  0.5),
     CGPoint(x: 18.0, y:  2.0),
@@ -42,10 +41,10 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
   var ddScene: Optional<DDScene> = .none
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
-  let mainCircle = SKShapeNode(circleOfRadius: PlayerNode.PLAYER_RADIUS)
+  let mainCircle = SKShapeNode(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
   let gun = DDGun(
-    points: UnsafeMutablePointer(mutating: PlayerNode.GUN_SHAPE),
-    count: PlayerNode.GUN_SHAPE.count)
+    points: UnsafeMutablePointer(mutating: DDPlayerNode.GUN_SHAPE),
+    count: DDPlayerNode.GUN_SHAPE.count)
   let gunJoint = SKNode()
   var wetChildren = Set<DDPlayerDroplet>()
 
@@ -103,7 +102,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     physicsBody.affectedByGravity = true
     physicsBody.friction = 0.5
     physicsBody.mass = PD_MASS
-    physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
+    physicsBody.categoryBitMask = DDBitmask.PLAYER_DROPLET
 
     newChild.physicsBody = physicsBody
 
@@ -146,8 +145,8 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
       wetChild.name = "PD \(name ?? "unnamed") \(i)"
 
       let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
-      let offsetX = cos(angle) * PlayerNode.PLAYER_RADIUS
-      let offsetY = sin(angle) * PlayerNode.PLAYER_RADIUS
+      let offsetX = cos(angle) * DDPlayerNode.PLAYER_RADIUS
+      let offsetY = sin(angle) * DDPlayerNode.PLAYER_RADIUS
 
       wetChild.position = CGPoint(
         x: mainCircle.position.x + offsetX,
@@ -166,8 +165,8 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
 
     gunJoint.physicsBody!.angularDamping = 8
     gunJoint.physicsBody!.pinned = true
-    gunJoint.physicsBody!.categoryBitMask = CategoryBitmask.PLAYER_GUN
-    gunJoint.physicsBody!.collisionBitMask = CategoryBitmask.none
+    gunJoint.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
+    gunJoint.physicsBody!.collisionBitMask = DDBitmask.none
 
     gun.name = "\(name ?? "unnamed") gun"
     gun.fillColor = .white
@@ -180,8 +179,8 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     gun.physicsBody!.angularDamping = 8
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
-    gun.physicsBody!.categoryBitMask = CategoryBitmask.PLAYER_GUN
-    gun.physicsBody!.collisionBitMask = CategoryBitmask.none
+    gun.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
+    gun.physicsBody!.collisionBitMask = DDBitmask.none
 
     gunJoint.addChild(gun)
     gun.position = CGPoint(x: 4.0, y: 0.0)
@@ -191,14 +190,14 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
   func initMainCircle() {
     mainCircle.name = "\(name ?? "unnamed") main circle"
 
-    let physicsBody = SKPhysicsBody(circleOfRadius: PlayerNode.PLAYER_RADIUS)
+    let physicsBody = SKPhysicsBody(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
 
     physicsBody.isDynamic = true
     physicsBody.affectedByGravity = false
     physicsBody.mass = 14.0
-    physicsBody.categoryBitMask = CategoryBitmask.PLAYER_DROPLET
+    physicsBody.categoryBitMask = DDBitmask.PLAYER_DROPLET
     physicsBody.collisionBitMask =
-      CategoryBitmask.all ^ CategoryBitmask.PLAYER_GUN
+      DDBitmask.all ^ DDBitmask.PLAYER_GUN
 
     mainCircle.physicsBody = physicsBody
 
@@ -222,7 +221,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     }
 
     guard ddScene.moveTouchNode.fingerDown else {
-      return run(SKAction.wait(forDuration: PlayerNode.TICK_FOLLOW)) {
+      return run(SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)) {
         self.followFirstTouch()
       }
     }
@@ -234,12 +233,12 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     let dx = min(
       max(
         diffX * 200,
-        -PlayerNode.MOVEMENT_FORCE_LIMIT),
-      PlayerNode.MOVEMENT_FORCE_LIMIT)
+        -DDPlayerNode.MOVEMENT_FORCE_LIMIT),
+      DDPlayerNode.MOVEMENT_FORCE_LIMIT)
 
     let applyForce = SKAction.applyForce(
       CGVector(dx: dx, dy: 0),
-      duration: PlayerNode.TICK_FOLLOW)
+      duration: DDPlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) {
       self.followFirstTouch()
@@ -254,7 +253,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     guard ddScene.aimTouchNode.fingerDown else {
       let action = SKAction.rotate(
         toAngle: -mainCircle.zRotation,
-        duration: PlayerNode.TICK_AIM,
+        duration: DDPlayerNode.TICK_AIM,
         shortestUnitArc: true)
       return gunJoint.run(action) {
         self.trackAim()
@@ -270,7 +269,7 @@ class PlayerNode: SKEffectNode, SKSceneDelegate, SceneAddable {
     let action = SKAction.rotate(
       // TODO: this angle isn't right
       toAngle: angle - mainCircle.zRotation,
-      duration: PlayerNode.TICK_AIM,
+      duration: DDPlayerNode.TICK_AIM,
       shortestUnitArc: true)
     return gunJoint.run(action) {
       self.trackAim()

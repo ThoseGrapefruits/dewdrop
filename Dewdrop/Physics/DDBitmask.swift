@@ -8,7 +8,7 @@
 import Foundation
 import SceneKit
 
-class CategoryBitmask {
+class DDBitmask {
   static let all: UInt32 =  0b11111111111111111111111111111111
   static let none: UInt32 = 0b00000000000000000000000000000000
 

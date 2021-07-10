@@ -19,7 +19,7 @@ class DDViewController: UIViewController {
     if let sceneNode = DDScene(fileNamed: "DDScene") {
       scene = sceneNode
 
-      let playerNode = PlayerNode()
+      let playerNode = DDPlayerNode()
 
       playerNode.position = CGPoint(x: 0, y: 160)
 

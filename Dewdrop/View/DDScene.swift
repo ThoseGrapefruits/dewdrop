@@ -18,7 +18,7 @@ class DDScene: SKScene {
   var aimTouch: Optional<UITouch> = .none
   var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
 
-  var playerNode: Optional<PlayerNode> = .none
+  var playerNode: Optional<DDPlayerNode> = .none
 
   override func sceneDidLoad() {
     moveTouchNode.name = "Movement touch"

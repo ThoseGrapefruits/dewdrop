@@ -12,10 +12,16 @@ class DDGun : SKShapeNode {
   static let LAUNCH_FORCE: CGFloat = 10.0
 
   var chambered: Optional<DDPlayerDroplet> = .none
+  var chamberedCollisionBitmask: UInt32 = UInt32.zero
 
   func chamberDroplet(_ droplet: DDPlayerDroplet) {
     chambered = droplet
     strokeColor = .white
+
+    if let collisionBM = droplet.physicsBody?.collisionBitMask {
+      chamberedCollisionBitmask = collisionBM
+      droplet.physicsBody?.collisionBitMask = DDBitmask.none
+    }
 
     droplet.removeFromParent()
     addChild(droplet)
@@ -52,6 +58,10 @@ class DDGun : SKShapeNode {
     // Apply launch force
     chambered.physicsBody?.pinned = false
     chambered.physicsBody?.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
+
+    if chamberedCollisionBitmask != UInt32.zero {
+      chambered.physicsBody?.collisionBitMask = chamberedCollisionBitmask
+    }
   }
 
   // MARK: Utilities

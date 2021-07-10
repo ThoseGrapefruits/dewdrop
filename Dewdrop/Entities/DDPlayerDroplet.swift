@@ -9,6 +9,6 @@ import Foundation
 import SpriteKit
 
 class DDPlayerDroplet : SKShapeNode {
-  var shooter: Optional<PlayerNode> = .none
-  var owner: Optional<PlayerNode> = .none
+  var shooter: Optional<DDPlayerNode> = .none
+  var owner: Optional<DDPlayerNode> = .none
 }
