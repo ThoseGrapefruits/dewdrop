@@ -13,6 +13,7 @@ class DDGun : SKShapeNode {
 
   var chambered: Optional<DDPlayerDroplet> = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
+  var chamberedCategoryBitmask: UInt32 = UInt32.zero
 
   override init() {
     super.init()
@@ -29,9 +30,12 @@ class DDGun : SKShapeNode {
     chambered = droplet
     strokeColor = .white
 
-    if let collisionBM = droplet.physicsBody?.collisionBitMask {
-      chamberedCollisionBitmask = collisionBM
-      droplet.physicsBody?.collisionBitMask = DDBitmask.none
+    if let dropletPhysicsBody = droplet.physicsBody {
+      chamberedCategoryBitmask = dropletPhysicsBody.categoryBitMask
+      chamberedCollisionBitmask = dropletPhysicsBody.collisionBitMask
+
+      dropletPhysicsBody.categoryBitMask = DDBitmask.none
+      dropletPhysicsBody.collisionBitMask = DDBitmask.none
     }
 
     droplet.removeFromParent()
@@ -66,12 +70,23 @@ class DDGun : SKShapeNode {
     scene?.addChild(chambered)
     chambered.position = scenePosition
 
-    // Apply launch force
-    chambered.physicsBody?.pinned = false
-    chambered.physicsBody?.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
+    if let chamberedPhysicsBody = chambered.physicsBody {
+      // Reset the physics bitmasks
+      if chamberedCollisionBitmask != UInt32.zero {
+        chamberedPhysicsBody.collisionBitMask = chamberedCollisionBitmask
+      }
 
-    if chamberedCollisionBitmask != UInt32.zero {
-      chambered.physicsBody?.collisionBitMask = chamberedCollisionBitmask
+      if (chamberedCategoryBitmask != UInt32.zero) {
+        chamberedPhysicsBody.categoryBitMask = chamberedCategoryBitmask
+      }
+
+      chamberedCategoryBitmask = UInt32.zero
+      chamberedCollisionBitmask = UInt32.zero
+
+
+      // Apply launch force
+      chamberedPhysicsBody.pinned = false
+      chamberedPhysicsBody.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
     }
   }
 

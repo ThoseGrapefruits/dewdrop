@@ -180,16 +180,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   func initMainCircle() {
     mainCircle.name = "\(name ?? "unnamed") main circle"
 
-    let physicsBody = SKPhysicsBody(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
+    mainCircle.physicsBody = SKPhysicsBody(
+      circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
 
-    physicsBody.isDynamic = true
-    physicsBody.affectedByGravity = false
-    physicsBody.mass = 14.0
-    physicsBody.categoryBitMask = DDBitmask.PLAYER_DROPLET
-    physicsBody.collisionBitMask =
+    mainCircle.physicsBody!.angularDamping = 5
+    mainCircle.physicsBody!.isDynamic = true
+    mainCircle.physicsBody!.affectedByGravity = false
+    mainCircle.physicsBody!.mass = 14.0
+    mainCircle.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+    mainCircle.physicsBody!.collisionBitMask =
       DDBitmask.all ^ DDBitmask.PLAYER_GUN
-
-    mainCircle.physicsBody = physicsBody
 
     addChild(mainCircle)
   }
@@ -201,18 +201,18 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Game loops
 
   func start() {
-    followFirstTouch()
-    trackAim()
+    trackMovementTouch()
+    trackAimTouch()
   }
 
-  func followFirstTouch() {
+  func trackMovementTouch() {
     guard let ddScene = ddScene else {
       return
     }
 
     guard ddScene.moveTouchNode.fingerDown else {
       return run(SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)) {
-        self.followFirstTouch()
+        self.trackMovementTouch()
       }
     }
 
@@ -231,18 +231,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       duration: DDPlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) {
-      self.followFirstTouch()
+      self.trackMovementTouch()
     }
   }
 
-  func trackAim(
-    pid: PIDController = PIDController(kP: 0.5, kI: 0.01, kD: 0.05)
+  func trackAimTouch(
+    pid: PIDController = PIDController(kP: 0.5, kI: 0.02, kD: 0.05)
   ) {
     guard let ddScene = ddScene else {
       return
     }
-
-    let offsetAngle = gunJoint.zRotation + mainCircle.zRotation
 
     let targetAngle: CGFloat = {
       guard ddScene.aimTouchNode.fingerDown else {
@@ -257,8 +255,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return atan2(dY, dX)
     }()
 
+    let currentAngle = mainCircle.zRotation + gunJoint.zRotation
+
     let impulse = pid.step(
-      error: targetAngle - offsetAngle,
+      error: wrap(value: targetAngle - currentAngle, boundary: CGFloat.pi),
       deltaTime: DDPlayerNode.TICK_AIM)
 
     let action = SKAction.applyAngularImpulse(
@@ -266,7 +266,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       duration: DDPlayerNode.TICK_AIM)
 
     return gunJoint.run(action) {
-      self.trackAim(pid: pid)
+      self.trackAimTouch(pid: pid)
     }
   }
 
@@ -302,5 +302,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func getDistance(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
     return sqrt(pow(p2.x - p1.x, 2.0) + pow(p2.y - p2.y, 2.0))
+  }
+
+  func wrap(value: CGFloat, boundary: CGFloat) -> CGFloat {
+    if (value > boundary) {
+      return value - boundary * 2;
+    } else if (value < -boundary) {
+      return value + boundary * 2
+    } else {
+      return value
+    }
   }
 }

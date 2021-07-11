@@ -41,7 +41,7 @@ class PIDController {
 
     self.lastError = errorDouble;
 
-    self.cProportion = self.kProportion * errorDouble
+    self.cProportion = errorDouble
     self.cIntegral += errorDouble * secondsElapsed
 
     self.cDerivative = 0
@@ -50,8 +50,8 @@ class PIDController {
     }
 
     return CGFloat(
-      self.cProportion +
-      (self.kIntegral * self.cIntegral) +
+      (self.kProportion * self.cProportion) +
+      (self.kIntegral   * self.cIntegral) +
       (self.kDerivative * self.cDerivative)
     )
   }
