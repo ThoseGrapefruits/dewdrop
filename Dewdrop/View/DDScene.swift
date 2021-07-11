@@ -7,13 +7,16 @@
 
 import SpriteKit
 import GameplayKit
+import Combine
 
 class DDScene: SKScene {
 
-  static let AIM_OFFSET: CGFloat = 20
+  static let AIM_OFFSET: CGFloat = 20.0
+
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
+  let moveTouchPressureSubject = PassthroughSubject<CGFloat, Never>()
 
   var aimTouch: Optional<UITouch> = .none
   var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
@@ -44,6 +47,7 @@ class DDScene: SKScene {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if let mt = moveTouch, touches.contains(mt) {
       updateMoveTouch()
+      playerNode?.updateTouchForce(mt.force)
     }
 
     if let st = aimTouch, touches.contains(st) {

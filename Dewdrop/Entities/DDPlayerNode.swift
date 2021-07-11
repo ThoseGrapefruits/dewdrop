@@ -12,7 +12,7 @@ import SceneKit
 class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Constants
 
-  static let GUN_SHAPE = [
+  static var GUN_SHAPE = [
     CGPoint(x: 0.0, y:  0.5),
     CGPoint(x: 18.0, y:  2.0),
     CGPoint(x: 25.0, y:  4.0),
@@ -20,8 +20,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     CGPoint(x: 18.0, y: -2.0),
     CGPoint(x: 0.0, y: -0.5),
   ]
-  static let MOVEMENT_FORCE_LIMIT: CGFloat = 8000.0
-  static let PLAYER_RADIUS: CGFloat = 15.0
+
+  static let TOUCH_FORCE_JUMP: CGFloat = 3.5
+  static let MOVEMENT_FORCE_LIMIT: CGFloat = 16000.0
+  static let PLAYER_RADIUS: CGFloat = 12.0
   static let TICK_AIM: TimeInterval = 0.05
   static let TICK_CHARGE_SHOT: TimeInterval = 0.5
   static let TICK_FOLLOW: TimeInterval = 0.1
@@ -76,8 +78,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     initMainCircle()
     initGun()
     initWetChildren()
-
-    start()
   }
 
   // MARK: Helpers
@@ -179,6 +179,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func initMainCircle() {
     mainCircle.name = "\(name ?? "unnamed") main circle"
+    mainCircle.strokeColor = .clear
 
     mainCircle.physicsBody = SKPhysicsBody(
       circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
@@ -222,7 +223,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     let diffX = touchNodePosition.x - mainCirclePosition.x
     let dx = min(
       max(
-        diffX * 200,
+        diffX * 800,
         -DDPlayerNode.MOVEMENT_FORCE_LIMIT),
       DDPlayerNode.MOVEMENT_FORCE_LIMIT)
 
@@ -236,24 +237,21 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func trackAimTouch(
-    pid: PIDController = PIDController(kP: 0.5, kI: 0.02, kD: 0.05)
+    pid: PIDController = PIDController(kP: 1.0, kI: 0.2, kD: 0.05)
   ) {
     guard let ddScene = ddScene else {
       return
     }
 
-    let targetAngle: CGFloat = {
-      guard ddScene.aimTouchNode.fingerDown else {
-        return 0
-      }
-
-      let selfPosition = mainCircle.position
-      let targetPosition = ddScene.aimTouchNode.position
-      let dY = targetPosition.y - selfPosition.y
-      let dX = targetPosition.x - selfPosition.x
-
-      return atan2(dY, dX)
-    }()
+    let targetAngle: CGFloat = ddScene.aimTouchNode.fingerDown
+      ? {
+        let selfPosition = mainCircle.position
+        let targetPosition = ddScene.aimTouchNode.position
+        return atan2(
+          targetPosition.y - selfPosition.y,
+          targetPosition.x - selfPosition.x)
+      }()
+      : 0
 
     let currentAngle = mainCircle.zRotation + gunJoint.zRotation
 
@@ -270,6 +268,28 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
+  // MARK: Jumping
+
+  var jumpsSinceLastGroundTouch: Int = 0
+  var holdJump = false
+
+  func updateTouchForce(_ force: CGFloat) {
+    let cravesJump = force > DDPlayerNode.TOUCH_FORCE_JUMP
+    guard holdJump != cravesJump else {
+      return
+    }
+
+    holdJump = !holdJump
+
+    if cravesJump && jumpsSinceLastGroundTouch < 100000 {
+      jumpsSinceLastGroundTouch += 1
+      mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 800))
+      for wetChild in wetChildren {
+        wetChild.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 600))
+      }
+    }
+  }
+
   // MARK: Combat
 
   func chamberDroplet() {
@@ -279,8 +299,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
           return child;
         }
 
-        let closestDistance = getDistance(gun.position, closestChild.position)
-        let distance =        getDistance(gun.position, child.position)
+        let positionOfGun = gun.getPosition(
+          withinAncestor: mainCircle)
+        let positionOfChild = child.getPosition(
+          withinAncestor: mainCircle)
+        let positionOfClosestChild = closestChild.getPosition(
+          withinAncestor: mainCircle)
+
+        let closestDistance = getDistance(positionOfGun, positionOfClosestChild)
+        let distance =        getDistance(positionOfGun, positionOfChild)
+
         return distance < closestDistance
           ? child
           : closestChild

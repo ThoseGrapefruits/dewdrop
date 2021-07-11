@@ -43,10 +43,10 @@ class DDGun : SKShapeNode {
 
     let prepareRound = SKAction.move(
       to: CGPoint(x: 0.0, y: 0.0),
-      duration: 0.02)
+      duration: 0.05)
     let chamberRound = SKAction.move(
       to: CGPoint(x: 16.0, y: 0.0),
-      duration: 0.08)
+      duration: 0.15)
 
     droplet.run(prepareRound) {
       droplet.run(chamberRound) {
@@ -63,51 +63,31 @@ class DDGun : SKShapeNode {
 
     strokeColor = .green
 
-    let scenePosition = getScenePosition(ofNode: chambered)
+    let scenePosition = chambered.getPositionWithinScene()!
 
     // Reparent to scene but keep scene-relative position
     chambered.removeFromParent()
     scene?.addChild(chambered)
     chambered.position = scenePosition
 
-    if let chamberedPhysicsBody = chambered.physicsBody {
-      // Reset the physics bitmasks
-      if chamberedCollisionBitmask != UInt32.zero {
-        chamberedPhysicsBody.collisionBitMask = chamberedCollisionBitmask
-      }
-
-      if (chamberedCategoryBitmask != UInt32.zero) {
-        chamberedPhysicsBody.categoryBitMask = chamberedCategoryBitmask
-      }
-
-      chamberedCategoryBitmask = UInt32.zero
-      chamberedCollisionBitmask = UInt32.zero
-
-
-      // Apply launch force
-      chamberedPhysicsBody.pinned = false
-      chamberedPhysicsBody.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
-    }
-  }
-
-  // MARK: Utilities
-
-  func getScenePosition(ofNode node: SKNode) -> CGPoint {
-    var child: Optional<SKNode> = node
-    var scenePosition = node.position
-
-    // TODO: this isn't quite right
-    while let c = child, let parent = c.parent, c != scene {
-      scenePosition = CGPoint(
-        x: scenePosition.x
-           + cos(-parent.zRotation) * c.position.x
-           - sin(-parent.zRotation) * c.position.y,
-        y: scenePosition.y
-           + sin(-parent.zRotation) * c.position.x
-           + cos(-parent.zRotation) * c.position.y)
-      child = parent
+    guard let chamberedPhysicsBody = chambered.physicsBody else {
+      return
     }
 
-    return scenePosition
+    // Reset the physics bitmasks
+    if chamberedCollisionBitmask != UInt32.zero {
+      chamberedPhysicsBody.collisionBitMask = chamberedCollisionBitmask
+    }
+
+    if (chamberedCategoryBitmask != UInt32.zero) {
+      chamberedPhysicsBody.categoryBitMask = chamberedCategoryBitmask
+    }
+
+    chamberedCategoryBitmask = UInt32.zero
+    chamberedCollisionBitmask = UInt32.zero
+
+    // Apply launch force
+    chamberedPhysicsBody.pinned = false
+    chamberedPhysicsBody.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
   }
 }

@@ -24,6 +24,7 @@
 		DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192D2693DABB002F5585 /* PIDController.swift */; };
 		DCCD19302693E026002F5585 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
+		DCFE14EA269B4EE200896428 /* AncestralPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* AncestralPosition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,6 +68,7 @@
 		DCCD192D2693DABB002F5585 /* PIDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIDController.swift; sourceTree = "<group>"; };
 		DCCD192F2693E026002F5585 /* DDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDView.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
+		DCFE14E9269B4EE200896428 /* AncestralPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AncestralPosition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -165,6 +167,7 @@
 			children = (
 				DCCD192D2693DABB002F5585 /* PIDController.swift */,
 				DCF9815626983FD400430005 /* DDBitmask.swift */,
+				DCFE14E9269B4EE200896428 /* AncestralPosition.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -316,6 +319,7 @@
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
 				DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
+				DCFE14EA269B4EE200896428 /* AncestralPosition.swift in Sources */,
 				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,

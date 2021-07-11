@@ -32,17 +32,17 @@ class PIDController {
     return step(error: error, currentTime: time)
   }
 
-  func step(error: CGFloat, currentTime: TimeInterval) -> CGFloat {
-    let errorDouble = Double(error);
-    let secondsElapsed = currentTime.distance(to: lastTime ?? currentTime);
+  func step(error errorFloat: CGFloat, currentTime: TimeInterval) -> CGFloat {
+    let error = Double(errorFloat);
+    let secondsElapsed = (lastTime ?? currentTime).distance(to: currentTime);
     self.lastTime = currentTime;
 
-    let errorDerivative = errorDouble - self.lastError;
+    let errorDerivative = error - self.lastError;
 
-    self.lastError = errorDouble;
+    self.lastError = error;
 
-    self.cProportion = errorDouble
-    self.cIntegral += errorDouble * secondsElapsed
+    self.cProportion = error
+    self.cIntegral += error * secondsElapsed
 
     self.cDerivative = 0
     if (secondsElapsed > 0) {
