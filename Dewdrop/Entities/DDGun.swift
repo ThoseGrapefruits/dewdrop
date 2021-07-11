@@ -9,7 +9,7 @@ import Foundation
 import SpriteKit
 
 class DDGun : SKShapeNode {
-  static let LAUNCH_FORCE: CGFloat = 10.0
+  static let LAUNCH_FORCE: CGFloat = 400.0
 
   var chambered: Optional<DDPlayerDroplet> = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
@@ -63,7 +63,7 @@ class DDGun : SKShapeNode {
 
     strokeColor = .green
 
-    let scenePosition = chambered.getPositionWithinScene()!
+    let scenePosition = chambered.getPosition(withinAncestor: scene!)
 
     // Reparent to scene but keep scene-relative position
     chambered.removeFromParent()
@@ -86,8 +86,11 @@ class DDGun : SKShapeNode {
     chamberedCategoryBitmask = UInt32.zero
     chamberedCollisionBitmask = UInt32.zero
 
+    let launchAngle = getRotation(withinAncestor: scene!)
     // Apply launch force
     chamberedPhysicsBody.pinned = false
-    chamberedPhysicsBody.applyForce(CGVector(dx: DDGun.LAUNCH_FORCE, dy: 0))
+    chamberedPhysicsBody.applyImpulse(CGVector(
+      dx: cos(launchAngle) * DDGun.LAUNCH_FORCE,
+      dy: sin(launchAngle) * DDGun.LAUNCH_FORCE))
   }
 }

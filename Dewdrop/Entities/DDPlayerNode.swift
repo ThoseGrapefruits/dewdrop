@@ -47,25 +47,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   var chamberDropletAction: Optional<SKAction> = .none
 
-  // MARK: Accessor overrides
-
-  override var position: CGPoint {
-    get {
-      return mainCircle.position
-    }
-    set {
-      mainCircle.position = newValue
-    }
-  }
-
   // MARK: Initialisation
 
   override init() {
     super.init()
+    name = "DDPlayerNode"
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+    name = "DDPlayerNode"
   }
 
   // MARK: protocol SceneAddable
@@ -74,6 +65,12 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     scene.addChild(self)
     scene.playerNode = self
     ddScene = scene
+
+    physicsBody = SKPhysicsBody()
+
+    physicsBody!.allowsRotation = false
+    physicsBody!.isDynamic = false
+    physicsBody!.pinned = true
 
     initMainCircle()
     initGun()
@@ -87,16 +84,14 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return;
     }
 
-    let physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
+    newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
 
-    physicsBody.isDynamic = true
-    physicsBody.affectedByGravity = true
-    physicsBody.friction = 0.5
-    physicsBody.mass = PD_MASS
-    physicsBody.categoryBitMask = DDBitmask.PLAYER_DROPLET
-    physicsBody.collisionBitMask = DDBitmask.all ^ DDBitmask.PLAYER_GUN
-
-    newChild.physicsBody = physicsBody
+    newChild.physicsBody!.isDynamic = true
+    newChild.physicsBody!.affectedByGravity = true
+    newChild.physicsBody!.friction = 0.5
+    newChild.physicsBody!.mass = PD_MASS
+    newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+    newChild.physicsBody!.collisionBitMask = DDBitmask.all ^ DDBitmask.PLAYER_GUN
 
     addChild(newChild)
 

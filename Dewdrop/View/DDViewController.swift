@@ -21,7 +21,7 @@ class DDViewController: UIViewController {
 
       let playerNode = DDPlayerNode()
 
-      playerNode.position = CGPoint(x: 0, y: 160)
+      playerNode.mainCircle.position = CGPoint(x: 0, y: 160)
 
       playerNode.addToScene(scene: sceneNode)
 

@@ -119,14 +119,13 @@
 		DC04E8E1268F83840040F7A9 /* Dewdrop */ = {
 			isa = PBXGroup;
 			children = (
-				DC2C59DE2699E0ED001F49D9 /* View */,
-				DC2C59DD2699E0E2001F49D9 /* Physics */,
-				DC2C59DC2699E0C6001F49D9 /* Entities */,
 				DC04E8E2268F83840040F7A9 /* AppDelegate.swift */,
 				DC04E8EF268F83880040F7A9 /* Assets.xcassets */,
-				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
+				DC2C59DC2699E0C6001F49D9 /* Entities */,
 				DC04E8F1268F83880040F7A9 /* Info.plist */,
 				DC04E8EC268F83850040F7A9 /* Main.storyboard */,
+				DC2C59DD2699E0E2001F49D9 /* Physics */,
+				DC2C59DE2699E0ED001F49D9 /* View */,
 			);
 			path = Dewdrop;
 			sourceTree = "<group>";
@@ -152,12 +151,12 @@
 		DC2C59DC2699E0C6001F49D9 /* Entities */ = {
 			isa = PBXGroup;
 			children = (
-				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
-				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
 				DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */,
 				DCB9A97D2698F28F00B396CC /* DDGun.swift */,
 				DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */,
 				DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */,
+				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
+				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -165,9 +164,9 @@
 		DC2C59DD2699E0E2001F49D9 /* Physics */ = {
 			isa = PBXGroup;
 			children = (
-				DCCD192D2693DABB002F5585 /* PIDController.swift */,
-				DCF9815626983FD400430005 /* DDBitmask.swift */,
 				DCFE14E9269B4EE200896428 /* AncestralPosition.swift */,
+				DCF9815626983FD400430005 /* DDBitmask.swift */,
+				DCCD192D2693DABB002F5585 /* PIDController.swift */,
 			);
 			path = Physics;
 			sourceTree = "<group>";
@@ -178,6 +177,7 @@
 				DCC29BA1269223ED0023D58E /* DDScene.sks */,
 				DC04E8E8268F83850040F7A9 /* DDScene.swift */,
 				DCCD192F2693E026002F5585 /* DDView.swift */,
+				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";

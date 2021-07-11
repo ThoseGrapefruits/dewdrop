@@ -8,6 +8,14 @@
 import Foundation
 import SpriteKit
 
+
+extension CGFloat {
+    func format(f: String = "3.2") -> String {
+      return String(format: "%\(f)f", self)
+        .padding(toLength: 7, withPad: " ", startingAt: 0)
+    }
+}
+
 extension SKNode {
   func getPosition(withinAncestor ancestor: SKNode) -> CGPoint {
     guard let parent = parent, self != ancestor else {
@@ -15,21 +23,22 @@ extension SKNode {
     }
 
     let parentPosition = parent.getPosition(withinAncestor: ancestor)
+    let parentRotation = parent.getRotation(withinAncestor: ancestor)
 
     return CGPoint(
         x: parentPosition.x
-           + cos(-parent.zRotation) * position.x
-           - sin(-parent.zRotation) * position.y,
+           + cos(parentRotation) * position.x
+           - sin(parentRotation) * position.y,
         y: parentPosition.y
-           + sin(-parent.zRotation) * position.x
-           + cos(-parent.zRotation) * position.y)
+           + sin(parentRotation) * position.x
+           + cos(parentRotation) * position.y)
   }
 
-  func getPositionWithinScene() -> CGPoint? {
-    guard let scene = scene else {
-      return .none
+  func getRotation(withinAncestor ancestor: SKNode) -> CGFloat {
+    guard let parent = parent, self != ancestor else {
+      return CGFloat.zero
     }
 
-    return getPosition(withinAncestor: scene)
+    return zRotation + parent.getRotation(withinAncestor: ancestor)
   }
 }
