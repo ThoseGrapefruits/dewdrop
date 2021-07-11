@@ -232,7 +232,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func trackAimTouch(
-    pid: PIDController = PIDController(kP: 1.0, kI: 0.2, kD: 0.05)
+    pid: PIDController = PIDController(kP: 1.0, kI: 0, kD: 0.05)
   ) {
     guard let ddScene = ddScene else {
       return
@@ -251,7 +251,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     let currentAngle = mainCircle.zRotation + gunJoint.zRotation
 
     let impulse = pid.step(
-      error: wrap(value: targetAngle - currentAngle, boundary: CGFloat.pi),
+      error: (targetAngle - currentAngle).wrap(around: CGFloat.pi),
       deltaTime: DDPlayerNode.TICK_AIM)
 
     let action = SKAction.applyAngularImpulse(
@@ -325,15 +325,5 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func getDistance(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
     return sqrt(pow(p2.x - p1.x, 2.0) + pow(p2.y - p2.y, 2.0))
-  }
-
-  func wrap(value: CGFloat, boundary: CGFloat) -> CGFloat {
-    if (value > boundary) {
-      return value - boundary * 2;
-    } else if (value < -boundary) {
-      return value + boundary * 2
-    } else {
-      return value
-    }
   }
 }
