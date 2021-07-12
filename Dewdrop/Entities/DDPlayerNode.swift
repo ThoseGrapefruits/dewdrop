@@ -21,6 +21,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     CGPoint(x: 0.0, y: -0.5),
   ]
 
+  static let AIM_OFFSET: CGFloat = 20.0
   static let TOUCH_FORCE_JUMP: CGFloat = 3.5
   static let MOVEMENT_FORCE_LIMIT: CGFloat = 16000.0
   static let PLAYER_RADIUS: CGFloat = 12.0
@@ -86,12 +87,14 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
 
+    newChild.physicsBody!.linearDamping = 3
     newChild.physicsBody!.isDynamic = true
     newChild.physicsBody!.affectedByGravity = true
     newChild.physicsBody!.friction = 0.5
     newChild.physicsBody!.mass = PD_MASS
     newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
     newChild.physicsBody!.collisionBitMask = DDBitmask.all ^ DDBitmask.PLAYER_GUN
+    newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
 
     addChild(newChild)
 
@@ -240,8 +243,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     let targetAngle: CGFloat = ddScene.aimTouchNode.fingerDown
       ? {
-        let selfPosition = mainCircle.position
-        let targetPosition = ddScene.aimTouchNode.position
+        let selfPosition =
+          mainCircle.position
+        let targetPosition = CGPoint(
+          x: ddScene.aimTouchNode.position.x,
+          y: ddScene.aimTouchNode.position.y + DDPlayerNode.AIM_OFFSET)
         return atan2(
           targetPosition.y - selfPosition.y,
           targetPosition.x - selfPosition.x)
@@ -266,17 +272,31 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Jumping
 
   var jumpsSinceLastGroundTouch: Int = 0
-  var holdJump = false
+  var holdingJump = false
 
   func updateTouchForce(_ force: CGFloat) {
     let cravesJump = force > DDPlayerNode.TOUCH_FORCE_JUMP
-    guard holdJump != cravesJump else {
+    guard holdingJump != cravesJump else {
       return
     }
 
-    holdJump = !holdJump
+    holdingJump = !holdingJump
 
-    if cravesJump && jumpsSinceLastGroundTouch < 100000 {
+    guard cravesJump else {
+      return
+    }
+
+    let touchingGround = wetChildren
+      .compactMap { wetChild in wetChild.physicsBody }
+      .flatMap { wetBody in wetBody.allContactedBodies() }
+      .map { wetContact in wetContact.categoryBitMask }
+      .contains(DDBitmask.GROUND)
+
+    if touchingGround {
+      jumpsSinceLastGroundTouch = 0
+    }
+
+    if jumpsSinceLastGroundTouch < 2 {
       jumpsSinceLastGroundTouch += 1
       mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 800))
       for wetChild in wetChildren {

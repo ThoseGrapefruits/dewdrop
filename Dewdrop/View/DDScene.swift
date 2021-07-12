@@ -11,8 +11,6 @@ import Combine
 
 class DDScene: SKScene {
 
-  static let AIM_OFFSET: CGFloat = 20.0
-
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
@@ -24,6 +22,9 @@ class DDScene: SKScene {
   var playerNode: Optional<DDPlayerNode> = .none
 
   override func sceneDidLoad() {
+    aimTouchNode.name = "Aim touch"
+    addChild(aimTouchNode)
+
     moveTouchNode.name = "Movement touch"
     addChild(moveTouchNode)
   }
@@ -48,6 +49,8 @@ class DDScene: SKScene {
     if let mt = moveTouch, touches.contains(mt) {
       updateMoveTouch()
       playerNode?.updateTouchForce(mt.force)
+      moveTouchNode.touchPosition.strokeColor =
+        mt.force > DDPlayerNode.TOUCH_FORCE_JUMP ? .red : .cyan
     }
 
     if let st = aimTouch, touches.contains(st) {
@@ -90,9 +93,10 @@ class DDScene: SKScene {
         y: touchPosition.y)
     } else {
       moveTouchNode.fingerDown = false
-      if let camera = camera {
+      if let playerNode = playerNode {
         moveTouchNode.position = CGPoint(
-          x: camera.position.x, y: camera.position.y)
+          x: playerNode.mainCircle.position.x,
+          y: playerNode.mainCircle.position.y)
       }
     }
   }
@@ -102,7 +106,7 @@ class DDScene: SKScene {
       let touchPosition = st.location(in: self)
       aimTouchNode.position = CGPoint(
         x: touchPosition.x,
-        y: touchPosition.y + DDScene.AIM_OFFSET)
+        y: touchPosition.y)
       aimTouchNode.fingerDown = true
     } else {
       aimTouchNode.fingerDown = false
