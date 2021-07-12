@@ -40,8 +40,8 @@ class DDCameraNode : SKCameraNode {
       return
     }
 
-    let cameraScenePosition = self.getPosition(withinAncestor: scene)
-    let nodeScenePosition =   node.getPosition(withinAncestor: scene)
+    let cameraScenePosition = self.getPosition(within: scene)
+    let nodeScenePosition =   node.getPosition(within: scene)
     let errorX = nodeScenePosition.x - cameraScenePosition.x
     let errorY = nodeScenePosition.y - cameraScenePosition.y
 

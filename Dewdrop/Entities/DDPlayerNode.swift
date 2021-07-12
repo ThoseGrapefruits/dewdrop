@@ -295,11 +295,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         }
 
         let positionOfGun = gun.getPosition(
-          withinAncestor: mainCircle)
+          within: mainCircle)
         let positionOfChild = child.getPosition(
-          withinAncestor: mainCircle)
+          within: mainCircle)
         let positionOfClosestChild = closestChild.getPosition(
-          withinAncestor: mainCircle)
+          within: mainCircle)
 
         let closestDistance = getDistance(positionOfGun, positionOfClosestChild)
         let distance =        getDistance(positionOfGun, positionOfChild)

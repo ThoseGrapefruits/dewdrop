@@ -63,7 +63,7 @@ class DDGun : SKShapeNode {
 
     strokeColor = .green
 
-    let scenePosition = chambered.getPosition(withinAncestor: scene!)
+    let scenePosition = chambered.getPosition(within: scene!)
 
     // Reparent to scene but keep scene-relative position
     chambered.removeFromParent()
@@ -86,7 +86,7 @@ class DDGun : SKShapeNode {
     chamberedCategoryBitmask = UInt32.zero
     chamberedCollisionBitmask = UInt32.zero
 
-    let launchAngle = getRotation(withinAncestor: scene!)
+    let launchAngle = getRotation(within: scene!)
     // Apply launch force
     chamberedPhysicsBody.pinned = false
     chamberedPhysicsBody.applyImpulse(CGVector(

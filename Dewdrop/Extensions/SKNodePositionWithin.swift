@@ -9,20 +9,20 @@ import Foundation
 import SpriteKit
 
 extension SKNode {
-  func getPosition(withinAncestor ancestor: SKNode) -> CGPoint {
-    let (position, _) = getPositionAndRotation(withinAncestor: ancestor)
+  func getPosition(within ancestor: SKNode) -> CGPoint {
+    let (position, _) = getPositionAndRotation(within: ancestor)
 
     return position
   }
 
-  func getPositionAndRotation(withinAncestor ancestor: SKNode)
+  func getPositionAndRotation(within ancestor: SKNode)
   -> (CGPoint, CGFloat) {
     guard let parent = parent, self != ancestor else {
       return (CGPoint(x: CGFloat.zero, y: CGFloat.zero), CGFloat.zero)
     }
 
     let (parentPosition, parentRotation) = parent.getPositionAndRotation(
-      withinAncestor: ancestor)
+      within: ancestor)
 
     let position = CGPoint(
         x: parentPosition.x
@@ -37,8 +37,8 @@ extension SKNode {
     return (position, rotation)
   }
 
-  func getRotation(withinAncestor ancestor: SKNode) -> CGFloat {
-    let (_, rotation) = getPositionAndRotation(withinAncestor: ancestor)
+  func getRotation(within ancestor: SKNode) -> CGFloat {
+    let (_, rotation) = getPositionAndRotation(within: ancestor)
 
     return rotation;
   }
