@@ -41,19 +41,8 @@ class DDGun : SKShapeNode {
     droplet.removeFromParent()
     addChild(droplet)
 
-    let prepareRound = SKAction.move(
-      to: CGPoint(x: 0.0, y: 0.0),
-      duration: 0.05)
-    let chamberRound = SKAction.move(
-      to: CGPoint(x: 16.0, y: 0.0),
-      duration: 0.15)
-
-    droplet.run(prepareRound) {
-      droplet.run(chamberRound) {
-        droplet.physicsBody?.pinned = true
-        droplet.position = CGPoint(x: 24.0, y: 0.0)
-      }
-    }
+    droplet.physicsBody?.pinned = true
+    droplet.position = CGPoint(x: 24.0, y: 0.0)
   }
 
   func fireDroplet() {
