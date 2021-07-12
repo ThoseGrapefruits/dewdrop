@@ -11,25 +11,31 @@ import GameplayKit
 
 class DDViewController: UIViewController {
 
+  static let START_POSITION = CGPoint(x: 0, y: 160)
+
   var scene: Optional<DDScene> = .none
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
     if let sceneNode = DDScene(fileNamed: "DDScene") {
-      scene = sceneNode
-
       let playerNode = DDPlayerNode()
-
-      playerNode.mainCircle.position = CGPoint(x: 0, y: 160)
-
+      playerNode.mainCircle.position = DDViewController.START_POSITION
       playerNode.addToScene(scene: sceneNode)
+
+      let cameraNode = DDCameraNode()
+      sceneNode.addChild(cameraNode)
+      cameraNode.position = DDViewController.START_POSITION
+      sceneNode.camera = cameraNode
+
+      scene = sceneNode
 
       // Present the scene
       if let view = self.view as! SKView? {
         view.presentScene(sceneNode)
 
         playerNode.start()
+        cameraNode.track(playerNode.mainCircle)
 
         view.ignoresSiblingOrder = true
 

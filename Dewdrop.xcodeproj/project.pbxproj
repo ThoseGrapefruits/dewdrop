@@ -15,6 +15,7 @@
 		DC04E8FB268F83890040F7A9 /* DewdropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8FA268F83890040F7A9 /* DewdropTests.swift */; };
 		DC04E906268F83890040F7A9 /* DewdropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E905268F83890040F7A9 /* DewdropUITests.swift */; };
 		DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
+		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
 		DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
 		DC82AC94269B9AC60076CB92 /* CGFloatWrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82AC93269B9AC60076CB92 /* CGFloatWrap.swift */; };
 		DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
@@ -60,6 +61,7 @@
 		DC04E905268F83890040F7A9 /* DewdropUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropUITests.swift; sourceTree = "<group>"; };
 		DC04E907268F83890040F7A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAimTouchNode.swift; sourceTree = "<group>"; };
+		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
 		DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDMoveTouchNode.swift; sourceTree = "<group>"; };
 		DC82AC93269B9AC60076CB92 /* CGFloatWrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloatWrap.swift; sourceTree = "<group>"; };
 		DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerDroplet.swift; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 		DC2C59DE2699E0ED001F49D9 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				DC572302269C81D00027E6DB /* DDCameraNode.swift */,
 				DCC29BA1269223ED0023D58E /* DDScene.sks */,
 				DC04E8E8268F83850040F7A9 /* DDScene.swift */,
 				DCCD192F2693E026002F5585 /* DDView.swift */,
@@ -335,6 +338,7 @@
 				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,
+				DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */,
 				DCF9815726983FD400430005 /* DDBitmask.swift in Sources */,
 				DC04E8E3268F83840040F7A9 /* AppDelegate.swift in Sources */,
 			);
