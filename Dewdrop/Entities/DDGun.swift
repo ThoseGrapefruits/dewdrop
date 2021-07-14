@@ -56,6 +56,8 @@ class DDGun : SKShapeNode {
 
     // Reparent to scene but keep scene-relative position
     chambered.removeFromParent()
+    chambered.lastOwner = chambered.owner
+    chambered.owner = nil
     scene?.addChild(chambered)
     chambered.position = scenePosition
 

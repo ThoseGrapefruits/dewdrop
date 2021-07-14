@@ -9,7 +9,7 @@ import SpriteKit
 import GameplayKit
 import Combine
 
-class DDScene: SKScene {
+class DDScene: SKScene, SKPhysicsContactDelegate {
 
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
@@ -27,6 +27,8 @@ class DDScene: SKScene {
 
     moveTouchNode.name = "Movement touch"
     addChild(moveTouchNode)
+
+    physicsWorld.contactDelegate = self
   }
 
   // MARK: Touch handling
@@ -80,6 +82,28 @@ class DDScene: SKScene {
       aimTouch = .none
       updateAimTouch()
     }
+  }
+
+  // MARK: SKPhysicsContactDelegate
+
+  func didBegin(_ contact: SKPhysicsContact) {
+    guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
+          let dropletB = contact.bodyB.node as? DDPlayerDroplet
+    else {
+      print("no contact")
+      return
+    }
+
+    guard (dropletA.owner == nil) != (dropletB.owner == nil),
+          let newOwner = dropletA.owner ?? dropletB.owner
+    else {
+      return
+    }
+
+    let ownerless = dropletA.owner == nil ? dropletA : dropletB
+
+    ownerless.removeFromParent()
+    newOwner.baptiseWetChild(newChild: ownerless, resetPosition: true)
   }
 
   // MARK: Helpers

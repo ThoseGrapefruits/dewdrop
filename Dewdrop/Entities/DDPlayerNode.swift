@@ -80,21 +80,36 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   // MARK: Helpers
 
-  func baptiseWetChild(newChild: DDPlayerDroplet) {
+  func baptiseWetChild(newChild: DDPlayerDroplet, resetPosition: Bool = false) {
     if wetChildren.contains(newChild) {
       return;
     }
 
-    newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
+    newChild.owner = self
 
-    newChild.physicsBody!.linearDamping = 3
-    newChild.physicsBody!.isDynamic = true
-    newChild.physicsBody!.affectedByGravity = true
-    newChild.physicsBody!.friction = 0.5
-    newChild.physicsBody!.mass = PD_MASS
-    newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
-    newChild.physicsBody!.collisionBitMask = DDBitmask.all ^ DDBitmask.PLAYER_GUN
-    newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
+    if newChild.physicsBody == nil {
+      newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
+
+      newChild.physicsBody!.linearDamping = 3
+      newChild.physicsBody!.isDynamic = true
+      newChild.physicsBody!.affectedByGravity = true
+      newChild.physicsBody!.friction = 0.5
+      newChild.physicsBody!.mass = PD_MASS
+      newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+      newChild.physicsBody!.collisionBitMask =
+        DDBitmask.all ^ DDBitmask.PLAYER_GUN
+      newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
+    }
+
+    if resetPosition {
+      // TODO: this should be using the incoming node's current angle
+      // relative to the mainCircle, but that will take some repositioning
+      // before reparenting.
+      let angle = CGFloat.random(in: -CGFloat.pi...CGFloat.pi)
+      newChild.position = CGPoint(
+        x: mainCircle.position.x + cos(angle) * DDPlayerNode.PLAYER_RADIUS,
+        y: mainCircle.position.y + sin(angle) * DDPlayerNode.PLAYER_RADIUS)
+    }
 
     addChild(newChild)
 
@@ -248,9 +263,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         let targetPosition = CGPoint(
           x: ddScene.aimTouchNode.position.x,
           y: ddScene.aimTouchNode.position.y + DDPlayerNode.AIM_OFFSET)
-        return atan2(
-          targetPosition.y - selfPosition.y,
-          targetPosition.x - selfPosition.x)
+        return selfPosition.angle(to: targetPosition)
       }()
       : 0
 
