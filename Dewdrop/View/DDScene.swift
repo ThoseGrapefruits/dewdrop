@@ -90,7 +90,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
     guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
           let dropletB = contact.bodyB.node as? DDPlayerDroplet
     else {
-      print("no contact")
       return
     }
 
@@ -102,8 +101,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
 
     let ownerless = dropletA.owner == nil ? dropletA : dropletB
 
-    ownerless.removeFromParent()
-    newOwner.baptiseWetChild(newChild: ownerless, resetPosition: true)
+    newOwner.baptiseWetChild(newChild: ownerless)
   }
 
   // MARK: Helpers

@@ -78,71 +78,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     initWetChildren()
   }
 
-  // MARK: Helpers
-
-  func baptiseWetChild(newChild: DDPlayerDroplet, resetPosition: Bool = false) {
-    if wetChildren.contains(newChild) {
-      return;
-    }
-
-    newChild.owner = self
-
-    if newChild.physicsBody == nil {
-      newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
-
-      newChild.physicsBody!.linearDamping = 3
-      newChild.physicsBody!.isDynamic = true
-      newChild.physicsBody!.affectedByGravity = true
-      newChild.physicsBody!.friction = 0.5
-      newChild.physicsBody!.mass = PD_MASS
-      newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
-      newChild.physicsBody!.collisionBitMask =
-        DDBitmask.all ^ DDBitmask.PLAYER_GUN
-      newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
-    }
-
-    if resetPosition {
-      // TODO: this should be using the incoming node's current angle
-      // relative to the mainCircle, but that will take some repositioning
-      // before reparenting.
-      let angle = CGFloat.random(in: -CGFloat.pi...CGFloat.pi)
-      newChild.position = CGPoint(
-        x: mainCircle.position.x + cos(angle) * DDPlayerNode.PLAYER_RADIUS,
-        y: mainCircle.position.y + sin(angle) * DDPlayerNode.PLAYER_RADIUS)
-    }
-
-    addChild(newChild)
-
-    let joint = SKPhysicsJointSpring.joint(
-      withBodyA: mainCircle.physicsBody!,
-      bodyB: newChild.physicsBody!,
-      anchorA: mainCircle.position,
-      anchorB: newChild.position)
-
-    joint.damping = 1.5
-    joint.frequency = 4.0
-
-    scene!.physicsWorld.add(joint)
-
-    wetChildren.insert(newChild)
-  }
-
-  func banishWetChild(wetChild: DDPlayerDroplet) {
-    if wetChildren.remove(wetChild) != nil {
-      if let jointsForWetChild = joints.removeValue(forKey: wetChild) {
-        for joint in jointsForWetChild {
-          let otherNode = joint.bodyA.node == self
-            ? joint.bodyB.node!
-            : joint.bodyA.node!
-
-          joints[otherNode]?.remove(joint)
-
-          scene!.physicsWorld.remove(joint)
-        }
-      }
-    }
-  }
-
   func initWetChildren() {
     for i in 0..<PD_COUNT_INIT {
       let wetChild = DDPlayerDroplet(circleOfRadius: PD_RADIUS)
@@ -186,7 +121,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gun.physicsBody!.mass = GUN_MASS
 
     gunJoint.addChild(gun)
-    gun.position = CGPoint(x: 4.0, y: 0.0)
     mainCircle.addChild(gunJoint)
   }
 
@@ -208,8 +142,96 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     addChild(mainCircle)
   }
 
-  func distance(_ p: CGPoint, _ q: CGPoint) -> CGFloat {
-    return sqrt(pow(q.x - p.x, 2) + pow(q.y - p.y, 2))
+
+
+  // MARK: Helpers
+
+  func baptiseWetChild(newChild: DDPlayerDroplet, resetPosition: Bool = false) {
+    if wetChildren.contains(newChild) {
+      return;
+    }
+
+    newChild.owner = self
+
+    if newChild.physicsBody == nil {
+      newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
+
+      newChild.physicsBody!.linearDamping = 3
+      newChild.physicsBody!.isDynamic = true
+      newChild.physicsBody!.affectedByGravity = true
+      newChild.physicsBody!.friction = 0.5
+      newChild.physicsBody!.mass = PD_MASS
+      newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+      newChild.physicsBody!.collisionBitMask =
+        DDBitmask.all ^ DDBitmask.PLAYER_GUN
+      newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
+    }
+
+    if newChild.parent != nil {
+      let childPosition = newChild.getPosition(within: scene!)
+      let mainCirclePosition = mainCircle.getPosition(within: scene!)
+      let angle = mainCirclePosition.angle(to: childPosition)
+
+      newChild.removeFromParent()
+
+      addChild(newChild)
+
+      // Fake initial position to set the joint in the right place
+      newChild.position = CGPoint(
+        x: mainCircle.position.x + cos(angle) * DDPlayerNode.PLAYER_RADIUS,
+        y: mainCircle.position.y + sin(angle) * DDPlayerNode.PLAYER_RADIUS)
+
+      linkArms(wetChild: newChild)
+
+      // Previous position, so it can be pulled in by the joint. We assume that
+      // the actual DDPlayerNode is still at (0,0) [invariant]
+      newChild.position = childPosition
+    } else {
+      addChild(newChild)
+      linkArms(wetChild: newChild)
+    }
+
+    wetChildren.insert(newChild)
+    updateGunPosition()
+  }
+
+  func banishWetChild(wetChild: DDPlayerDroplet) {
+    guard wetChildren.remove(wetChild) != nil else {
+      return
+    }
+
+    updateGunPosition()
+
+    guard let jointsForWetChild = joints.removeValue(forKey: wetChild) else {
+      return
+    }
+
+    for joint in jointsForWetChild {
+      let otherNode = joint.bodyA.node == self
+      ? joint.bodyB.node!
+      : joint.bodyA.node!
+
+      joints[otherNode]?.remove(joint)
+
+      scene!.physicsWorld.remove(joint)
+    }
+  }
+
+  func linkArms(wetChild: DDPlayerDroplet) {
+    let joint = SKPhysicsJointSpring.joint(
+      withBodyA: mainCircle.physicsBody!,
+      bodyB: wetChild.physicsBody!,
+      anchorA: mainCircle.position,
+      anchorB: wetChild.position)
+
+    joint.damping = 1.5
+    joint.frequency = 4.0
+
+    scene!.physicsWorld.add(joint)
+  }
+
+  func updateGunPosition() {
+    gun.position = CGPoint(x: CGFloat(wetChildren.count) / 2.0, y: 0)
   }
 
   // MARK: Game loops
@@ -327,6 +349,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
           return child;
         }
 
+        // TODO make this account for radial distance
         let positionOfGun = gun.getPosition(
           within: mainCircle)
         let positionOfChild = child.getPosition(
@@ -334,8 +357,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         let positionOfClosestChild = closestChild.getPosition(
           within: mainCircle)
 
-        let closestDistance = getDistance(positionOfGun, positionOfClosestChild)
-        let distance =        getDistance(positionOfGun, positionOfChild)
+        let closestDistance = positionOfGun.distance(to: positionOfClosestChild)
+        let distance =        positionOfGun.distance(to: positionOfChild)
 
         return distance < closestDistance
           ? child
@@ -352,11 +375,5 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func fireDroplet() {
     gun.fireDroplet()
-  }
-
-  // MARK: Utility
-
-  func getDistance(_ p1: CGPoint, _ p2: CGPoint) -> CGFloat {
-    return sqrt(pow(p2.x - p1.x, 2.0) + pow(p2.y - p2.y, 2.0))
   }
 }

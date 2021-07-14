@@ -14,4 +14,8 @@ extension CGPoint {
       to.y - self.y,
       to.x - self.x)
   }
+
+  func distance(to: CGPoint) -> CGFloat {
+    return sqrt(pow(to.x - x, 2) + pow(to.y - y, 2))
+  }
 }
