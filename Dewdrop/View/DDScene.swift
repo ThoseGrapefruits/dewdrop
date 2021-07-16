@@ -22,6 +22,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
   var playerNode: Optional<DDPlayerNode> = .none
 
   override func sceneDidLoad() {
+    vivifyBouncyLeaves()
+
     aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
 
@@ -29,6 +31,38 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
     addChild(moveTouchNode)
 
     physicsWorld.contactDelegate = self
+  }
+
+  func vivifyBouncyLeaves() {
+    let leafAnchors = children
+      .filter { child in child.userData?["isLeafAnchor"] as? Bool ?? false }
+
+    for leafAnchor in leafAnchors {
+      let leaf = leafAnchor.children.first!
+
+      leaf.physicsBody!.categoryBitMask = DDBitmask.ground
+      leaf.physicsBody!.collisionBitMask = DDBitmask.all
+
+      let springJoint = SKPhysicsJointSpring.joint(
+        withBodyA: leaf.physicsBody!,
+        bodyB: scene!.physicsBody!,
+        anchorA: leaf.position,
+        anchorB: CGPoint(x: leaf.position.x, y: leaf.position.y + 80))
+
+      let strengthFactor = abs(leaf.position.x) * leaf.physicsBody!.mass;
+
+      print("sf", strengthFactor)
+      springJoint.damping = strengthFactor / 20000
+      springJoint.frequency = strengthFactor / 2000
+
+      let pinJoint = SKPhysicsJointPin.joint(
+        withBodyA: leaf.physicsBody!,
+        bodyB: scene!.physicsBody!,
+        anchor: leafAnchor.position)
+
+      scene!.physicsWorld.add(pinJoint)
+      scene!.physicsWorld.add(springJoint)
+    }
   }
 
   // MARK: Touch handling
