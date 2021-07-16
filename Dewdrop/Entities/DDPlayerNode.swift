@@ -43,7 +43,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   let gun = DDGun(
     points: &GUN_SHAPE,
     count: DDPlayerNode.GUN_SHAPE.count)
-  let gunJoint = SKNode()
+  let gunAnchor = SKNode()
   var wetChildren = Set<DDPlayerDroplet>()
 
   var chamberDropletAction: Optional<SKAction> = .none
@@ -98,15 +98,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func initGun() {
-    gunJoint.name = "\(name ?? "unnamed") gun joint"
+    gunAnchor.name = "\(name ?? "unnamed") gun joint"
 
-    gunJoint.physicsBody = SKPhysicsBody(circleOfRadius: 10)
+    gunAnchor.physicsBody = SKPhysicsBody(circleOfRadius: 10)
 
-    gunJoint.physicsBody!.angularDamping = 200
-    gunJoint.physicsBody!.pinned = true
-    gunJoint.physicsBody!.mass = 4
-    gunJoint.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
-    gunJoint.physicsBody!.collisionBitMask = DDBitmask.none
+    gunAnchor.physicsBody!.angularDamping = 200
+    gunAnchor.physicsBody!.pinned = true
+    gunAnchor.physicsBody!.mass = 4
+    gunAnchor.physicsBody!.categoryBitMask = DDBitmask.playerGun
+    gunAnchor.physicsBody!.collisionBitMask = DDBitmask.none
 
     gun.name = "\(name ?? "unnamed") gun"
 
@@ -116,12 +116,12 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
-    gun.physicsBody!.categoryBitMask = DDBitmask.PLAYER_GUN
+    gun.physicsBody!.categoryBitMask = DDBitmask.playerGun
     gun.physicsBody!.collisionBitMask = DDBitmask.none
     gun.physicsBody!.mass = GUN_MASS
 
-    gunJoint.addChild(gun)
-    mainCircle.addChild(gunJoint)
+    gunAnchor.addChild(gun)
+    mainCircle.addChild(gunAnchor)
   }
 
   func initMainCircle() {
@@ -135,9 +135,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.isDynamic = true
     mainCircle.physicsBody!.affectedByGravity = false
     mainCircle.physicsBody!.mass = 14.0
-    mainCircle.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+    mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
     mainCircle.physicsBody!.collisionBitMask =
-      DDBitmask.all ^ DDBitmask.PLAYER_GUN
+      DDBitmask.all ^ DDBitmask.playerGun
 
     addChild(mainCircle)
   }
@@ -161,10 +161,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       newChild.physicsBody!.affectedByGravity = true
       newChild.physicsBody!.friction = 0.5
       newChild.physicsBody!.mass = PD_MASS
-      newChild.physicsBody!.categoryBitMask = DDBitmask.PLAYER_DROPLET
+      newChild.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
       newChild.physicsBody!.collisionBitMask =
-        DDBitmask.all ^ DDBitmask.PLAYER_GUN
-      newChild.physicsBody!.contactTestBitMask = DDBitmask.PLAYER_DROPLET
+        DDBitmask.all ^ DDBitmask.playerGun
+      newChild.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet
     }
 
     if newChild.parent != nil {
@@ -286,7 +286,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       }()
       : 0
 
-    let currentAngle = mainCircle.zRotation + gunJoint.zRotation
+    let currentAngle = mainCircle.zRotation + gunAnchor.zRotation
 
     let impulse = pid.step(
       error: (targetAngle - currentAngle).wrap(around: CGFloat.pi),
@@ -296,7 +296,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       impulse,
       duration: DDPlayerNode.TICK_AIM)
 
-    return gunJoint.run(action) {
+    return gunAnchor.run(action) {
       self.trackAimTouch(pid: pid)
     }
   }
@@ -318,22 +318,37 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
 
-    let touchingGround = wetChildren
+    let groundContacts = wetChildren
       .compactMap { wetChild in wetChild.physicsBody }
       .flatMap { wetBody in wetBody.allContactedBodies() }
-      .map { wetContact in wetContact.categoryBitMask }
-      .contains(DDBitmask.GROUND)
+      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground }
+      .reduce(into: [SKPhysicsBody: Int]()) { counts, groundBody in
+        counts[groundBody] = (counts[groundBody] ?? 0) + 1
+      }
 
-    if touchingGround {
+    if groundContacts.count != 0 {
       jumpsSinceLastGroundTouch = 0
+
+      let totalContact =
+        groundContacts.values.reduce(0) { sum, count in sum + count }
+      let positionInScene = mainCircle.getPosition(within: scene!)
+
+      for (body, contactCount) in groundContacts {
+        let fractionOfTotal = contactCount / totalContact
+        body.applyImpulse(
+          CGVector(dx: 0, dy: 1600 * fractionOfTotal),
+          at: positionInScene)
+      }
     }
 
-    if jumpsSinceLastGroundTouch < 2 {
-      jumpsSinceLastGroundTouch += 1
-      mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 800))
-      for wetChild in wetChildren {
-        wetChild.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 600))
-      }
+    guard jumpsSinceLastGroundTouch < 2 else {
+      return
+    }
+
+    jumpsSinceLastGroundTouch += 1
+    mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 800))
+    for wetChild in wetChildren {
+      wetChild.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 600))
     }
   }
 
