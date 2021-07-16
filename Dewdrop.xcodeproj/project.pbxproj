@@ -18,7 +18,7 @@
 		DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
 		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
 		DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
-		DC82AC94269B9AC60076CB92 /* CGFloatWrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82AC93269B9AC60076CB92 /* CGFloatWrap.swift */; };
+		DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82AC93269B9AC60076CB92 /* CGFloat.swift */; };
 		DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
 		DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
 		DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29B98269206720023D58E /* DDPlayerNode.swift */; };
@@ -27,7 +27,7 @@
 		DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192D2693DABB002F5585 /* PIDController.swift */; };
 		DCCD19302693E026002F5585 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
-		DCFE14EA269B4EE200896428 /* SKNodePositionWithin.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNodePositionWithin.swift */; };
+		DCFE14EA269B4EE200896428 /* SKNodeGetPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,7 +65,7 @@
 		DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAimTouchNode.swift; sourceTree = "<group>"; };
 		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
 		DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDMoveTouchNode.swift; sourceTree = "<group>"; };
-		DC82AC93269B9AC60076CB92 /* CGFloatWrap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloatWrap.swift; sourceTree = "<group>"; };
+		DC82AC93269B9AC60076CB92 /* CGFloat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloat.swift; sourceTree = "<group>"; };
 		DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerDroplet.swift; sourceTree = "<group>"; };
 		DCB9A97D2698F28F00B396CC /* DDGun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDGun.swift; sourceTree = "<group>"; };
 		DCC29B98269206720023D58E /* DDPlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerNode.swift; sourceTree = "<group>"; };
@@ -74,7 +74,7 @@
 		DCCD192D2693DABB002F5585 /* PIDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIDController.swift; sourceTree = "<group>"; };
 		DCCD192F2693E026002F5585 /* DDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDView.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
-		DCFE14E9269B4EE200896428 /* SKNodePositionWithin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodePositionWithin.swift; sourceTree = "<group>"; };
+		DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeGetPosition.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,8 +192,8 @@
 		DC82AC92269B9A890076CB92 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				DCFE14E9269B4EE200896428 /* SKNodePositionWithin.swift */,
-				DC82AC93269B9AC60076CB92 /* CGFloatWrap.swift */,
+				DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */,
+				DC82AC93269B9AC60076CB92 /* CGFloat.swift */,
 				DC018D1C269EA7260087A835 /* CGPoint.swift */,
 			);
 			path = Extensions;
@@ -331,14 +331,14 @@
 			files = (
 				DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */,
 				DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */,
-				DC82AC94269B9AC60076CB92 /* CGFloatWrap.swift in Sources */,
+				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,
 				DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */,
 				DCC29BA4269226690023D58E /* DDSceneAddable.swift in Sources */,
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
 				DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,
-				DCFE14EA269B4EE200896428 /* SKNodePositionWithin.swift in Sources */,
+				DCFE14EA269B4EE200896428 /* SKNodeGetPosition.swift in Sources */,
 				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,

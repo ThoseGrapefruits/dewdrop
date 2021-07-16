@@ -23,7 +23,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   static let AIM_OFFSET: CGFloat = 20.0
   static let TOUCH_FORCE_JUMP: CGFloat = 3.5
-  static let MOVEMENT_FORCE_LIMIT: CGFloat = 16000.0
+  static let MOVEMENT_FORCE_LIMIT: CGVector = CGVector(dx: 16000.0, dy: 4000.0)
   static let PLAYER_RADIUS: CGFloat = 12.0
   static let TICK_AIM: TimeInterval = 0.05
   static let TICK_CHARGE_SHOT: TimeInterval = 0.5
@@ -41,7 +41,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   let mainCircle = SKShapeNode(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
   let gun = DDGun(
-    points: UnsafeMutablePointer(mutating: DDPlayerNode.GUN_SHAPE),
+    points: &GUN_SHAPE,
     count: DDPlayerNode.GUN_SHAPE.count)
   let gunJoint = SKNode()
   var wetChildren = Set<DDPlayerDroplet>()
@@ -52,12 +52,12 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   override init() {
     super.init()
-    name = "DDPlayerNode"
+    name = "Player"
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
-    name = "DDPlayerNode"
+    name = "Player"
   }
 
   // MARK: protocol SceneAddable
@@ -151,7 +151,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return;
     }
 
-    newChild.owner = self
+    newChild.onCatch(by: self)
 
     if newChild.physicsBody == nil {
       newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
@@ -256,14 +256,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     let touchNodePosition = ddScene.moveTouchNode.position
 
     let diffX = touchNodePosition.x - mainCirclePosition.x
-    let dx = min(
-      max(
-        diffX * 800,
-        -DDPlayerNode.MOVEMENT_FORCE_LIMIT),
-      DDPlayerNode.MOVEMENT_FORCE_LIMIT)
-
+    let diffY = touchNodePosition.y - mainCirclePosition.y
     let applyForce = SKAction.applyForce(
-      CGVector(dx: dx, dy: 0),
+      CGVector(
+        dx: (diffX * 800).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
+        dy: (diffY * 400).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
       duration: DDPlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) {
@@ -343,34 +340,27 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Combat
 
   func chamberDroplet() {
-    let closest: Optional<DDPlayerDroplet> =
-      wetChildren.reduce(.none) { closestChild, child in
-        guard let closestChild = closestChild else {
-          return child;
+    let closest: Optional<(DDPlayerDroplet, CGFloat)> =
+      wetChildren.reduce(.none) { closest, child in
+        guard let (_, closestDistance) = closest else {
+          return (child, CGFloat.infinity);
         }
 
-        // TODO make this account for radial distance
-        let positionOfGun = gun.getPosition(
-          within: mainCircle)
-        let positionOfChild = child.getPosition(
-          within: mainCircle)
-        let positionOfClosestChild = closestChild.getPosition(
-          within: mainCircle)
-
-        let closestDistance = positionOfGun.distance(to: positionOfClosestChild)
+        let positionOfGun = gun.getPosition(within: self)
+        let positionOfChild = child.getPosition(within: self)
         let distance =        positionOfGun.distance(to: positionOfChild)
 
         return distance < closestDistance
-          ? child
-          : closestChild
+          ? (child, distance)
+          : closest
       }
 
-    guard let closest = closest else {
+    guard let (closestChild, _) = closest else {
       return
     }
 
-    banishWetChild(wetChild: closest)
-    gun.chamberDroplet(closest)
+    banishWetChild(wetChild: closestChild)
+    gun.chamberDroplet(closestChild)
   }
 
   func fireDroplet() {

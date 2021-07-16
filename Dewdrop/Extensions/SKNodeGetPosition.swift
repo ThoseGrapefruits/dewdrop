@@ -18,7 +18,7 @@ extension SKNode {
   func getPositionAndRotation(within ancestor: SKNode)
   -> (CGPoint, CGFloat) {
     guard let parent = parent, self != ancestor else {
-      return (CGPoint(x: CGFloat.zero, y: CGFloat.zero), CGFloat.zero)
+      return (CGPoint.zero, CGFloat.zero)
     }
 
     let (parentPosition, parentRotation) = parent.getPositionAndRotation(

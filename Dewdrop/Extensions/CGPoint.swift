@@ -18,4 +18,10 @@ extension CGPoint {
   func distance(to: CGPoint) -> CGFloat {
     return sqrt(pow(to.x - x, 2) + pow(to.y - y, 2))
   }
+
+  func rotate(by rotation: CGFloat) -> CGPoint {
+    return CGPoint(
+      x: cos(rotation) * x - sin(rotation) * y,
+      y: sin(rotation) * x + cos(rotation) * y)
+  }
 }

@@ -11,4 +11,13 @@ import SpriteKit
 class DDPlayerDroplet : SKShapeNode {
   var lastOwner: Optional<DDPlayerNode> = .none
   var owner: Optional<DDPlayerNode> = .none
+
+  func onCatch(by newOwner: DDPlayerNode) {
+    owner = newOwner
+  }
+
+  func onRelease() {
+    lastOwner = owner
+    owner = nil
+  }
 }
