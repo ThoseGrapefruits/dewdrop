@@ -43,17 +43,18 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
       leaf.physicsBody!.categoryBitMask = DDBitmask.ground
       leaf.physicsBody!.collisionBitMask = DDBitmask.all
 
+      let leafScenePosition = leaf.getPosition(within: scene!)
       let springJoint = SKPhysicsJointSpring.joint(
         withBodyA: leaf.physicsBody!,
         bodyB: scene!.physicsBody!,
-        anchorA: leaf.position,
-        anchorB: CGPoint(x: leaf.position.x, y: leaf.position.y + 80))
+        anchorA: leafScenePosition,
+        anchorB: CGPoint(
+          x: leafScenePosition.x,
+          y: leafScenePosition.y + 100))
 
       let strengthFactor = abs(leaf.position.x) * leaf.physicsBody!.mass;
-
-      print("sf", strengthFactor)
-      springJoint.damping = strengthFactor / 20000
-      springJoint.frequency = strengthFactor / 2000
+      springJoint.damping = strengthFactor / 10000
+      springJoint.frequency = strengthFactor / 1000
 
       let pinJoint = SKPhysicsJointPin.joint(
         withBodyA: leaf.physicsBody!,

@@ -142,8 +142,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     addChild(mainCircle)
   }
 
-
-
   // MARK: Helpers
 
   func baptiseWetChild(newChild: DDPlayerDroplet, resetPosition: Bool = false) {
