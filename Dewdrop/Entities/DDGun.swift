@@ -11,6 +11,13 @@ import SpriteKit
 class DDGun : SKShapeNode {
   static let LAUNCH_FORCE: CGFloat = 400.0
 
+  // MARK: Audio nodes
+
+  let audioChamber = SKAudioNode(fileNamed: "ChamberDroplet.aif")
+  let audioLaunch = SKAudioNode(fileNamed: "LaunchDroplet.aif")
+
+  // MARK: State
+
   var chambered: Optional<DDPlayerDroplet> = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
@@ -20,6 +27,11 @@ class DDGun : SKShapeNode {
 
     fillColor = .systemGreen
     strokeColor = .green
+
+    audioChamber.autoplayLooped = false
+    audioLaunch.autoplayLooped = false
+    addChild(audioChamber)
+    addChild(audioLaunch)
   }
 
   required init?(coder: NSCoder) {
@@ -43,9 +55,11 @@ class DDGun : SKShapeNode {
 
     droplet.physicsBody?.pinned = true
     droplet.position = CGPoint(x: 24.0, y: 0.0)
+
+    audioChamber.run(SKAction.play())
   }
 
-  func fireDroplet() {
+  func launchDroplet() {
     guard let chambered = chambered else {
       return
     }
@@ -82,5 +96,7 @@ class DDGun : SKShapeNode {
     chamberedPhysicsBody.applyImpulse(CGVector(
       dx: cos(launchAngle) * DDGun.LAUNCH_FORCE,
       dy: sin(launchAngle) * DDGun.LAUNCH_FORCE))
+
+    audioLaunch.run(SKAction.play())
   }
 }

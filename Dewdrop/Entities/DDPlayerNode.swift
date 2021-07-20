@@ -35,15 +35,18 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   let PD_COUNT_INIT = 22
   let PD_COUNT_MAX = 40
 
-  // MARK: State
+  // MARK: Child nodes
 
-  var ddScene: Optional<DDScene> = .none
-  var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
-  let mainCircle = SKShapeNode(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
   let gun = DDGun(
     points: &GUN_SHAPE,
     count: DDPlayerNode.GUN_SHAPE.count)
   let gunAnchor = SKNode()
+  let mainCircle = SKShapeNode(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
+
+  // MARK: State
+
+  var ddScene: Optional<DDScene> = .none
+  var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   var wetChildren = Set<DDPlayerDroplet>()
 
   var chamberDropletAction: Optional<SKAction> = .none
@@ -376,7 +379,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gun.chamberDroplet(closestChild)
   }
 
-  func fireDroplet() {
-    gun.fireDroplet()
+  func launchDroplet() {
+    gun.launchDroplet()
   }
 }

@@ -167,7 +167,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
       aimTouchNode.fingerDown = true
     } else {
       aimTouchNode.fingerDown = false
-      playerNode?.fireDroplet()
+      playerNode?.launchDroplet()
     }
   }
 }
