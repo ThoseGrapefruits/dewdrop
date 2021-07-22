@@ -13,8 +13,10 @@ class DDGun : SKShapeNode {
 
   // MARK: Audio nodes
 
-  let audioChamber = SKAudioNode(fileNamed: "ChamberDroplet.aif")
-  let audioLaunch = SKAudioNode(fileNamed: "LaunchDroplet.aif")
+  let audioChamber = DDAudioNodeGroup()
+    .add(fileNamed: "FSChamberDroplet.aif")
+  let audioLaunch = DDAudioNodeGroup()
+    .add(fileNamed: "FSLaunchDroplet.aif")
 
   // MARK: State
 
@@ -22,21 +24,31 @@ class DDGun : SKShapeNode {
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
 
+  // MARK: Initialisation
+
   override init() {
     super.init()
-
-    fillColor = .systemGreen
-    strokeColor = .green
-
-    audioChamber.autoplayLooped = false
-    audioLaunch.autoplayLooped = false
-    addChild(audioChamber)
-    addChild(audioLaunch)
+    initColor()
+    initAudio()
   }
 
   required init?(coder: NSCoder) {
     super.init(coder: coder)
+    initColor()
+    initAudio()
   }
+
+  func initAudio() {
+    addChild(audioChamber)
+    addChild(audioLaunch)
+  }
+
+  func initColor() {
+    fillColor = .systemGreen
+    strokeColor = .green
+  }
+
+  // MARK: Actions
 
   func chamberDroplet(_ droplet: DDPlayerDroplet) {
     chambered = droplet
@@ -56,7 +68,7 @@ class DDGun : SKShapeNode {
     droplet.physicsBody?.pinned = true
     droplet.position = CGPoint(x: 24.0, y: 0.0)
 
-    audioChamber.run(SKAction.play())
+    audioChamber.playRandom()
   }
 
   func launchDroplet() {
@@ -97,6 +109,6 @@ class DDGun : SKShapeNode {
       dx: cos(launchAngle) * DDGun.LAUNCH_FORCE,
       dy: sin(launchAngle) * DDGun.LAUNCH_FORCE))
 
-    audioLaunch.run(SKAction.play())
+    audioChamber.playRandom()
   }
 }
