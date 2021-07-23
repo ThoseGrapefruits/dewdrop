@@ -157,7 +157,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     if newChild.physicsBody == nil {
       newChild.physicsBody = SKPhysicsBody(circleOfRadius: PD_RADIUS)
 
-      newChild.physicsBody!.linearDamping = 3
+      newChild.physicsBody!.linearDamping = 1
       newChild.physicsBody!.isDynamic = true
       newChild.physicsBody!.affectedByGravity = true
       newChild.physicsBody!.friction = 0.5
