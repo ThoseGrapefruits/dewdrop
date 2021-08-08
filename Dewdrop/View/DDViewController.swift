@@ -7,18 +7,66 @@
 
 import UIKit
 import SpriteKit
+import GameKit
 import GameplayKit
 
-class DDViewController: UIViewController {
+class DDViewController: UIViewController, GKGameCenterControllerDelegate {
+
+  // MARK: GKGameCenterControllerDelegate
+
+  func gameCenterViewControllerDidFinish(
+    _ gameCenterViewController: GKGameCenterViewController
+  ) {
+    gameCenterViewController.dismiss(animated: true, completion: nil)
+  }
+
 
   static let START_POSITION = CGPoint(x: 0, y: 160)
 
   var scene: Optional<DDScene> = .none
 
+  func ensureGameCenter(_ closure: @escaping () -> Void) {
+    GKLocalPlayer.local.authenticateHandler = { viewController, error in
+      guard let viewController = viewController else {
+        return closure()
+      }
+
+      if error != nil {
+          // Player could not be authenticated.
+          // Disable Game Center in the game.
+          return
+      }
+
+      self.present(viewController, animated: true, completion: nil)
+
+      if GKLocalPlayer.local.isUnderage {
+        // Hide explicit game content.
+      }
+
+      if GKLocalPlayer.local.isMultiplayerGamingRestricted {
+        return
+      }
+
+      if GKLocalPlayer.local.isPersonalizedCommunicationRestricted {
+        // Disable in game communication UI.
+      }
+
+      return closure()
+    }
+  }
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    if let sceneNode = DDScene(fileNamed: "DDScene") {
+    ensureGameCenter() { [weak self] in
+      guard let self = self else {
+        return
+      }
+
+      guard let sceneNode = DDScene(fileNamed: "DDScene") else {
+        return
+      }
+
       let playerNode = DDPlayerNode()
       playerNode.mainCircle.position = DDViewController.START_POSITION
       playerNode.addToScene(scene: sceneNode)
@@ -28,7 +76,7 @@ class DDViewController: UIViewController {
       cameraNode.position = DDViewController.START_POSITION
       sceneNode.camera = cameraNode
 
-      scene = sceneNode
+      self.scene = sceneNode
 
       // Present the scene
       if let view = self.view as! SKView? {

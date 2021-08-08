@@ -16,6 +16,7 @@
 		DC04E8FB268F83890040F7A9 /* DewdropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8FA268F83890040F7A9 /* DewdropTests.swift */; };
 		DC04E906268F83890040F7A9 /* DewdropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E905268F83890040F7A9 /* DewdropUITests.swift */; };
 		DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
+		DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		DC5347ED26A69E62004DF564 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */; };
 		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
 		DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
@@ -66,6 +67,7 @@
 		DC04E905268F83890040F7A9 /* DewdropUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropUITests.swift; sourceTree = "<group>"; };
 		DC04E907268F83890040F7A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAimTouchNode.swift; sourceTree = "<group>"; };
+		DC3BB91026AC870F0097A9AA /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
 		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
 		DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDMoveTouchNode.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,6 +118,7 @@
 				DC04E8F9268F83890040F7A9 /* DewdropTests */,
 				DC04E904268F83890040F7A9 /* DewdropUITests */,
 				DC04E8E0268F83840040F7A9 /* Products */,
+				DC3BB90F26AC870F0097A9AA /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +198,14 @@
 				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
 			);
 			path = View;
+			sourceTree = "<group>";
+		};
+		DC3BB90F26AC870F0097A9AA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DC3BB91026AC870F0097A9AA /* GameKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		DC82AC92269B9A890076CB92 /* Extensions */ = {
@@ -551,6 +563,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -570,6 +583,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
