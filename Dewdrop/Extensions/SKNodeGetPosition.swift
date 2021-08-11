@@ -15,26 +15,35 @@ extension SKNode {
     return position
   }
 
-  func getPositionAndRotation(within ancestor: SKNode)
-  -> (CGPoint, CGFloat) {
-    guard let parent = parent, self != ancestor else {
-      return (CGPoint.zero, CGFloat.zero)
+  private func getPositionAndRotation(
+    within ancestor: SKNode,
+    position childPosition: CGPoint,
+    rotation childRotation: CGFloat
+  ) -> (CGPoint, CGFloat) {
+    guard parent != nil, let parent = parent, self != ancestor else {
+      return (childPosition, childRotation)
     }
 
-    let (parentPosition, parentRotation) = parent.getPositionAndRotation(
-      within: ancestor)
-
     let position = CGPoint(
-        x: parentPosition.x
-           + cos(parentRotation) * position.x
-           - sin(parentRotation) * position.y,
-        y: parentPosition.y
-           + sin(parentRotation) * position.x
-           + cos(parentRotation) * position.y)
+        x: position.x
+           + cos(zRotation) * childPosition.x
+           - sin(zRotation) * childPosition.y,
+        y: position.y
+           + sin(zRotation) * childPosition.x
+           + cos(zRotation) * childPosition.y)
 
-    let rotation = (zRotation + parentRotation).wrap(around: CGFloat.pi)
+    let rotation = (childRotation + zRotation).wrap(around: CGFloat.pi)
 
-    return (position, rotation)
+    return parent.getPositionAndRotation(
+      within: ancestor, position: position, rotation: rotation)
+  }
+
+  func getPositionAndRotation(within ancestor: SKNode) -> (CGPoint, CGFloat) {
+    return getPositionAndRotation(
+      within: ancestor,
+      position: CGPoint.zero,
+      rotation: CGFloat.zero
+    )
   }
 
   func getRotation(within ancestor: SKNode) -> CGFloat {

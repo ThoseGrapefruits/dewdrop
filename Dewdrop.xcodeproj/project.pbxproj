@@ -16,6 +16,8 @@
 		DC04E8FB268F83890040F7A9 /* DewdropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8FA268F83890040F7A9 /* DewdropTests.swift */; };
 		DC04E906268F83890040F7A9 /* DewdropUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E905268F83890040F7A9 /* DewdropUITests.swift */; };
 		DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
+		DC1A3D0E26C44650008850ED /* SKNodeGetPositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1A3D0D26C44650008850ED /* SKNodeGetPositionTests.swift */; };
+		DC1A3D1026C45BA6008850ED /* CGFloatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */; };
 		DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		DC5347ED26A69E62004DF564 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */; };
 		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
@@ -67,6 +69,8 @@
 		DC04E905268F83890040F7A9 /* DewdropUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropUITests.swift; sourceTree = "<group>"; };
 		DC04E907268F83890040F7A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAimTouchNode.swift; sourceTree = "<group>"; };
+		DC1A3D0D26C44650008850ED /* SKNodeGetPositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeGetPositionTests.swift; sourceTree = "<group>"; };
+		DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloatTests.swift; sourceTree = "<group>"; };
 		DC3BB91026AC870F0097A9AA /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
 		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
@@ -151,6 +155,7 @@
 		DC04E8F9268F83890040F7A9 /* DewdropTests */ = {
 			isa = PBXGroup;
 			children = (
+				DC1A3D0C26C4463D008850ED /* Extensions */,
 				DC04E8FA268F83890040F7A9 /* DewdropTests.swift */,
 				DC04E8FC268F83890040F7A9 /* Info.plist */,
 			);
@@ -164,6 +169,15 @@
 				DC04E907268F83890040F7A9 /* Info.plist */,
 			);
 			path = DewdropUITests;
+			sourceTree = "<group>";
+		};
+		DC1A3D0C26C4463D008850ED /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				DC1A3D0D26C44650008850ED /* SKNodeGetPositionTests.swift */,
+				DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		DC2C59DC2699E0C6001F49D9 /* Entities */ = {
@@ -401,6 +415,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC04E8FB268F83890040F7A9 /* DewdropTests.swift in Sources */,
+				DC1A3D1026C45BA6008850ED /* CGFloatTests.swift in Sources */,
+				DC1A3D0E26C44650008850ED /* SKNodeGetPositionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -563,7 +579,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -583,7 +599,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.7;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -603,7 +619,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = DewdropTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -625,7 +641,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = DewdropTests/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

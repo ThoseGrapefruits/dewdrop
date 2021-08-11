@@ -26,12 +26,15 @@ extension CGFloat {
   }
 
   func wrap(around boundary: CGFloat) -> CGFloat {
-    if (self > boundary) {
-      return (self - boundary * 2).wrap(around: boundary)
-    } else if (self < -boundary) {
-      return (self + boundary * 2).wrap(around: boundary)
-    } else {
-      return self
+    var current = self
+    while (current > boundary) {
+      current -= boundary * 2
     }
+
+    while (current < -boundary) {
+      current += boundary * 2
+    }
+
+    return current
   }
 }
