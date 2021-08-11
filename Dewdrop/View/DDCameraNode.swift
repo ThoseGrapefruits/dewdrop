@@ -51,8 +51,8 @@ class DDCameraNode : SKCameraNode {
         dy: pidY.step(error: errorY, deltaTime: DDCameraNode.TICK_TRACKING)),
       duration: DDCameraNode.TICK_TRACKING)
 
-    run(force) {
-      self.track(node, pidX: pidX, pidY: pidY)
+    run(force) { [weak self] in
+      self?.track(node, pidX: pidX, pidY: pidY)
     }
   }
 }

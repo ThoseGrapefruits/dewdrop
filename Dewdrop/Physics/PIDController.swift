@@ -21,9 +21,9 @@ class PIDController {
   var lastTime: Optional<TimeInterval> = .none;
 
   init(kP: CGFloat, kI: CGFloat, kD: CGFloat) {
-    self.kProportion = Double(kP);
-    self.kIntegral = Double(kI);
-    self.kDerivative = Double(kD);
+    kProportion = Double(kP);
+    kIntegral = Double(kI);
+    kDerivative = Double(kD);
   }
 
   func step(error: CGFloat, deltaTime: TimeInterval) -> CGFloat {
@@ -35,24 +35,24 @@ class PIDController {
   func step(error errorFloat: CGFloat, currentTime: TimeInterval) -> CGFloat {
     let error = Double(errorFloat);
     let secondsElapsed = (lastTime ?? currentTime).distance(to: currentTime);
-    self.lastTime = currentTime;
+    lastTime = currentTime;
 
-    let errorDerivative = error - self.lastError;
+    let errorDerivative = error - lastError;
 
-    self.lastError = error;
+    lastError = error;
 
-    self.cProportion = error
-    self.cIntegral += error * secondsElapsed
+    cProportion = error
+    cIntegral += error * secondsElapsed
 
-    self.cDerivative = 0
+    cDerivative = 0
     if (secondsElapsed > 0) {
-      self.cDerivative = errorDerivative / secondsElapsed
+      cDerivative = errorDerivative / secondsElapsed
     }
 
     return CGFloat(
-      (self.kProportion * self.cProportion) +
-      (self.kIntegral   * self.cIntegral) +
-      (self.kDerivative * self.cDerivative)
+      (kProportion * cProportion) +
+      (kIntegral   * cIntegral) +
+      (kDerivative * cDerivative)
     )
   }
 }

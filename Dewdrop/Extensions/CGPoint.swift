@@ -10,9 +10,7 @@ import SpriteKit
 
 extension CGPoint {
   func angle(to: CGPoint) -> CGFloat {
-    return atan2(
-      to.y - self.y,
-      to.x - self.x)
+    return atan2(to.y - y, to.x - x)
   }
 
   func distance(to: CGPoint) -> CGFloat {

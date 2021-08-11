@@ -26,15 +26,20 @@ class DDViewController: UIViewController, GKGameCenterControllerDelegate {
   var scene: Optional<DDScene> = .none
 
   func ensureGameCenter(_ closure: @escaping () -> Void) {
-    GKLocalPlayer.local.authenticateHandler = { viewController, error in
-      guard let viewController = viewController else {
-        return closure()
+    GKLocalPlayer.local.authenticateHandler =
+    { [weak self] viewController, error in
+      guard let self = self else {
+        return
       }
 
       if error != nil {
           // Player could not be authenticated.
           // Disable Game Center in the game.
           return
+      }
+
+      guard let viewController = viewController else {
+        return closure()
       }
 
       self.present(viewController, animated: true, completion: nil)

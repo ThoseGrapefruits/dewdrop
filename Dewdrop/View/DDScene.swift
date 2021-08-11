@@ -21,6 +21,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
 
   var playerNode: Optional<DDPlayerNode> = .none
 
+  // MARK: Initialization
+
   override func sceneDidLoad() {
     vivifyBouncyLeaves()
 

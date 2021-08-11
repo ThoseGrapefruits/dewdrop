@@ -248,8 +248,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
 
     guard ddScene.moveTouchNode.fingerDown else {
-      return run(SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)) {
-        self.trackMovementTouch()
+      let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
+      return run(wait) { [weak self] in
+        self?.trackMovementTouch()
       }
     }
 
@@ -264,8 +265,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         dy: (diffY * 400).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
       duration: DDPlayerNode.TICK_FOLLOW)
 
-    mainCircle.run(applyForce) {
-      self.trackMovementTouch()
+    mainCircle.run(applyForce) { [weak self] in
+      self?.trackMovementTouch()
     }
   }
 
@@ -297,8 +298,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       impulse,
       duration: DDPlayerNode.TICK_AIM)
 
-    return gunAnchor.run(action) {
-      self.trackAimTouch(pid: pid)
+    return gunAnchor.run(action) { [weak self] in
+      self?.trackAimTouch(pid: pid)
     }
   }
 
