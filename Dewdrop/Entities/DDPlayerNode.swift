@@ -239,7 +239,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func start() {
     trackMovementTouch()
-    trackAimTouch()
+    gun.start(playerNode: self)
   }
 
   func trackMovementTouch() {
@@ -267,39 +267,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     mainCircle.run(applyForce) { [weak self] in
       self?.trackMovementTouch()
-    }
-  }
-
-  func trackAimTouch(
-    pid: PIDController = PIDController(kP: 1.0, kI: 0, kD: 0.05)
-  ) {
-    guard let ddScene = ddScene else {
-      return
-    }
-
-    let targetAngle: CGFloat = ddScene.aimTouchNode.fingerDown
-      ? {
-        let selfPosition =
-          mainCircle.position
-        let targetPosition = CGPoint(
-          x: ddScene.aimTouchNode.position.x,
-          y: ddScene.aimTouchNode.position.y + DDPlayerNode.AIM_OFFSET)
-        return selfPosition.angle(to: targetPosition)
-      }()
-      : 0
-
-    let currentAngle = mainCircle.zRotation + gunAnchor.zRotation
-
-    let impulse = pid.step(
-      error: (targetAngle - currentAngle).wrap(around: CGFloat.pi),
-      deltaTime: DDPlayerNode.TICK_AIM)
-
-    let action = SKAction.applyAngularImpulse(
-      impulse,
-      duration: DDPlayerNode.TICK_AIM)
-
-    return gunAnchor.run(action) { [weak self] in
-      self?.trackAimTouch(pid: pid)
     }
   }
 

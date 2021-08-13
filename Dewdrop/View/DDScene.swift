@@ -191,8 +191,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
   }
 
   func updateAimTouch() {
-    if let st = aimTouch {
-      let touchPosition = st.location(in: self)
+    if let aimTouch = aimTouch {
+      let touchPosition = aimTouch.location(in: self)
       aimTouchNode.position = CGPoint(
         x: touchPosition.x,
         y: touchPosition.y)
