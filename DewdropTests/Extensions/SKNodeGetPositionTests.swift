@@ -12,7 +12,22 @@ import XCTest
 import SpriteKit
 
 class SKNodeGetPositionTests: XCTestCase {
-  func testGetPositionAndRotationSimple() throws {
+  func testGetPositionAndRotationParent() throws {
+    let parent = SKNode()
+    let child = SKNode()
+    parent.addChild(child)
+
+    child.position = CGPoint(x: -7, y: 3)
+    child.zRotation = -CGFloat.pi
+
+    let (position, rotation) = child.getPositionAndRotation(within: parent)
+
+    XCTAssertEqual(position.x, -7,          accuracy: 0.000001)
+    XCTAssertEqual(position.y, 3,          accuracy: 0.000001)
+    XCTAssertEqual(rotation,   CGFloat.pi, accuracy: 0.0000001)
+  }
+
+  func testGetPositionAndRotationGrandparent() throws {
     let grandparent = SKNode()
     let parent = SKNode()
     let child = SKNode()
@@ -89,5 +104,16 @@ class SKNodeGetPositionTests: XCTestCase {
       XCTAssertEqual(position.y, -85092.24,   accuracy: 0.01)
       XCTAssertEqual(rotation,   -CGFloat.pi, accuracy: 0.00001)
     }
+  }
+
+  func testGetRotationWrap() throws {
+      let parent = SKNode()
+      let child = SKNode()
+      parent.addChild(child)
+      child.zRotation = -CGFloat.pi
+
+      let rotation = child.getRotation(within: parent)
+
+      XCTAssertEqual(rotation, CGFloat.pi, accuracy: 0.0000001)
   }
 }
