@@ -10,67 +10,34 @@ import SpriteKit
 import GameKit
 import GameplayKit
 
-class DDViewController: UIViewController, GKGameCenterControllerDelegate {
+class DDViewController: UIViewController {
 
-  // MARK: GKGameCenterControllerDelegate
-
-  func gameCenterViewControllerDidFinish(
-    _ gameCenterViewController: GKGameCenterViewController
-  ) {
-    gameCenterViewController.dismiss(animated: true, completion: nil)
-  }
-
+  // MARK: Constants
 
   static let START_POSITION = CGPoint(x: 0, y: 160)
 
+  // MARK: State
+
+  let matchmaking = DDMatchmaking()
+  var match: GKMatch? = .none
+  var networking: DDMatchNetworking? = .none
   var scene: Optional<DDScene> = .none
-
-  func ensureGameCenter(_ closure: @escaping () -> Void) {
-    GKLocalPlayer.local.authenticateHandler =
-    { [weak self] viewController, error in
-      guard let self = self else {
-        return
-      }
-
-      if error != nil {
-          // Player could not be authenticated.
-          // Disable Game Center in the game.
-          return
-      }
-
-      guard let viewController = viewController else {
-        return closure()
-      }
-
-      self.present(viewController, animated: true, completion: nil)
-
-      if GKLocalPlayer.local.isUnderage {
-        // Hide explicit game content.
-      }
-
-      if GKLocalPlayer.local.isMultiplayerGamingRestricted {
-        return
-      }
-
-      if GKLocalPlayer.local.isPersonalizedCommunicationRestricted {
-        // Disable in game communication UI.
-      }
-
-      return closure()
-    }
-  }
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    ensureGameCenter() { [weak self] in
-      guard let self = self else {
+    matchmaking.findMatch(view: self) { [weak self] match in
+      guard
+        let self = self,
+        let sceneNode = DDScene(fileNamed: "DDScene"),
+        let view = self.view as! SKView?
+      else {
         return
       }
 
-      guard let sceneNode = DDScene(fileNamed: "DDScene") else {
-        return
-      }
+      self.match = match
+      self.networking = DDMatchNetworking()
+      match.delegate = self.networking!
 
       let playerNode = DDPlayerNode()
       playerNode.mainCircle.position = DDViewController.START_POSITION
@@ -84,17 +51,15 @@ class DDViewController: UIViewController, GKGameCenterControllerDelegate {
       self.scene = sceneNode
 
       // Present the scene
-      if let view = self.view as! SKView? {
-        view.presentScene(sceneNode)
+      view.presentScene(sceneNode)
 
-        playerNode.start()
-        cameraNode.track(playerNode.mainCircle)
+      playerNode.start()
+      cameraNode.track(playerNode.mainCircle)
 
-        view.ignoresSiblingOrder = true
+      view.ignoresSiblingOrder = true
 
-        view.showsFPS = true
-        view.showsNodeCount = true
-      }
+      view.showsFPS = true
+      view.showsNodeCount = true
     }
   }
 
@@ -104,7 +69,7 @@ class DDViewController: UIViewController, GKGameCenterControllerDelegate {
 
   override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
     if UIDevice.current.userInterfaceIdiom == .phone {
-      return .allButUpsideDown
+      return .portrait.union(.portraitUpsideDown)
     } else {
       return .all
     }

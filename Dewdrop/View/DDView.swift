@@ -9,5 +9,4 @@ import Foundation
 import SpriteKit
 
 class DDView : SKView {
-
 }

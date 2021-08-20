@@ -20,7 +20,7 @@ extension SKNode {
     position childPosition: CGPoint,
     rotation childRotation: CGFloat
   ) -> (CGPoint, CGFloat) {
-    guard parent != nil, let parent = parent, self != ancestor else {
+    guard let parent = parent, self != ancestor else {
       return (childPosition, childRotation)
     }
 
