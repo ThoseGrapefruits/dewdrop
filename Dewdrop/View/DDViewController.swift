@@ -19,8 +19,7 @@ class DDViewController: UIViewController {
   // MARK: State
 
   let matchmaking = DDMatchmaking()
-  var match: GKMatch? = .none
-  var networking: DDNetworking? = .none
+  var networkMatch: DDNetworkMatch? = .none
   var scene: Optional<DDScene> = .none
 
   override func viewDidLoad() {
@@ -40,12 +39,11 @@ class DDViewController: UIViewController {
         return
       }
 
-      self.match = match
-      self.networking = DDNetworking()
-      self.networking!.match = match
-      match.delegate = self.networking!
+      self.networkMatch = DDNetworkMatch()
+      self.networkMatch!.match = match
+      match.delegate = self.networkMatch!
 
-      self.networking!.updateHost { [weak self] bestHost in
+      self.networkMatch!.updateHost { [weak self] bestHost in
         guard let self = self else {
           return
         }
