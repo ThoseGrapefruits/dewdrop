@@ -19,7 +19,7 @@ class DDMatchmaking : NSObject,
   var index: Int = 0
   var registry: [Int : DDNetworkDelegate] = [:]
 
-  var findMatchClosure: ((_ match: GKMatch) -> Void)? = .none
+  var findMatchClosure: ((_ match: GKMatch, _ error: Error?) -> Void)? = .none
   var matchmakerViewController: GKMatchmakerViewController? = .none
 
   // MARK: API
@@ -74,7 +74,7 @@ class DDMatchmaking : NSObject,
 
   func findMatch(
     view: UIViewController,
-    _ closure: @escaping (_ match: GKMatch) -> Void
+    _ closure: @escaping (_ match: GKMatch, _ error: Error?) -> Void
   ) {
     guard findMatchClosure == nil else {
       return
@@ -132,7 +132,7 @@ class DDMatchmaking : NSObject,
     _ viewController: GKMatchmakerViewController,
     didFind match: GKMatch
   ) {
-    findMatchClosure?(match)
+    findMatchClosure?(match, nil)
     viewController.dismiss(animated: true)
   }
 

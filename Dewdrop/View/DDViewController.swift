@@ -20,13 +20,18 @@ class DDViewController: UIViewController {
 
   let matchmaking = DDMatchmaking()
   var match: GKMatch? = .none
-  var networking: DDMatchNetworking? = .none
+  var networking: DDNetworking? = .none
   var scene: Optional<DDScene> = .none
 
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    matchmaking.findMatch(view: self) { [weak self] match in
+    matchmaking.findMatch(view: self) { [weak self] match, error in
+      guard error == nil else {
+        print(error.debugDescription)
+        return
+      }
+
       guard
         let self = self,
         let sceneNode = DDScene(fileNamed: "DDScene"),
@@ -36,7 +41,8 @@ class DDViewController: UIViewController {
       }
 
       self.match = match
-      self.networking = DDMatchNetworking()
+      self.networking = DDNetworking()
+      self.networking!.match = match
       match.delegate = self.networking!
 
       let playerNode = DDPlayerNode()
