@@ -8,5 +8,6 @@
 import Foundation
 
 struct DataHostChange : Codable {
-
+  let oldHost: String
+  let newHost: String
 }

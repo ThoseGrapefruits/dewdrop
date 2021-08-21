@@ -15,11 +15,18 @@ class DDNetworking : NSObject, GKMatchDelegate {
   var host: GKPlayer? = .none
   var match: GKMatch? = .none
 
-  func sendData(
-    toAllPlayers data: DDNetworkData,
-    with mode: GKMatch.SendDataMode
+  func send(
+    _ data: Data,
+    to: [GKPlayer],
+    mode: GKMatch.SendDataMode
   ) throws {
-    let data = DataHostChange()
+    let encoder = PropertyListEncoder()
+    encoder.outputFormat = .binary
+    let message = try encoder.encode(data)
+    try match?.send(message, to: to, dataMode: mode)
+  }
+
+  func send(_ data: DDNetworkData, mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
@@ -32,22 +39,35 @@ class DDNetworking : NSObject, GKMatchDelegate {
       return
     }
 
-    let data = DataHostChange()
+    let data = DataHostChange(
+      oldHost: oldHost.gamePlayerID,
+      newHost: newHost.gamePlayerID)
     let message = DDNetworkData.hostChange(data: data)
-    try sendData(toAllPlayers: message, with: .reliable)
-
-    print("oldHost", oldHost)
+    try send(message, mode: .reliable)
   }
 
-  func updateHost(player: GKPlayer?) {
-    guard let player = player else {
-      host = match?.players[0]
-      match?.chooseBestHostingPlayer { [weak self] player in
-        self?.updateHost(player: player)
-      }
+  func updateHost(
+    player: GKPlayer? = nil,
+    _ closure: @escaping (GKPlayer) -> Void
+  ) {
+    if let player = player {
+      print("Determined host: \( player.gamePlayerID )")
+      host = player
+      closure(player)
       return
     }
 
-    host = player
+    match?.chooseBestHostingPlayer { [weak self] player in
+      guard let self = self, let match = self.match else {
+        return
+      }
+
+      guard let player = player else {
+        self.updateHost(player: match.players[0], closure)
+        return
+      }
+
+      self.updateHost(player: player, closure)
+    }
   }
 }

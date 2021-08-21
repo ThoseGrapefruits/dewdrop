@@ -45,27 +45,33 @@ class DDViewController: UIViewController {
       self.networking!.match = match
       match.delegate = self.networking!
 
-      let playerNode = DDPlayerNode()
-      playerNode.mainCircle.position = DDViewController.START_POSITION
-      playerNode.addToScene(scene: sceneNode)
+      self.networking!.updateHost { [weak self] bestHost in
+        guard let self = self else {
+          return
+        }
 
-      let cameraNode = DDCameraNode()
-      sceneNode.addChild(cameraNode)
-      cameraNode.position = DDViewController.START_POSITION
-      sceneNode.camera = cameraNode
+        let playerNode = DDPlayerNode()
+        playerNode.mainCircle.position = DDViewController.START_POSITION
+        playerNode.addToScene(scene: sceneNode)
 
-      self.scene = sceneNode
+        let cameraNode = DDCameraNode()
+        sceneNode.addChild(cameraNode)
+        cameraNode.position = DDViewController.START_POSITION
+        sceneNode.camera = cameraNode
 
-      // Present the scene
-      view.presentScene(sceneNode)
+        self.scene = sceneNode
 
-      playerNode.start()
-      cameraNode.track(playerNode.mainCircle)
+        // Present the scene
+        view.presentScene(sceneNode)
 
-      view.ignoresSiblingOrder = true
+        playerNode.start()
+        cameraNode.track(playerNode.mainCircle)
 
-      view.showsFPS = true
-      view.showsNodeCount = true
+        view.ignoresSiblingOrder = true
+
+        view.showsFPS = true
+        view.showsNodeCount = true
+      }
     }
   }
 
