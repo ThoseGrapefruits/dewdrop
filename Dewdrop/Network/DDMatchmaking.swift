@@ -16,23 +16,8 @@ class DDMatchmaking : NSObject,
 
   // MARK: State
 
-  var index: Int = 0
-  var registry: [Int : DDNetworkDelegate] = [:]
-
   var findMatchClosure: ((_ match: GKMatch, _ error: Error?) -> Void)? = .none
   var matchmakerViewController: GKMatchmakerViewController? = .none
-
-  // MARK: API
-
-  func register(node: SKNode) -> DDNetworkDelegate {
-    let id = index
-    index += 1
-
-    let delegate = DDNetworkDelegate(id: id, node: node)
-    registry[id] = delegate
-
-    return delegate
-  }
 
   // MARK: Game Center
 

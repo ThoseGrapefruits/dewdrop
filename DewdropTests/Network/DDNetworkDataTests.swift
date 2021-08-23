@@ -26,8 +26,8 @@ class DDNetworkDataTests: XCTestCase {
 
   func testHostChange() throws {
     let hostChange = DDNetworkData.hostChange(
-      metadata: DDMetadata(sender: "walrus"),
-      data: DDDataHostChange(oldHost: "old", newHost: "new"))
+      DDMetadata(sender: "walrus"),
+      DDDataHostChange(oldHost: "old", newHost: "new"))
     let encoder = encoder
     let decoder = decoder
 
@@ -36,21 +36,20 @@ class DDNetworkDataTests: XCTestCase {
       DDNetworkData.self,
       from: hostChangeEncoded)
 
-    switch (hostChange, hostChangeDecoded) {
-      case (
-        .hostChange(let metadata, let data),
-        .hostChange(let metadataDecoded, let dataDecoded)
-      ):
-        XCTAssertEqual(metadata.sender, metadataDecoded.sender)
-        XCTAssertEqual(data.oldHost, dataDecoded.oldHost)
-        XCTAssertEqual(data.newHost, dataDecoded.newHost)
-      default:
-        XCTFail("hostChange or hostChangeDecoded was not a hostChange")
+    if case (
+      .hostChange(let metadata, let data),
+      .hostChange(let metadataDecoded, let dataDecoded)
+    ) = (hostChange, hostChangeDecoded) {
+      XCTAssertEqual(metadata.sender, metadataDecoded.sender)
+      XCTAssertEqual(data.oldHost, dataDecoded.oldHost)
+      XCTAssertEqual(data.newHost, dataDecoded.newHost)
+    } else {
+      XCTFail("hostChange or hostChangeDecoded was not a hostChange")
     }
   }
 
   func testPing() throws {
-    let ping = DDNetworkData.ping(metadata: DDMetadata(sender: "banana"))
+    let ping = DDNetworkData.ping(DDMetadata(sender: "banana"))
     let encoder = encoder
     let decoder = decoder
 
@@ -59,11 +58,13 @@ class DDNetworkDataTests: XCTestCase {
       DDNetworkData.self,
       from: pingEncoded)
 
-    switch (ping, pingDecoded) {
-      case (.ping(let metadata), .ping(let metadataDecoded)):
-            XCTAssertEqual(metadata.sender, metadataDecoded.sender)
-      default:
-        XCTFail("ping or pingDecoded was not a ping")
+    if case (
+      .ping(let metadata),
+      .ping(let metadataDecoded)
+    ) = (ping, pingDecoded) {
+      XCTAssertEqual(metadata.sender, metadataDecoded.sender)
+    } else {
+      XCTFail("ping or pingDecoded was not a ping")
     }
   }
 }

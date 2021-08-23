@@ -10,6 +10,7 @@ import Foundation
 enum DDNetworkDataType : Int8, Codable {
   case hostChange
   case ping
+  case registrationRequest
 }
 
 private extension KeyedDecodingContainer where Key == DDNetworkData.CodingKeys {
@@ -48,8 +49,10 @@ enum DDNetworkData : Codable {
 
   // MARK: Message types
 
-  case hostChange (metadata: DDMetadata, data: DDDataHostChange)
-  case ping       (metadata: DDMetadata)
+  //   Name                 Metadata    Data
+  case hostChange          (DDMetadata, DDDataHostChange)
+  case ping                (DDMetadata)
+  case registrationRequest (DDMetadata, DDDataRegistrationRequest)
 
   // MARK: Codable
 
@@ -62,10 +65,14 @@ enum DDNetworkData : Codable {
 
     switch self {
       case .hostChange(let metadata, let data):
-        try container.encode(type: .hostChange, metadata: metadata, data: data)
-
+        try container.encode(
+          type: .hostChange, metadata: metadata, data: data)
       case .ping(let metadata):
-        try container.encode(type: .ping, metadata: metadata)
+        try container.encode(
+          type: .ping, metadata: metadata)
+      case .registrationRequest(let metadata, let data):
+        try container.encode(
+          type: .registrationRequest, metadata: metadata, data: data)
     }
   }
 
@@ -79,10 +86,14 @@ enum DDNetworkData : Codable {
       case .hostChange:
         let (metadata, data) = try container.decode(
           dataType: DDDataHostChange.self)
-        self = .hostChange(metadata: metadata, data: data)
+        self = .hostChange(metadata, data)
       case .ping:
         let metadata = try container.decodeMetadata()
-        self = .ping(metadata: metadata)
+        self = .ping(metadata)
+      case .registrationRequest:
+        let (metadata, data) = try container.decode(
+          dataType: DDDataRegistrationRequest.self)
+        self = .registrationRequest(metadata, data)
     }
   }
 }

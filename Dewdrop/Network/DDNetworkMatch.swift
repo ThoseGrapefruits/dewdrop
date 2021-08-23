@@ -8,13 +8,20 @@
 import Foundation
 import GameKit
 
+typealias RegistrationID = Int16
+
 class DDNetworkMatch : NSObject, GKMatchDelegate {
+
+  let decoder = PropertyListDecoder()
 
   // MARK: State
 
   var host: GKPlayer? = .none
   var match: GKMatch? = .none
-  var registry: [Int16 : DDNetworkDelegate] = [:]
+  var scene: SKScene? = .none
+
+  var registry: [RegistrationID : DDNetworkDelegate] = [:]
+  var registryIndex: RegistrationID = 0
 
   // MARK: Accessors
 
@@ -29,7 +36,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     didReceive data: Data,
     fromRemotePlayer player: GKPlayer
   ) {
+    self.match = match
     // TODO
+    if isHost {
+      receiveMessage(asHost: data, fromRemotePlayer: player)
+    } else if host == player {
+
+    }
   }
 
   func match(
@@ -38,6 +51,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     forRecipient recipient: GKPlayer,
     fromRemotePlayer player: GKPlayer
   ) {
+    self.match = match
     guard isHost else {
       return
     }
@@ -50,7 +64,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     player: GKPlayer,
     didChange state: GKPlayerConnectionState
   ) {
-    if player == host {
+    self.match = match
+    if player == host && (state == .disconnected || state == .unknown) {
       // TODO pause game
       updateHost { [weak self] newHost in
          // TODO resync & unpause game
@@ -85,6 +100,24 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: API
 
+  func register(node: SKNode, _ closure: (DDNetworkDelegate) -> Void) {
+    
+  }
+
+  func registerLocal(node: SKNode) -> DDNetworkDelegate? {
+    guard isHost else {
+      return nil
+    }
+
+    let id = registryIndex
+    registryIndex += 1
+
+    let delegate = DDNetworkDelegate(id: id, node: node)
+    registry[id] = delegate
+
+    return delegate
+  }
+
   func updateHost(
     player: GKPlayer? = nil,
     _ closure: @escaping (GKPlayer) -> Void
@@ -105,6 +138,42 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       } else {
         self.updateHost(player: match.players[0], closure)
       }
+    }
+  }
+
+  // MARK: Internal API
+
+  func receiveMessage(asHost data: Data, fromRemotePlayer player: GKPlayer) {
+    var binary = PropertyListSerialization.PropertyListFormat.binary
+    let decoded = try! decoder.decode(
+      DDNetworkData.self,
+      from: data,
+      format: &binary)
+
+    switch decoded {
+      case .hostChange(_, _):
+        break
+      case .ping(_):
+        break
+      case .registrationRequest(_, _):
+        break
+    }
+  }
+
+  func receiveMessage(fromHost data: Data) {
+    var binary = PropertyListSerialization.PropertyListFormat.binary
+    let decoded = try! decoder.decode(
+      DDNetworkData.self,
+      from: data,
+      format: &binary)
+
+    switch decoded {
+      case .hostChange(_, _):
+        break
+      case .ping(_):
+        break
+      case .registrationRequest(_, _):
+        break
     }
   }
 }
