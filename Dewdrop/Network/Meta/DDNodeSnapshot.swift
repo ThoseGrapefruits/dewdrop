@@ -13,7 +13,7 @@ func setIfChanged<T : Equatable>(from old: T, to new: T) -> DDFieldChange<T>? {
   return old == new ? .none : DDFieldChange.set(new)
 }
 
-struct PhysicsBodySnapshot {
+struct PhysicsBodySnapshot : Codable {
   var angularDamping: CGFloat
   var angularVelocity: CGFloat
   var linearDamping: CGFloat
@@ -79,7 +79,7 @@ struct PhysicsBodySnapshot {
   }
 }
 
-struct DDNodeSnapshot {
+struct DDNodeSnapshot : Codable {
 
   // MARK: Stored fields
 

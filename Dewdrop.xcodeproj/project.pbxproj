@@ -24,6 +24,8 @@
 		DC2A7BE526D0605F009C7AAF /* DDNetworkRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */; };
 		DC2A7BE826D06089009C7AAF /* DDRPCHostChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */; };
 		DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
+		DC465C5526D524F6009DCE05 /* DDRPCPlayerUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */; };
+		DC465C5726D5250A009DCE05 /* DDRPCSceneSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */; };
 		DC4981FF26D46CBD000359FE /* DDNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4981FE26D46CBD000359FE /* DDNode.swift */; };
 		DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820226D46D85000359FE /* DDNodeSnapshot.swift */; };
 		DC49820526D46E54000359FE /* DDNodeChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820426D46E54000359FE /* DDNodeChange.swift */; };
@@ -91,6 +93,8 @@
 		DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkRPC.swift; sourceTree = "<group>"; };
 		DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCHostChange.swift; sourceTree = "<group>"; };
 		DC3BB91026AC870F0097A9AA /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCPlayerUpdate.swift; sourceTree = "<group>"; };
+		DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSceneSnapshot.swift; sourceTree = "<group>"; };
 		DC4981FE26D46CBD000359FE /* DDNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNode.swift; sourceTree = "<group>"; };
 		DC49820226D46D85000359FE /* DDNodeSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeSnapshot.swift; sourceTree = "<group>"; };
 		DC49820426D46E54000359FE /* DDNodeChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeChange.swift; sourceTree = "<group>"; };
@@ -204,10 +208,10 @@
 		DC0E80B526C986D200A37917 /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				DC465C5326D521D9009DCE05 /* Object Management */,
 				DCD06F4226D4A11700EA6A36 /* Meta */,
 				DC2A7BE626D0607F009C7AAF /* RPC */,
 				DC0E80BA26C99C0800A37917 /* DDMatchmaking.swift */,
-				DC0E80B826C9955700A37917 /* DDNetworkDelegate.swift */,
 				DC09EC1026D0273500CCDE49 /* DDNetworkMatch.swift */,
 			);
 			path = Network;
@@ -230,6 +234,8 @@
 				DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */,
 				DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */,
 				DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */,
+				DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */,
+				DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */,
 			);
 			path = RPC;
 			sourceTree = "<group>";
@@ -243,7 +249,6 @@
 				DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */,
 				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
 				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
-				DC4981FE26D46CBD000359FE /* DDNode.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -275,6 +280,15 @@
 				DC3BB91026AC870F0097A9AA /* GameKit.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DC465C5326D521D9009DCE05 /* Object Management */ = {
+			isa = PBXGroup;
+			children = (
+				DC0E80B826C9955700A37917 /* DDNetworkDelegate.swift */,
+				DC4981FE26D46CBD000359FE /* DDNode.swift */,
+			);
+			path = "Object Management";
 			sourceTree = "<group>";
 		};
 		DC4EFC8926D1839800B4EE64 /* Network */ = {
@@ -465,6 +479,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */,
+				DC465C5726D5250A009DCE05 /* DDRPCSceneSnapshot.swift in Sources */,
+				DC465C5526D524F6009DCE05 /* DDRPCPlayerUpdate.swift in Sources */,
 				DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */,
 				DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */,
 				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,

@@ -8,7 +8,7 @@
 import Foundation
 import SpriteKit
 
-struct PhysicsBodyDelta {
+struct PhysicsBodyDelta : Codable {
   var angularDamping: DDFieldChange<CGFloat>?
   var angularVelocity: DDFieldChange<CGFloat>?
   var damping: DDFieldChange<CGFloat>?
@@ -16,7 +16,7 @@ struct PhysicsBodyDelta {
   var velocity: DDFieldChange<CGVector>?
 }
 
-struct DDNodeDelta {
+struct DDNodeDelta : Codable {
   var physicsBody: PhysicsBodyDelta?
   var position: DDFieldChange<CGPoint>?
   var zPosition: DDFieldChange<CGFloat>?

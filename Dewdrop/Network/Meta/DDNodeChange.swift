@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum DDNodeChange {
+enum DDNodeChange : Codable {
   case delta(DDNodeDelta)
   case full(DDNodeSnapshot)
 }

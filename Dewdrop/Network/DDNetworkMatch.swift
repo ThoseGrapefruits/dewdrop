@@ -104,7 +104,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     
   }
 
-  func registerLocal(node: SKNode) -> DDNetworkDelegate? {
+  func registerLocal(node: DDNode) -> DDNetworkDelegate? {
     guard isHost else {
       return nil
     }
@@ -150,12 +150,18 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       from: data,
       format: &binary)
 
+    // TODO
+
     switch decoded {
       case .hostChange(_, _):
         break
       case .ping(_):
         break
+      case .playerUpdate(_, _):
+        break
       case .registrationRequest(_, _):
+        break
+      case .sceneSnapshot(_, _):
         break
     }
   }
@@ -167,12 +173,18 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       from: data,
       format: &binary)
 
+    // TODO
+
     switch decoded {
       case .hostChange(_, _):
         break
       case .ping(_):
         break
+      case .playerUpdate(_, _):
+        break
       case .registrationRequest(_, _):
+        break
+      case .sceneSnapshot(_, _):
         break
     }
   }

@@ -8,7 +8,7 @@
 import Foundation
 import SpriteKit
 
-enum DDFieldChange<FieldType> {
+enum DDFieldChange<FieldType : Codable> : Codable {
 
   // MARK: Operations
 

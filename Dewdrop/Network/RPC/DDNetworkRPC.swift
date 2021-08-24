@@ -10,7 +10,9 @@ import Foundation
 enum DDNetworkRPCType : Int8, Codable {
   case hostChange
   case ping
+  case playerUpdate
   case registrationRequest
+  case sceneSnapshot
 }
 
 private extension KeyedDecodingContainer where Key == DDNetworkRPC.CodingKeys {
@@ -52,7 +54,9 @@ enum DDNetworkRPC : Codable {
   //   Name                 Metadata    Data
   case hostChange          (DDRPCMetadata, DDRPCHostChange)
   case ping                (DDRPCMetadata)
+  case playerUpdate        (DDRPCMetadata, DDRPCPlayerUpdate)
   case registrationRequest (DDRPCMetadata, DDRPCRegistrationRequest)
+  case sceneSnapshot       (DDRPCMetadata, DDRPCSceneSnapshot)
 
   // MARK: Codable
 
@@ -73,6 +77,12 @@ enum DDNetworkRPC : Codable {
       case .registrationRequest(let metadata, let data):
         try container.encode(
           type: .registrationRequest, metadata: metadata, data: data)
+      case .playerUpdate(let metadata, let data):
+        try container.encode(
+          type: .playerUpdate, metadata: metadata, data: data)
+      case .sceneSnapshot(let metadata, let data):
+        try container.encode(
+          type: .sceneSnapshot, metadata: metadata, data: data)
     }
   }
 
@@ -90,10 +100,18 @@ enum DDNetworkRPC : Codable {
       case .ping:
         let metadata = try container.decodeMetadata()
         self = .ping(metadata)
+      case .playerUpdate:
+        let (metadata, data) = try container.decode(
+          dataType: DDRPCPlayerUpdate.self)
+        self = .playerUpdate(metadata, data)
       case .registrationRequest:
         let (metadata, data) = try container.decode(
           dataType: DDRPCRegistrationRequest.self)
         self = .registrationRequest(metadata, data)
+      case .sceneSnapshot:
+        let (metadata, data) = try container.decode(
+          dataType: DDRPCSceneSnapshot.self)
+        self = .sceneSnapshot(metadata, data)
     }
   }
 }
