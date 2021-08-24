@@ -80,14 +80,14 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     try match?.send(message, to: to, dataMode: mode)
   }
 
-  func sendAll(_ data: DDNetworkData, mode: GKMatch.SendDataMode) throws {
+  func sendAll(_ data: DDNetworkRPC, mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
     try match?.sendData(toAllPlayers: message, with: mode)
   }
 
-  func sendHost(_ data: DDNetworkData, mode: GKMatch.SendDataMode) throws {
+  func sendHost(_ data: DDNetworkRPC, mode: GKMatch.SendDataMode) throws {
     guard let host = host else {
       return
     }
@@ -146,7 +146,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   func receiveMessage(asHost data: Data, fromRemotePlayer player: GKPlayer) {
     var binary = PropertyListSerialization.PropertyListFormat.binary
     let decoded = try! decoder.decode(
-      DDNetworkData.self,
+      DDNetworkRPC.self,
       from: data,
       format: &binary)
 
@@ -163,7 +163,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   func receiveMessage(fromHost data: Data) {
     var binary = PropertyListSerialization.PropertyListFormat.binary
     let decoded = try! decoder.decode(
-      DDNetworkData.self,
+      DDNetworkRPC.self,
       from: data,
       format: &binary)
 

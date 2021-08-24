@@ -1,6 +1,6 @@
 //
-//  DDDataRegistrationRequest.swift
-//  DDDataRegistrationRequest
+//  DDRPCRegistrationRequest.swift
+//  DDRPCRegistrationRequest
 //
 //  Created by Logan Moore on 2021-08-22.
 //
@@ -20,7 +20,7 @@ let nodeTypeMap: [ NodeType : SKNode.Type ] = [
   .ddGun: DDGun.self
 ]
 
-struct DDDataRegistrationRequest : Codable {
+struct DDRPCRegistrationRequest : Codable {
   let nodeType: NodeType
   let nodeProperties: [ String : PropertyValue ]
 

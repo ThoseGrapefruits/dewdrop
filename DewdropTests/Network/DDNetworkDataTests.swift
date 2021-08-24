@@ -25,15 +25,15 @@ class DDNetworkDataTests: XCTestCase {
   }
 
   func testHostChange() throws {
-    let hostChange = DDNetworkData.hostChange(
-      DDMetadata(sender: "walrus"),
-      DDDataHostChange(oldHost: "old", newHost: "new"))
+    let hostChange = DDNetworkRPC.hostChange(
+      DDRPCMetadata(sender: "walrus"),
+      DDRPCHostChange(oldHost: "old", newHost: "new"))
     let encoder = encoder
     let decoder = decoder
 
     let hostChangeEncoded = try encoder.encode(hostChange)
     let hostChangeDecoded = try decoder.decode(
-      DDNetworkData.self,
+      DDNetworkRPC.self,
       from: hostChangeEncoded)
 
     if case (
@@ -49,13 +49,13 @@ class DDNetworkDataTests: XCTestCase {
   }
 
   func testPing() throws {
-    let ping = DDNetworkData.ping(DDMetadata(sender: "banana"))
+    let ping = DDNetworkRPC.ping(DDRPCMetadata(sender: "banana"))
     let encoder = encoder
     let decoder = decoder
 
     let pingEncoded = try encoder.encode(ping)
     let pingDecoded = try decoder.decode(
-      DDNetworkData.self,
+      DDNetworkRPC.self,
       from: pingEncoded)
 
     if case (

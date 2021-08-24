@@ -1,43 +1,43 @@
 //
-//  DDNetworkData.swift
-//  DDNetworkData
+//  DDNetworkRPC.swift
+//  DDNetworkRPC
 //
 //  Created by Logan Moore on 2021-08-20.
 //
 
 import Foundation
 
-enum DDNetworkDataType : Int8, Codable {
+enum DDNetworkRPCType : Int8, Codable {
   case hostChange
   case ping
   case registrationRequest
 }
 
-private extension KeyedDecodingContainer where Key == DDNetworkData.CodingKeys {
+private extension KeyedDecodingContainer where Key == DDNetworkRPC.CodingKeys {
   func decode<DataType>(dataType: DataType.Type) throws
-  -> (DDMetadata, DataType) where DataType : Decodable {
+  -> (DDRPCMetadata, DataType) where DataType : Decodable {
     let metadata = try decodeMetadata()
     let data = try decode(dataType, forKey: .data)
     return (metadata, data)
   }
 
-  func decodeMetadata() throws -> DDMetadata {
-    return try decode(DDMetadata.self, forKey: .metadata)
+  func decodeMetadata() throws -> DDRPCMetadata {
+    return try decode(DDRPCMetadata.self, forKey: .metadata)
   }
 }
 
-private extension KeyedEncodingContainer where K == DDNetworkData.CodingKeys {
+private extension KeyedEncodingContainer where K == DDNetworkRPC.CodingKeys {
   mutating func encode(
-    type: DDNetworkDataType,
-    metadata: DDMetadata
+    type: DDNetworkRPCType,
+    metadata: DDRPCMetadata
   ) throws {
     try encode(type, forKey: .type)
     try encode(metadata, forKey: .metadata)
   }
 
   mutating func encode<DataType>(
-    type: DDNetworkDataType,
-    metadata: DDMetadata,
+    type: DDNetworkRPCType,
+    metadata: DDRPCMetadata,
     data: DataType
   ) throws where DataType : Codable {
     try encode(type: type, metadata: metadata)
@@ -45,14 +45,14 @@ private extension KeyedEncodingContainer where K == DDNetworkData.CodingKeys {
   }
 }
 
-enum DDNetworkData : Codable {
+enum DDNetworkRPC : Codable {
 
   // MARK: Message types
 
   //   Name                 Metadata    Data
-  case hostChange          (DDMetadata, DDDataHostChange)
-  case ping                (DDMetadata)
-  case registrationRequest (DDMetadata, DDDataRegistrationRequest)
+  case hostChange          (DDRPCMetadata, DDRPCHostChange)
+  case ping                (DDRPCMetadata)
+  case registrationRequest (DDRPCMetadata, DDRPCRegistrationRequest)
 
   // MARK: Codable
 
@@ -79,20 +79,20 @@ enum DDNetworkData : Codable {
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let typeName = try container.decode(
-      DDNetworkDataType.self,
+      DDNetworkRPCType.self,
       forKey: .type)
 
     switch typeName {
       case .hostChange:
         let (metadata, data) = try container.decode(
-          dataType: DDDataHostChange.self)
+          dataType: DDRPCHostChange.self)
         self = .hostChange(metadata, data)
       case .ping:
         let metadata = try container.decodeMetadata()
         self = .ping(metadata)
       case .registrationRequest:
         let (metadata, data) = try container.decode(
-          dataType: DDDataRegistrationRequest.self)
+          dataType: DDRPCRegistrationRequest.self)
         self = .registrationRequest(metadata, data)
     }
   }
