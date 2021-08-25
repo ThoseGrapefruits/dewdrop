@@ -9,6 +9,6 @@ import Foundation
 
 protocol DDSceneAddable {
   /// Add self to the given `scene`
-  /// - Returns: `true` if the object was sucessfully added, `false` otherwise
+  /// - Returns: `true` if the object was sucessfully added, `false` otherwise.
   func addToScene(scene: DDScene) throws -> Void
 }

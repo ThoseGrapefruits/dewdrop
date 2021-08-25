@@ -12,6 +12,25 @@ typealias RegistrationID = Int16
 
 class DDNetworkMatch : NSObject, GKMatchDelegate {
 
+  // MARK: Static properties
+
+  static var singleton: DDNetworkMatch {
+    get {
+      if _singleton == nil {
+        _singleton = DDNetworkMatch()
+      }
+
+      return _singleton!
+    }
+    set {
+      _singleton = nil
+    }
+  }
+
+  private static var _singleton: DDNetworkMatch? = .none
+
+  // MARK: Properties
+
   let decoder = PropertyListDecoder()
 
   // MARK: State

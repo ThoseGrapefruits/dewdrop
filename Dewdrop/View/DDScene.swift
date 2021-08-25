@@ -10,7 +10,6 @@ import GameplayKit
 import Combine
 
 class DDScene: SKScene, SKPhysicsContactDelegate {
-
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()

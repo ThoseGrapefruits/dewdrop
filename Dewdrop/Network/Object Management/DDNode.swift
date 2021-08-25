@@ -24,7 +24,5 @@ enum CapturedFieldsPhysicsBody {
 }
 
 protocol DDNode : SKNode {
-  var networkDelegate: DDNetworkDelegate { get }
-
   init(from snapshot: DDNodeSnapshot)
 }

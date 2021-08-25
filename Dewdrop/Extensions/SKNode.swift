@@ -51,4 +51,8 @@ extension SKNode {
 
     return rotation;
   }
+
+  var isHost: Bool {
+    get { DDNetworkMatch.singleton.isHost }
+  }
 }

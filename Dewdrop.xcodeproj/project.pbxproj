@@ -49,7 +49,7 @@
 		DCCD19302693E026002F5585 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		DCDCE19826D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
-		DCFE14EA269B4EE200896428 /* SKNodeGetPosition.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */; };
+		DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNode.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,7 +118,7 @@
 		DCCD192F2693E026002F5585 /* DDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDView.swift; sourceTree = "<group>"; };
 		DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDRPCRegistrationRequest.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
-		DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeGetPosition.swift; sourceTree = "<group>"; };
+		DCFE14E9269B4EE200896428 /* SKNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -310,7 +310,7 @@
 		DC82AC92269B9A890076CB92 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				DCFE14E9269B4EE200896428 /* SKNodeGetPosition.swift */,
+				DCFE14E9269B4EE200896428 /* SKNode.swift */,
 				DC82AC93269B9AC60076CB92 /* CGFloat.swift */,
 				DC018D1C269EA7260087A835 /* CGPoint.swift */,
 			);
@@ -503,7 +503,7 @@
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,
 				DC0E80BB26C99C0800A37917 /* DDMatchmaking.swift in Sources */,
-				DCFE14EA269B4EE200896428 /* SKNodeGetPosition.swift in Sources */,
+				DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */,
 				DC2A7BE826D06089009C7AAF /* DDRPCHostChange.swift in Sources */,
 				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
 				DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */,
