@@ -147,6 +147,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DC0073F626D5BD600027814A /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */,
+				DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */,
+				DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */,
+				DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		DC04E8D6268F83840040F7A9 = {
 			isa = PBXGroup;
 			children = (
@@ -230,12 +241,9 @@
 		DC2A7BE626D0607F009C7AAF /* RPC */ = {
 			isa = PBXGroup;
 			children = (
+				DC0073F626D5BD600027814A /* Data */,
 				DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */,
-				DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */,
 				DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */,
-				DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */,
-				DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */,
-				DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */,
 			);
 			path = RPC;
 			sourceTree = "<group>";
