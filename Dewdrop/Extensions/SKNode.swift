@@ -9,6 +9,9 @@ import Foundation
 import SpriteKit
 
 extension SKNode {
+
+  // MARK: getPositionAndRotation
+
   func getPosition(within ancestor: SKNode) -> CGPoint {
     let (position, _) = getPositionAndRotation(within: ancestor)
 
@@ -52,7 +55,17 @@ extension SKNode {
     return rotation;
   }
 
+  // MARK: Network
+
   var isHost: Bool {
     get { DDNetworkMatch.singleton.isHost }
+  }
+
+  func update(from snapshot: DDNodeSnapshot) {
+    if self is SKScene {
+      // TODO special stuff?
+    }
+
+    // TODO
   }
 }

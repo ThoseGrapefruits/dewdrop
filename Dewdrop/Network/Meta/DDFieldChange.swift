@@ -27,7 +27,7 @@ enum DDFieldChange<FieldType : Codable> : Codable {
     }
   }
 
-  // MARK: apply - SpriteKit
+  // MARK: apply - CoreGraphics
 
   func apply(to existingValue: FieldType?)
   -> FieldType where FieldType == CGFloat {

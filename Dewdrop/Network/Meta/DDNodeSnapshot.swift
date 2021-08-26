@@ -8,7 +8,6 @@
 import Foundation
 import SpriteKit
 
-
 func setIfChanged<T : Equatable>(from old: T, to new: T) -> DDFieldChange<T>? {
   return old == new ? .none : DDFieldChange.set(new)
 }
@@ -90,7 +89,7 @@ struct DDNodeSnapshot : Codable {
 
   // MARK: Static API
 
-  static func capture(_ node: DDNode) -> DDNodeSnapshot {
+  static func capture(_ node: SKNode) -> DDNodeSnapshot {
     return DDNodeSnapshot(
       physicsBody: PhysicsBodySnapshot.capture(node.physicsBody),
       position: node.position,
@@ -113,7 +112,7 @@ struct DDNodeSnapshot : Codable {
     ))
   }
 
-  func restore(to node: DDNode) {
+  func restore(to node: SKNode) {
     physicsBody?.restore(to: node.physicsBody)
 
     node.position = position

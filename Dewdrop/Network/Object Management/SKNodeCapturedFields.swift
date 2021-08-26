@@ -1,8 +1,8 @@
 //
-//  DDNode.swift
-//  DDNode
+//  SKNodeCapturedFields.swift
+//  SKNodeCapturedFields
 //
-//  Created by Logan Moore on 2021-08-23.
+//  Created by Logan Moore on 2021-08-26.
 //
 
 import Foundation
@@ -21,8 +21,4 @@ enum CapturedFieldsPhysicsBody {
   case damping
   case mass
   case velocity
-}
-
-protocol DDNode : SKNode {
-  init(from snapshot: DDNodeSnapshot)
 }

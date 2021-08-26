@@ -23,6 +23,10 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
   // MARK: Initialization
 
   override func sceneDidLoad() {
+    guard isHost else {
+      return
+    }
+
     vivifyBouncyLeaves()
 
     aimTouchNode.name = "Aim touch"

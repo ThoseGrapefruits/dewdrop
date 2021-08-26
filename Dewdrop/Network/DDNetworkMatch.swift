@@ -7,6 +7,7 @@
 
 import Foundation
 import GameKit
+import SceneKit
 
 typealias RegistrationID = Int16
 
@@ -28,10 +29,11 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   private static var _singleton: DDNetworkMatch? = .none
+  private static let updateInterval: CGFloat = 1/30
 
   // MARK: Properties
 
-  let decoder = PropertyListDecoder()
+  private let decoder = PropertyListDecoder()
 
   // MARK: State
 
@@ -46,6 +48,60 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   var isHost: Bool {
     get { host != nil && host == GKLocalPlayer.local }
+  }
+
+  // MARK: Game loops
+
+  func start() {
+    registerScene()
+    watchScene()
+  }
+
+  func watchScene() {
+    guard isHost, let scene = scene else {
+      return
+    }
+
+    // TODO some loop
+
+    let waitForInterval = SKAction.wait(
+      forDuration: DDNetworkMatch.updateInterval)
+    scene.run(waitForInterval) { [weak self] in
+      guard let self = self else {
+        return
+      }
+
+      self.watchScene()
+    }
+  }
+
+  // MARK: Registration
+
+  func register(node: SKNode) -> DDNetworkDelegate? {
+    guard isHost else {
+      return nil
+    }
+
+    let id = registryIndex
+    registryIndex += 1
+
+    let delegate = DDNetworkDelegate(node: node, id: id)
+    registry[id] = delegate
+
+    return delegate
+  }
+
+  func registerScene() {
+    guard let scene = scene else {
+      return
+    }
+
+    var nodesToRegister: [SKNode] = [scene]
+
+    while let node = nodesToRegister.popLast() {
+      let _ = register(node: node)
+      nodesToRegister.insert(contentsOf: node.children, at: 0)
+    }
   }
 
   // MARK: GKMatch
@@ -87,7 +143,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     if player == host && (state == .disconnected || state == .unknown) {
       // TODO pause game
       updateHost { [weak self] newHost in
-         // TODO resync & unpause game
+        // TODO resync & unpause game
       }
     }
   }
@@ -118,24 +174,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   // MARK: API
-
-  func register(node: SKNode, _ closure: (DDNetworkDelegate) -> Void) {
-    
-  }
-
-  func registerLocal(node: DDNode) -> DDNetworkDelegate? {
-    guard isHost else {
-      return nil
-    }
-
-    let id = registryIndex
-    registryIndex += 1
-
-    let delegate = DDNetworkDelegate(id: id, node: node)
-    registry[id] = delegate
-
-    return delegate
-  }
 
   func updateHost(
     player: GKPlayer? = nil,
@@ -174,6 +212,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     switch decoded {
       case .hostChange(_, _):
         break
+      case .lastSeen(_, _):
+        break
       case .ping(_):
         break
       case .playerUpdate(_, _):
@@ -196,6 +236,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     switch decoded {
       case .hostChange(_, _):
+        break
+      case .lastSeen(_, _):
         break
       case .ping(_):
         break

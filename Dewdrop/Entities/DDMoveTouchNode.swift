@@ -19,7 +19,7 @@ class DDMoveTouchNode : SKNode {
     }
     set {
       _fingerDown = newValue
-      touchPosition.strokeColor = newValue ? .cyan : .clear
+      touchPosition.strokeColor = _fingerDown ? .cyan : .clear
     }
   }
 

@@ -12,11 +12,11 @@ class DDNetworkDelegate {
   // MARK: State
 
   let id: RegistrationID
-  weak var node: DDNode?
+  weak var node: SKNode?
 
   // MARK: Initialisation
 
-  init(id: RegistrationID, node: DDNode) {
+  init(node: SKNode, id: RegistrationID) {
     self.id = id
     self.node = node
   }
@@ -26,11 +26,7 @@ class DDNetworkDelegate {
   // TODO(optimisation): Hold 2 of these and swap between them to reduce malloc
   private var lastSnapshot: DDNodeSnapshot? = .none
 
-  var capturedFields: [CapturedFieldsNode] {
-    get {
-      return DDNetworkDelegate.defaultCapturedFields
-    }
-  }
+  var capturedFields = DDNetworkDelegate.defaultCapturedFields
 
   static let defaultCapturedFields: [ CapturedFieldsNode ] = [
     .position,

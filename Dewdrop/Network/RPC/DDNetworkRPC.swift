@@ -9,6 +9,7 @@ import Foundation
 
 enum DDNetworkRPCType : Int8, Codable {
   case hostChange
+  case lastSeen
   case ping
   case playerUpdate
   case registrationRequest
@@ -53,6 +54,7 @@ enum DDNetworkRPC : Codable {
 
   //   Name                 Metadata    Data
   case hostChange          (DDRPCMetadata, DDRPCHostChange)
+  case lastSeen            (DDRPCMetadata, DDRPCLastSeen)
   case ping                (DDRPCMetadata)
   case playerUpdate        (DDRPCMetadata, DDRPCPlayerUpdate)
   case registrationRequest (DDRPCMetadata, DDRPCRegistrationRequest)
@@ -71,6 +73,8 @@ enum DDNetworkRPC : Codable {
       case .hostChange(let metadata, let data):
         try container.encode(
           type: .hostChange, metadata: metadata, data: data)
+      case .lastSeen(let metadata, let data):
+        try container.encode(type: .lastSeen, metadata: metadata, data: data)
       case .ping(let metadata):
         try container.encode(
           type: .ping, metadata: metadata)
@@ -97,6 +101,10 @@ enum DDNetworkRPC : Codable {
         let (metadata, data) = try container.decode(
           dataType: DDRPCHostChange.self)
         self = .hostChange(metadata, data)
+      case .lastSeen:
+        let (metadata, data) = try container.decode(
+          dataType: DDRPCLastSeen.self)
+        self = .lastSeen(metadata, data)
       case .ping:
         let metadata = try container.decodeMetadata()
         self = .ping(metadata)

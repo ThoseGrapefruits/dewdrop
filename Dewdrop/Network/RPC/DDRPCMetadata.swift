@@ -8,5 +8,6 @@
 import Foundation
 
 struct DDRPCMetadata : Codable {
+  let index: Int32?
   let sender: String?
 }
