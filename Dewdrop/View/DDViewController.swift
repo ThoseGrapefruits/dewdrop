@@ -41,7 +41,7 @@ class DDViewController: UIViewController {
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 
-      DDNetworkMatch.singleton.updateHost { [weak self] bestHost in
+      DDNetworkMatch.singleton.updateHost { [weak self] _ in
         guard let self = self else {
           return
         }

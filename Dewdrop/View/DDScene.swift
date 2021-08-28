@@ -101,6 +101,18 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
     }
   }
 
+  // MARK: SKScene
+
+  override func addChild(_ node: SKNode) {
+    guard isHost else {
+      return
+    }
+
+    let _ =  DDNetworkMatch.singleton.register(node: node)
+
+    super.addChild(node)
+  }
+
   // MARK: Touch handling
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {

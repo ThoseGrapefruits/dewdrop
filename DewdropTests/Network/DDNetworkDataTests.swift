@@ -26,7 +26,7 @@ class DDNetworkDataTests: XCTestCase {
 
   func testHostChange() throws {
     let hostChange = DDNetworkRPC.hostChange(
-      DDRPCMetadata(sender: "walrus"),
+      DDRPCMetadata(index: 0, indexWrapped: false, sender: "walrus"),
       DDRPCHostChange(oldHost: "old", newHost: "new"))
     let encoder = encoder
     let decoder = decoder
@@ -49,7 +49,8 @@ class DDNetworkDataTests: XCTestCase {
   }
 
   func testPing() throws {
-    let ping = DDNetworkRPC.ping(DDRPCMetadata(sender: "banana"))
+    let ping = DDNetworkRPC.ping(
+      DDRPCMetadata(index: 0, indexWrapped: false, sender: "banana"))
     let encoder = encoder
     let decoder = decoder
 

@@ -8,5 +8,5 @@
 import Foundation
 
 struct DDRPCSceneSnapshot : Codable {
-  
+  let nodes: [ DDNodeDelta ]
 }

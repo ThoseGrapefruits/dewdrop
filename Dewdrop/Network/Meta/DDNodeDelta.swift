@@ -17,6 +17,13 @@ struct PhysicsBodyDelta : Codable {
 }
 
 struct DDNodeDelta : Codable {
+
+  // MARK: Network metadata
+
+  var id: NodeRegistrationID
+
+  // MARK: SKNode fields
+
   var physicsBody: PhysicsBodyDelta?
   var position: DDFieldChange<CGPoint>?
   var zPosition: DDFieldChange<CGFloat>?

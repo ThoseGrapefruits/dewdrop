@@ -60,12 +60,4 @@ extension SKNode {
   var isHost: Bool {
     get { DDNetworkMatch.singleton.isHost }
   }
-
-  func update(from snapshot: DDNodeSnapshot) {
-    if self is SKScene {
-      // TODO special stuff?
-    }
-
-    // TODO
-  }
 }

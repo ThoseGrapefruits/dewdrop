@@ -33,9 +33,12 @@ class DewdropUITests: XCTestCase {
   }
 
   func testLaunchPerformance() throws {
-    if #available(macOS 10.15, iOS 13.0, tvOS 13.0, *) {
+    if #available(iOS 15.0, *) {
       // This measures how long it takes to launch your application.
-      measure(metrics: [XCTApplicationLaunchMetric()]) {
+      let options = XCTMeasureOptions()
+      options.iterationCount = 2
+
+      measure(metrics: [XCTApplicationLaunchMetric()], options: options) {
         XCUIApplication().launch()
       }
     }

@@ -11,12 +11,12 @@ import SpriteKit
 class DDNetworkDelegate {
   // MARK: State
 
-  let id: RegistrationID
+  let id: NodeRegistrationID
   weak var node: SKNode?
 
   // MARK: Initialisation
 
-  init(node: SKNode, id: RegistrationID) {
+  init(node: SKNode, id: NodeRegistrationID) {
     self.id = id
     self.node = node
   }
@@ -54,11 +54,11 @@ class DDNetworkDelegate {
       delta.zRotation?.apply(to: node.zRotation) ?? node.zRotation
   }
 
-  func nextMessage() -> DDNodeChange? {
+  func nextMessage() -> DDNodeDelta? {
     let lastSnapshot = lastSnapshot
     let snapshot = captureSnapshot()
 
-    return snapshot?.delta(from: lastSnapshot)
+    return snapshot?.delta(from: lastSnapshot, id: id)
   }
 
   func captureSnapshot() -> DDNodeSnapshot? {
@@ -66,7 +66,7 @@ class DDNetworkDelegate {
       return .none
     }
 
-    let snapshot = DDNodeSnapshot.capture(node)
+    let snapshot = DDNodeSnapshot.capture(node, id: id)
     lastSnapshot = snapshot
     return snapshot
   }

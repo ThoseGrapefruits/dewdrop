@@ -9,7 +9,7 @@ import Foundation
 import GameKit
 import SceneKit
 
-typealias RegistrationID = Int16
+typealias NodeRegistrationID = Int16
 
 class DDNetworkMatch : NSObject, GKMatchDelegate {
 
@@ -41,8 +41,14 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   var match: GKMatch? = .none
   var scene: SKScene? = .none
 
-  var registry: [RegistrationID : DDNetworkDelegate] = [:]
-  var registryIndex: RegistrationID = 0
+  var onSceneLoaded: (() -> Void)? = .none
+
+  private var registry: [NodeRegistrationID : DDNetworkDelegate] = [:]
+  private var registryIndex: NodeRegistrationID = 0
+  private var requestIndicesReceived:
+    [DDNetworkRPCType : [GKPlayer: (RequestIndex, Bool)] ] = [:]
+  private var requestIndicesSent:
+    [DDNetworkRPCType : (RequestIndex, Bool)] = [:]
 
   // MARK: Accessors
 
@@ -52,17 +58,34 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Game loops
 
-  func start() {
-    registerScene()
-    watchScene()
+  func startClient(_ closure: @escaping () -> Void) {
+    updateHost { [weak self] _ in
+      self?.onSceneLoaded = closure
+    }
   }
 
-  func watchScene() {
+  func startServer() throws {
+    registerScene()
+    try watchScene()
+  }
+
+  func watchScene() throws {
     guard isHost, let scene = scene else {
       return
     }
 
-    // TODO some loop
+    let nodeSnapshots = registry.values.compactMap { delegate in
+      delegate.nextMessage()
+    }
+
+    let (index, wrapped) = getNextRequestSendIndex(for: .sceneSnapshot)
+    let metadata = DDRPCMetadata(
+      index: index,
+      indexWrapped: wrapped,
+      sender: GKLocalPlayer.local.gamePlayerID)
+    let data = DDRPCSceneSnapshot(nodes: nodeSnapshots)
+    let message = DDNetworkRPC.sceneSnapshot(metadata, data)
+    try sendAll(message, mode: .unreliable)
 
     let waitForInterval = SKAction.wait(
       forDuration: DDNetworkMatch.updateInterval)
@@ -71,7 +94,12 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         return
       }
 
-      self.watchScene()
+      do {
+        try self.watchScene()
+      } catch {
+        // TODO probably just leave the match
+        fatalError(error.localizedDescription)
+      }
     }
   }
 
@@ -173,7 +201,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     try match?.send(message, to: [host], dataMode: mode)
   }
 
-  // MARK: API
+  // MARK: Host
 
   func updateHost(
     player: GKPlayer? = nil,
@@ -198,7 +226,47 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
   }
 
-  // MARK: Internal API
+  // MARK: Network message indices
+
+  func getNextRequestSendIndex(for type: DDNetworkRPCType)
+  -> (index: RequestIndex, wrapped: Bool) {
+    let (existingValue, _) = requestIndicesSent[type] ?? (0, false)
+    let newValue = existingValue + 1
+    let wrapped = newValue < existingValue
+    let result = (newValue, wrapped)
+
+    requestIndicesSent[type] = result
+    return result
+  }
+
+  func updateLastReceivedIndex(
+    for type: DDNetworkRPCType,
+    metadata: DDRPCMetadata
+  ) -> (oldIndex: RequestIndex?, newIndex: RequestIndex, wrapped: Bool) {
+    let senderID = metadata.sender
+
+    var typeEntries = requestIndicesReceived[type] ?? [:]
+    requestIndicesReceived[type] = typeEntries
+
+    let sender = match?.players.first { player in
+      player.gamePlayerID == senderID
+    }
+
+    guard let sender = sender else {
+      fatalError("Unknown sender ID: \( senderID )")
+    }
+
+    let oldIndex = typeEntries[sender]?.0
+    let newIndex = metadata.index
+    let wrapped = metadata.indexWrapped
+
+    typeEntries[sender] = (newIndex, wrapped)
+
+    return (oldIndex, newIndex, wrapped)
+  }
+
+
+  // MARK: Messaging
 
   func receiveMessage(asHost data: Data, fromRemotePlayer player: GKPlayer) {
     var binary = PropertyListSerialization.PropertyListFormat.binary
@@ -220,8 +288,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         break
       case .registrationRequest(_, _):
         break
-      case .sceneSnapshot(_, _):
-        break
+      case .sceneSnapshot(let metadata, _):
+        fatalError("Received sceneSnapshot from non-host: \( metadata.sender )")
     }
   }
 
@@ -245,8 +313,34 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         break
       case .registrationRequest(_, _):
         break
-      case .sceneSnapshot(_, _):
-        break
+      case .sceneSnapshot(let metadata, let data):
+        handleSceneSnapshotAsClient(metadata: metadata, data: data)
+    }
+  }
+
+  func shouldProcessMessage(metadata: DDRPCMetadata) -> Bool {
+    let (lastIndex, index, wrapped) = updateLastReceivedIndex(
+      for: .sceneSnapshot, metadata: metadata)
+
+    guard let lastIndex = lastIndex else {
+      return true
+    }
+
+    return wrapped || lastIndex < index
+  }
+
+  // MARK: Message handlers
+
+  func handleSceneSnapshotAsClient(
+    metadata: DDRPCMetadata,
+    data: DDRPCSceneSnapshot
+  ) {
+    guard shouldProcessMessage(metadata: metadata) else {
+      return
+    }
+
+    for delta in data.nodes {
+      registry[delta.id]?.apply(delta: delta)
     }
   }
 }

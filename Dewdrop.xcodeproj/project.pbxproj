@@ -27,7 +27,6 @@
 		DC465C5526D524F6009DCE05 /* DDRPCPlayerUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */; };
 		DC465C5726D5250A009DCE05 /* DDRPCSceneSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */; };
 		DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820226D46D85000359FE /* DDNodeSnapshot.swift */; };
-		DC49820526D46E54000359FE /* DDNodeChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820426D46E54000359FE /* DDNodeChange.swift */; };
 		DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820626D47B93000359FE /* DDFieldChange.swift */; };
 		DC49820926D47F1B000359FE /* DDNodeDelta.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820826D47F1B000359FE /* DDNodeDelta.swift */; };
 		DC4EFC8B26D183AC00B4EE64 /* DDNetworkDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4EFC8A26D183AC00B4EE64 /* DDNetworkDataTests.swift */; };
@@ -97,7 +96,6 @@
 		DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCPlayerUpdate.swift; sourceTree = "<group>"; };
 		DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSceneSnapshot.swift; sourceTree = "<group>"; };
 		DC49820226D46D85000359FE /* DDNodeSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeSnapshot.swift; sourceTree = "<group>"; };
-		DC49820426D46E54000359FE /* DDNodeChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeChange.swift; sourceTree = "<group>"; };
 		DC49820626D47B93000359FE /* DDFieldChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDFieldChange.swift; sourceTree = "<group>"; };
 		DC49820826D47F1B000359FE /* DDNodeDelta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeDelta.swift; sourceTree = "<group>"; };
 		DC4EFC8A26D183AC00B4EE64 /* DDNetworkDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkDataTests.swift; sourceTree = "<group>"; };
@@ -350,7 +348,6 @@
 			isa = PBXGroup;
 			children = (
 				DC49820626D47B93000359FE /* DDFieldChange.swift */,
-				DC49820426D46E54000359FE /* DDNodeChange.swift */,
 				DC49820826D47F1B000359FE /* DDNodeDelta.swift */,
 				DC49820226D46D85000359FE /* DDNodeSnapshot.swift */,
 			);
@@ -502,7 +499,6 @@
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
 				DCB6530C26A901E60097839C /* DDAudioNodeGroup.swift in Sources */,
 				DCDCE19826D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift in Sources */,
-				DC49820526D46E54000359FE /* DDNodeChange.swift in Sources */,
 				DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,

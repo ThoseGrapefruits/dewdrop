@@ -8,7 +8,7 @@
 import Foundation
 import SpriteKit
 
-func setIfChanged<T : Equatable>(from old: T, to new: T) -> DDFieldChange<T>? {
+func setIfChanged<T : Equatable>(from old: T?, to new: T) -> DDFieldChange<T>? {
   return old == new ? .none : DDFieldChange.set(new)
 }
 
@@ -80,17 +80,23 @@ struct PhysicsBodySnapshot : Codable {
 
 struct DDNodeSnapshot : Codable {
 
+  // MARK: Network metadata
+
+  let id: NodeRegistrationID
+
   // MARK: Stored fields
 
-  var physicsBody: PhysicsBodySnapshot?
-  var position: CGPoint
-  var zPosition: CGFloat
-  var zRotation: CGFloat
+  let physicsBody: PhysicsBodySnapshot?
+  let position: CGPoint
+  let zPosition: CGFloat
+  let zRotation: CGFloat
 
   // MARK: Static API
 
-  static func capture(_ node: SKNode) -> DDNodeSnapshot {
+  static func capture(_ node: SKNode, id: NodeRegistrationID)
+    -> DDNodeSnapshot {
     return DDNodeSnapshot(
+      id: id,
       physicsBody: PhysicsBodySnapshot.capture(node.physicsBody),
       position: node.position,
       zPosition: node.zPosition,
@@ -99,20 +105,17 @@ struct DDNodeSnapshot : Codable {
 
   // MARK: API
 
-  func delta(from: DDNodeSnapshot?) -> DDNodeChange {
-    guard let from = from else {
-      return DDNodeChange.full(self)
-    }
-
-    return DDNodeChange.delta(DDNodeDelta(
-      physicsBody: physicsBody?.delta(from: from.physicsBody),
-      position: setIfChanged(from: from.position, to: position),
-      zPosition: setIfChanged(from: from.zPosition, to: zPosition),
-      zRotation: setIfChanged(from: from.zRotation, to: zRotation)
-    ))
+  func delta(from: DDNodeSnapshot?, id: NodeRegistrationID) -> DDNodeDelta {
+    return DDNodeDelta(
+      id: id,
+      physicsBody: physicsBody?.delta(from: from?.physicsBody),
+      position: setIfChanged(from: from?.position, to: position),
+      zPosition: setIfChanged(from: from?.zPosition, to: zPosition),
+      zRotation: setIfChanged(from: from?.zRotation, to: zRotation)
+    )
   }
 
-  func restore(to node: SKNode) {
+  func apply(to node: SKNode) {
     physicsBody?.restore(to: node.physicsBody)
 
     node.position = position
