@@ -6,19 +6,22 @@
 //
 
 import Foundation
+import GameKit
 import SpriteKit
 
 class DDNetworkDelegate {
   // MARK: State
 
-  let id: NodeRegistrationID
+  let id: DDNodeID
   weak var node: SKNode?
+  let owner: GKPlayer
 
   // MARK: Initialisation
 
-  init(node: SKNode, id: NodeRegistrationID) {
+  init(node: SKNode, id: DDNodeID, owner: GKPlayer) {
     self.id = id
     self.node = node
+    self.owner = owner
   }
 
   // MARK: Snapshots
@@ -46,12 +49,7 @@ class DDNetworkDelegate {
       return
     }
 
-    node.position =
-      delta.position?.apply(to: node.position) ?? node.position
-    node.zPosition =
-      delta.zPosition?.apply(to: node.zPosition) ?? node.zPosition
-    node.zRotation =
-      delta.zRotation?.apply(to: node.zRotation) ?? node.zRotation
+    delta.apply(to: node)
   }
 
   func nextMessage() -> DDNodeDelta? {

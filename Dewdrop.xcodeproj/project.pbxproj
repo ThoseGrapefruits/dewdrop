@@ -48,6 +48,8 @@
 		DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192D2693DABB002F5585 /* PIDController.swift */; };
 		DCCD19302693E026002F5585 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		DCDCE19826D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */; };
+		DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD726DA8975001229CB /* DDNodeType.swift */; };
+		DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
 		DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNode.swift */; };
 /* End PBXBuildFile section */
@@ -117,6 +119,8 @@
 		DCCD192D2693DABB002F5585 /* PIDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIDController.swift; sourceTree = "<group>"; };
 		DCCD192F2693E026002F5585 /* DDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDView.swift; sourceTree = "<group>"; };
 		DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDRPCRegistrationRequest.swift; sourceTree = "<group>"; };
+		DCE10DD726DA8975001229CB /* DDNodeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeType.swift; sourceTree = "<group>"; };
+		DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSpawnNodes.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
 		DCFE14E9269B4EE200896428 /* SKNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -155,6 +159,7 @@
 				DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */,
 				DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */,
 				DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */,
+				DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -350,6 +355,7 @@
 				DC49820626D47B93000359FE /* DDFieldChange.swift */,
 				DC49820826D47F1B000359FE /* DDNodeDelta.swift */,
 				DC49820226D46D85000359FE /* DDNodeSnapshot.swift */,
+				DCE10DD726DA8975001229CB /* DDNodeType.swift */,
 			);
 			path = Meta;
 			sourceTree = "<group>";
@@ -509,10 +515,12 @@
 				DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,
+				DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */,
 				DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */,
 				DC49820926D47F1B000359FE /* DDNodeDelta.swift in Sources */,
 				DC2A7BE526D0605F009C7AAF /* DDNetworkRPC.swift in Sources */,
 				DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */,
+				DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */,
 				DC0E80B926C9955700A37917 /* DDNetworkDelegate.swift in Sources */,
 				DCF9815726983FD400430005 /* DDBitmask.swift in Sources */,
 				DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */,

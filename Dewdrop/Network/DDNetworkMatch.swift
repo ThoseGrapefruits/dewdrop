@@ -9,7 +9,7 @@ import Foundation
 import GameKit
 import SceneKit
 
-typealias NodeRegistrationID = Int16
+typealias DDNodeID = Int16
 
 class DDNetworkMatch : NSObject, GKMatchDelegate {
 
@@ -35,16 +35,21 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   private let decoder = PropertyListDecoder()
 
-  // MARK: State
+  // MARK: References
 
   var host: GKPlayer? = .none
   var match: GKMatch? = .none
   var scene: SKScene? = .none
 
-  var onSceneLoaded: (() -> Void)? = .none
+  // MARK: External event handlers
 
-  private var registry: [NodeRegistrationID : DDNetworkDelegate] = [:]
-  private var registryIndex: NodeRegistrationID = 0
+  var onSceneLoaded: (() -> Void)? = .none
+  var registrationResponseDelegate: ((DDNetworkDelegate) -> Void)? = .none
+
+  // MARK: Network registries
+
+  private var registry: [DDNodeID : DDNetworkDelegate] = [:]
+  private var registryIndex: DDNodeID = 0
   private var requestIndicesReceived:
     [DDNetworkRPCType : [GKPlayer: (RequestIndex, Bool)] ] = [:]
   private var requestIndicesSent:
@@ -105,7 +110,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Registration
 
-  func register(node: SKNode) -> DDNetworkDelegate? {
+  func register(node: SKNode, owner: GKPlayer) -> DDNetworkDelegate? {
     guard isHost else {
       return nil
     }
@@ -113,23 +118,29 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     let id = registryIndex
     registryIndex += 1
 
-    let delegate = DDNetworkDelegate(node: node, id: id)
+    let delegate = DDNetworkDelegate(node: node, id: id, owner: owner)
     registry[id] = delegate
 
     return delegate
   }
 
   func registerScene() {
-    guard let scene = scene else {
+    guard let host = host, let scene = scene else {
       return
     }
 
     var nodesToRegister: [SKNode] = [scene]
 
     while let node = nodesToRegister.popLast() {
-      let _ = register(node: node)
+      let _ = register(node: node, owner: host)
       nodesToRegister.insert(contentsOf: node.children, at: 0)
     }
+
+    // TODO send update
+  }
+
+  func requestRegistration(node: SKNode) {
+    // TODO
   }
 
   // MARK: GKMatch
@@ -139,12 +150,10 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     didReceive data: Data,
     fromRemotePlayer player: GKPlayer
   ) {
-    self.match = match
-    // TODO
     if isHost {
       receiveMessage(asHost: data, fromRemotePlayer: player)
     } else if host == player {
-
+      receiveMessage(fromHost: data)
     }
   }
 
@@ -154,7 +163,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     forRecipient recipient: GKPlayer,
     fromRemotePlayer player: GKPlayer
   ) {
-    self.match = match
     guard isHost else {
       return
     }
@@ -167,10 +175,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     player: GKPlayer,
     didChange state: GKPlayerConnectionState
   ) {
-    self.match = match
     if player == host && (state == .disconnected || state == .unknown) {
       // TODO pause game
-      updateHost { [weak self] newHost in
+      updateHost { newHost in
         // TODO resync & unpause game
       }
     }

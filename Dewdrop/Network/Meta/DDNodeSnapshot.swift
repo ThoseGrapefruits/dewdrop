@@ -8,7 +8,7 @@
 import Foundation
 import SpriteKit
 
-func setIfChanged<T : Equatable>(from old: T?, to new: T) -> DDFieldChange<T>? {
+func setIfChanged<T : Equatable>(from old: T?, to new: T) -> DDFieldChange<T> {
   return old == new ? .none : DDFieldChange.set(new)
 }
 
@@ -41,7 +41,7 @@ struct PhysicsBodySnapshot : Codable {
       return PhysicsBodyDelta(
         angularDamping: .set(angularDamping),
         angularVelocity: .set(angularVelocity),
-        damping: .set(linearDamping),
+        linearDamping: .set(linearDamping),
         mass: .set(mass),
         velocity: .set(velocity))
     }
@@ -53,7 +53,7 @@ struct PhysicsBodySnapshot : Codable {
       angularVelocity: setIfChanged(
         from: angularVelocity,
         to: last.angularVelocity),
-      damping: setIfChanged(
+      linearDamping: setIfChanged(
         from: linearDamping,
         to: last.linearDamping),
       mass: setIfChanged(
@@ -65,7 +65,7 @@ struct PhysicsBodySnapshot : Codable {
       )
   }
 
-  func restore(to physicsBody: SKPhysicsBody?) {
+  func apply(to physicsBody: SKPhysicsBody?) {
     guard let physicsBody = physicsBody else {
       return
     }
@@ -82,7 +82,7 @@ struct DDNodeSnapshot : Codable {
 
   // MARK: Network metadata
 
-  let id: NodeRegistrationID
+  let id: DDNodeID
 
   // MARK: Stored fields
 
@@ -93,7 +93,7 @@ struct DDNodeSnapshot : Codable {
 
   // MARK: Static API
 
-  static func capture(_ node: SKNode, id: NodeRegistrationID)
+  static func capture(_ node: SKNode, id: DDNodeID)
     -> DDNodeSnapshot {
     return DDNodeSnapshot(
       id: id,
@@ -105,7 +105,7 @@ struct DDNodeSnapshot : Codable {
 
   // MARK: API
 
-  func delta(from: DDNodeSnapshot?, id: NodeRegistrationID) -> DDNodeDelta {
+  func delta(from: DDNodeSnapshot?, id: DDNodeID) -> DDNodeDelta {
     return DDNodeDelta(
       id: id,
       physicsBody: physicsBody?.delta(from: from?.physicsBody),
@@ -116,7 +116,7 @@ struct DDNodeSnapshot : Codable {
   }
 
   func apply(to node: SKNode) {
-    physicsBody?.restore(to: node.physicsBody)
+    physicsBody?.apply(to: node.physicsBody)
 
     node.position = position
     node.zPosition = zPosition

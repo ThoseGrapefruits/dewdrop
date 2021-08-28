@@ -26,48 +26,60 @@ class DDViewController: UIViewController {
 
     matchmaking.findMatch(view: self) { [weak self] match, error in
       guard error == nil else {
-        print(error.debugDescription)
-        return
-      }
-
-      guard
-        let self = self,
-        let sceneNode = DDScene(fileNamed: "DDScene"),
-        let view = self.view as! SKView?
-      else {
-        return
+        // TODO actual error handling
+        fatalError(error.debugDescription)
       }
 
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 
-      DDNetworkMatch.singleton.updateHost { [weak self] _ in
+      DDNetworkMatch.singleton.updateHost { [weak self] host in
         guard let self = self else {
           return
         }
 
-        let playerNode = DDPlayerNode()
-        playerNode.mainCircle.position = DDViewController.START_POSITION
-        playerNode.addToScene(scene: sceneNode)
-
-        let cameraNode = DDCameraNode()
-        sceneNode.addChild(cameraNode)
-        cameraNode.position = DDViewController.START_POSITION
-        sceneNode.camera = cameraNode
-
-        self.scene = sceneNode
-
-        // Present the scene
-        view.presentScene(sceneNode)
-
-        playerNode.start()
-        cameraNode.track(playerNode.mainCircle)
-
-        view.ignoresSiblingOrder = true
-
-        view.showsFPS = true
-        view.showsNodeCount = true
+        if DDNetworkMatch.singleton.isHost {
+          self.scene = DDScene(fileNamed: "DDScene")
+          DDNetworkMatch.singleton.scene = self.scene
+          self.startClient {
+            try! DDNetworkMatch.singleton.startServer()
+          }
+        } else {
+          self.startClient()
+        }
       }
+    }
+  }
+
+  func startClient(_ closure: (() -> Void)? = .none) {
+    DDNetworkMatch.singleton.startClient { [weak self] in
+      guard
+        let self = self,
+        let scene = self.scene,
+        let view = self.view as! SKView?
+      else {
+        return
+      }
+
+      let playerNode = DDPlayerNode()
+      playerNode.mainCircle.position = DDViewController.START_POSITION
+      playerNode.addToScene(scene: self.scene!)
+
+      let cameraNode = DDCameraNode()
+      scene.addChild(cameraNode)
+      cameraNode.position = DDViewController.START_POSITION
+      scene.camera = cameraNode
+
+      // Present the scene
+      view.presentScene(self.scene!)
+
+      playerNode.start()
+      cameraNode.track(playerNode.mainCircle)
+
+      view.ignoresSiblingOrder = true
+
+      view.showsFPS = true
+      view.showsNodeCount = true
     }
   }
 
