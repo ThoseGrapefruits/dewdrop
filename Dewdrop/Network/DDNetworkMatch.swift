@@ -50,9 +50,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   private var registry: [DDNodeID : DDNetworkDelegate] = [:]
   private var registryIndex: DDNodeID = 0
-  private var requestIndicesSeenBy:
+  private var requestLastSeenBy:
     [DDNetworkRPCType : [GKPlayer: (RequestIndex, Bool)] ] = [:]
-  private var requestIndicesSeenFrom:
+  private var requestLastSeenFrom:
     [DDNetworkRPCType : [GKPlayer: (RequestIndex, Bool)] ] = [:]
   private var requestIndicesSent:
     [DDNetworkRPCType : (RequestIndex, Bool)] = [:]
@@ -157,7 +157,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     try sendHost(message, mode: .reliable)
   }
 
-  // MARK: GKMatch
+  // MARK: Network message receiving
 
   func match(
     _ match: GKMatch,
@@ -198,6 +198,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       }
     }
   }
+
+
+  // MARK: Network message sending
 
   func send(_ data: Data, to: [GKPlayer], mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
@@ -269,8 +272,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) -> (oldIndex: RequestIndex?, newIndex: RequestIndex, wrapped: Bool) {
     let senderID = metadata.sender
 
-    var typeEntries = requestIndicesSeenFrom[type] ?? [:]
-    requestIndicesSeenFrom[type] = typeEntries
+    var typeEntries = requestLastSeenFrom[type] ?? [:]
+    requestLastSeenFrom[type] = typeEntries
 
     let sender = match?.players.first { player in
       player.gamePlayerID == senderID
@@ -302,8 +305,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       case .lastSeen(let metadata, let data):
         handleLastSeen(metadata: metadata, data: data)
         break
-      case .ping(_):
-        break
       case .playerUpdate(_, _):
         break
       case .registrationRequest(_, _):
@@ -323,8 +324,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     switch decoded {
       case .lastSeen(let metadata, let data):
         handleLastSeen(metadata: metadata, data: data)
-        break
-      case .ping(_):
         break
       case .playerUpdate(_, _):
         fatalError("Received .playerUpdate as client")
@@ -365,8 +364,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     let receiverID = metadata.sender
 
-    var typeEntries = requestIndicesSeenFrom[data.type] ?? [:]
-    requestIndicesSeenFrom[data.type] = typeEntries
+    var typeEntries = requestLastSeenBy[data.type] ?? [:]
+    requestLastSeenBy[data.type] = typeEntries
 
     let sender = match?.players.first { player in
       player.gamePlayerID == receiverID

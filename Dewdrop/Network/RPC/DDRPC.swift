@@ -9,7 +9,6 @@ import Foundation
 
 enum DDNetworkRPCType : Int8, Codable {
   case lastSeen
-  case ping
   case playerUpdate
   case registrationRequest
   case sceneSnapshot
@@ -82,7 +81,6 @@ enum DDRPC : Codable {
 
   //   Name                 Metadata    Data
   case lastSeen            (DDRPCMetadataUnreliable, DDRPCLastSeen)
-  case ping                (DDRPCMetadataReliable)
   case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
   case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
   case sceneSnapshot       (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
@@ -99,9 +97,6 @@ enum DDRPC : Codable {
     switch self {
       case .lastSeen(let metadata, let data):
         try container.encode(type: .lastSeen, metadata: metadata, data: data)
-      case .ping(let metadata):
-        try container.encode(
-          type: .ping, metadata: metadata)
       case .registrationRequest(let metadata, let data):
         try container.encode(
           type: .registrationRequest, metadata: metadata, data: data)
@@ -125,9 +120,6 @@ enum DDRPC : Codable {
         let (metadata, data) = try container.decode(
           unreliable: DDRPCLastSeen.self)
         self = .lastSeen(metadata, data)
-      case .ping:
-        let metadata = try container.decodeMetadataReliable()
-        self = .ping(metadata)
       case .playerUpdate:
         let (metadata, data) = try container.decode(
           unreliable: DDRPCPlayerUpdate.self)
