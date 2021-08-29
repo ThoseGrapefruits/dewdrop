@@ -24,39 +24,53 @@ class DDNetworkDataTests: XCTestCase {
     }
   }
 
-  func testHostChange() throws {
-    let hostChange = DDNetworkRPC.hostChange(
-      DDRPCMetadata(index: 0, indexWrapped: false, sender: "walrus"),
-      DDRPCHostChange(oldHost: "old", newHost: "new"))
+  func testRegistrationRequest() throws {
+    let hostChange = DDRPC.registrationRequest(
+      DDRPCMetadataReliable(index: 0, indexWrapped: false, sender: "walrus"),
+      DDRPCRegistrationRequest(
+        type: DDNodeType.ddGun,
+        snapshot: DDNodeSnapshot(
+          id: DDNodeID.zero,
+          physicsBody: nil,
+          position: CGPoint.zero,
+          zPosition: CGFloat.zero,
+          zRotation: CGFloat.zero)))
     let encoder = encoder
     let decoder = decoder
 
     let hostChangeEncoded = try encoder.encode(hostChange)
     let hostChangeDecoded = try decoder.decode(
-      DDNetworkRPC.self,
+      DDRPC.self,
       from: hostChangeEncoded)
 
     if case (
-      .hostChange(let metadata, let data),
-      .hostChange(let metadataDecoded, let dataDecoded)
+      .registrationRequest(let metadata, let data),
+      .registrationRequest(let metadataDecoded, let dataDecoded)
     ) = (hostChange, hostChangeDecoded) {
-      XCTAssertEqual(metadata.sender, metadataDecoded.sender)
-      XCTAssertEqual(data.oldHost, dataDecoded.oldHost)
-      XCTAssertEqual(data.newHost, dataDecoded.newHost)
+      XCTAssertEqual(metadata.index,        metadataDecoded.index)
+      XCTAssertEqual(metadata.indexWrapped, metadataDecoded.indexWrapped)
+      XCTAssertEqual(metadata.sender,       metadataDecoded.sender)
+
+      let snapshot = data.snapshot, snapshotDecoded = dataDecoded.snapshot
+      XCTAssertNil(snapshotDecoded.physicsBody)
+      XCTAssertEqual(snapshot.id,        snapshotDecoded.id)
+      XCTAssertEqual(snapshot.position,  snapshotDecoded.position)
+      XCTAssertEqual(snapshot.zPosition, snapshotDecoded.zPosition)
+      XCTAssertEqual(snapshot.zRotation,  snapshotDecoded.zRotation)
     } else {
-      XCTFail("hostChange or hostChangeDecoded was not a hostChange")
+      XCTFail("registrationRequest or registrationRequestDecoded not right")
     }
   }
 
   func testPing() throws {
-    let ping = DDNetworkRPC.ping(
-      DDRPCMetadata(index: 0, indexWrapped: false, sender: "banana"))
+    let ping = DDRPC.ping(
+      DDRPCMetadataReliable(index: 0, indexWrapped: false, sender: "banana"))
     let encoder = encoder
     let decoder = decoder
 
     let pingEncoded = try encoder.encode(ping)
     let pingDecoded = try decoder.decode(
-      DDNetworkRPC.self,
+      DDRPC.self,
       from: pingEncoded)
 
     if case (

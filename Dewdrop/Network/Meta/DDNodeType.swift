@@ -16,7 +16,7 @@ let ddNodeTypeRegistry: [ DDNodeType: SKNode.Type ] = [
   .skNode: SKNode.self
 ]
 
-enum DDNodeType : UInt8 {
+enum DDNodeType : UInt8, Codable {
   case ddGun
   case ddPlayerDroplet
   case ddPlayerNode
@@ -29,5 +29,3 @@ func instantiate<NodeType : SKNode>(type: DDNodeType) -> NodeType {
 
   return TypeReference?.init() as! NodeType
 }
-
-let x: DDGun = instantiate(type: .ddGun)

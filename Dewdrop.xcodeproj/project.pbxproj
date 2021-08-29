@@ -21,8 +21,7 @@
 		DC0E80BB26C99C0800A37917 /* DDMatchmaking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0E80BA26C99C0800A37917 /* DDMatchmaking.swift */; };
 		DC1A3D0E26C44650008850ED /* SKNodeGetPositionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1A3D0D26C44650008850ED /* SKNodeGetPositionTests.swift */; };
 		DC1A3D1026C45BA6008850ED /* CGFloatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */; };
-		DC2A7BE526D0605F009C7AAF /* DDNetworkRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */; };
-		DC2A7BE826D06089009C7AAF /* DDRPCHostChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */; };
+		DC2A7BE526D0605F009C7AAF /* DDRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE426D0605F009C7AAF /* DDRPC.swift */; };
 		DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		DC465C5526D524F6009DCE05 /* DDRPCPlayerUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */; };
 		DC465C5726D5250A009DCE05 /* DDRPCSceneSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */; };
@@ -33,7 +32,7 @@
 		DC5347ED26A69E62004DF564 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */; };
 		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
 		DC59CC7426C70C7100971935 /* CGPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59CC7326C70C7100971935 /* CGPointTests.swift */; };
-		DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */; };
+		DC74AFC726D17CB300498E41 /* DDRPCMetadataUnreliable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74AFC626D17CB300498E41 /* DDRPCMetadataUnreliable.swift */; };
 		DC78A7F426966DD0000FFCFD /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
 		DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82AC93269B9AC60076CB92 /* CGFloat.swift */; };
 		DCAE32CE26A66A4D0079BCC7 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSChamberDroplet.aif */; };
@@ -48,6 +47,7 @@
 		DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192D2693DABB002F5585 /* PIDController.swift */; };
 		DCCD19302693E026002F5585 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		DCDCE19826D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */; };
+		DCDF577626DB242A0046B012 /* DDRPCMetadataReliable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF577526DB242A0046B012 /* DDRPCMetadataReliable.swift */; };
 		DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD726DA8975001229CB /* DDNodeType.swift */; };
 		DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
@@ -92,8 +92,7 @@
 		DC0E80BA26C99C0800A37917 /* DDMatchmaking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDMatchmaking.swift; sourceTree = "<group>"; };
 		DC1A3D0D26C44650008850ED /* SKNodeGetPositionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeGetPositionTests.swift; sourceTree = "<group>"; };
 		DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloatTests.swift; sourceTree = "<group>"; };
-		DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkRPC.swift; sourceTree = "<group>"; };
-		DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCHostChange.swift; sourceTree = "<group>"; };
+		DC2A7BE426D0605F009C7AAF /* DDRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPC.swift; sourceTree = "<group>"; };
 		DC3BB91026AC870F0097A9AA /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
 		DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCPlayerUpdate.swift; sourceTree = "<group>"; };
 		DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSceneSnapshot.swift; sourceTree = "<group>"; };
@@ -104,7 +103,7 @@
 		DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
 		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
 		DC59CC7326C70C7100971935 /* CGPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPointTests.swift; sourceTree = "<group>"; };
-		DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCMetadata.swift; sourceTree = "<group>"; };
+		DC74AFC626D17CB300498E41 /* DDRPCMetadataUnreliable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCMetadataUnreliable.swift; sourceTree = "<group>"; };
 		DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDMoveTouchNode.swift; sourceTree = "<group>"; };
 		DC82AC93269B9AC60076CB92 /* CGFloat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGFloat.swift; sourceTree = "<group>"; };
 		DCAE32CD26A66A4D0079BCC7 /* FSChamberDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSChamberDroplet.aif; sourceTree = "<group>"; };
@@ -119,6 +118,7 @@
 		DCCD192D2693DABB002F5585 /* PIDController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PIDController.swift; sourceTree = "<group>"; };
 		DCCD192F2693E026002F5585 /* DDView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDView.swift; sourceTree = "<group>"; };
 		DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDRPCRegistrationRequest.swift; sourceTree = "<group>"; };
+		DCDF577526DB242A0046B012 /* DDRPCMetadataReliable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCMetadataReliable.swift; sourceTree = "<group>"; };
 		DCE10DD726DA8975001229CB /* DDNodeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeType.swift; sourceTree = "<group>"; };
 		DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSpawnNodes.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
@@ -154,7 +154,6 @@
 		DC0073F626D5BD600027814A /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				DC2A7BE726D06089009C7AAF /* DDRPCHostChange.swift */,
 				DCDCE19726D2DC4D0095E2DE /* DDRPCRegistrationRequest.swift */,
 				DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */,
 				DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */,
@@ -248,8 +247,9 @@
 			isa = PBXGroup;
 			children = (
 				DC0073F626D5BD600027814A /* Data */,
-				DC2A7BE426D0605F009C7AAF /* DDNetworkRPC.swift */,
-				DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */,
+				DC2A7BE426D0605F009C7AAF /* DDRPC.swift */,
+				DC74AFC626D17CB300498E41 /* DDRPCMetadataUnreliable.swift */,
+				DCDF577526DB242A0046B012 /* DDRPCMetadataReliable.swift */,
 			);
 			path = RPC;
 			sourceTree = "<group>";
@@ -510,15 +510,15 @@
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,
 				DC0E80BB26C99C0800A37917 /* DDMatchmaking.swift in Sources */,
 				DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */,
-				DC2A7BE826D06089009C7AAF /* DDRPCHostChange.swift in Sources */,
 				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
-				DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */,
+				DC74AFC726D17CB300498E41 /* DDRPCMetadataUnreliable.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
+				DCDF577626DB242A0046B012 /* DDRPCMetadataReliable.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,
 				DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */,
 				DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */,
 				DC49820926D47F1B000359FE /* DDNodeDelta.swift in Sources */,
-				DC2A7BE526D0605F009C7AAF /* DDNetworkRPC.swift in Sources */,
+				DC2A7BE526D0605F009C7AAF /* DDRPC.swift in Sources */,
 				DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */,
 				DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */,
 				DC0E80B926C9955700A37917 /* DDNetworkDelegate.swift in Sources */,

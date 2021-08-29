@@ -63,7 +63,7 @@ class DDViewController: UIViewController {
 
       let playerNode = DDPlayerNode()
       playerNode.mainCircle.position = DDViewController.START_POSITION
-      playerNode.addToScene(scene: self.scene!)
+      // playerNode.addToScene(scene: self.scene!)
 
       let cameraNode = DDCameraNode()
       scene.addChild(cameraNode)

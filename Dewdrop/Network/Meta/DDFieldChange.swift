@@ -24,8 +24,7 @@ enum DDFieldChange<FieldType : Codable> : Codable {
         fatalError(
           "apply(to:) .add not implemented for \( type(of: existingValue) )")
       case .none:
-        fatalError(
-          "apply(to:) .none not implemented for \( type(of: existingValue) )")
+        return existingValue
       case .set(let newValue):
         return newValue
     }

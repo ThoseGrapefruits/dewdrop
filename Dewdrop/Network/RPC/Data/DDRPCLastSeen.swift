@@ -9,5 +9,5 @@ import Foundation
 
 struct DDRPCLastSeen : Codable {
   let type: DDNetworkRPCType
-  let index: Int32
+  let index: RequestIndex
 }

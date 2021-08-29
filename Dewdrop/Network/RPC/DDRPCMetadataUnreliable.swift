@@ -9,7 +9,7 @@ import Foundation
 
 typealias RequestIndex = UInt16
 
-struct DDRPCMetadata : Codable {
+struct DDRPCMetadataUnreliable : Codable {
   let index: RequestIndex
   let indexWrapped: Bool
   let sender: String
