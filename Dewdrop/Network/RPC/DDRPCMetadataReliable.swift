@@ -10,5 +10,4 @@ import Foundation
 struct DDRPCMetadataReliable : Codable {
   let index: RequestIndex
   let indexWrapped: Bool
-  let sender: String
 }

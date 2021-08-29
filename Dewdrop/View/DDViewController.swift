@@ -41,10 +41,12 @@ class DDViewController: UIViewController {
         if DDNetworkMatch.singleton.isHost {
           self.scene = DDScene(fileNamed: "DDScene")
           DDNetworkMatch.singleton.scene = self.scene
+          print("--starting as host--")
           self.startClient {
             try! DDNetworkMatch.singleton.startServer()
           }
         } else {
+          print("--starting as client--")
           self.startClient()
         }
       }

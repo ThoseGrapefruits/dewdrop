@@ -63,16 +63,10 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     get { host != nil && host == GKLocalPlayer.local }
   }
 
-  var localPlayerID: String {
-    get { GKLocalPlayer.local.gamePlayerID }
-  }
-
   // MARK: Game loops
 
   func startClient(_ closure: @escaping () -> Void) {
-    updateHost { [weak self] _ in
-      self?.onSceneLoaded = closure
-    }
+    self.onSceneLoaded = closure
   }
 
   func startServer() throws {
@@ -92,8 +86,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     let (index, wrapped) = getNextRequestSendIndex(for: .sceneSnapshot)
     let metadata = DDRPCMetadataUnreliable(
       index: index,
-      indexWrapped: wrapped,
-      sender: GKLocalPlayer.local.gamePlayerID)
+      indexWrapped: wrapped)
     let data = DDRPCSceneSnapshot(nodes: nodeSnapshots)
     let message = DDRPC.sceneSnapshot(metadata, data)
     try sendAll(message, mode: .unreliable)
@@ -151,7 +144,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) throws {
     let (index, wrapped) = getNextRequestSendIndex(for: .registrationRequest)
     let metadata = DDRPCMetadataReliable(
-      index: index, indexWrapped: wrapped, sender: localPlayerID)
+      index: index, indexWrapped: wrapped)
     let data = DDRPCRegistrationRequest(type: nodeType, snapshot: snapshot)
     let message = DDRPC.registrationRequest(metadata, data)
     try sendHost(message, mode: .reliable)
@@ -245,9 +238,27 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       }
 
       if let player = player {
+        print("--optimal host--", player.displayName)
         self.updateHost(player: player, closure)
       } else {
-        self.updateHost(player: match.players[0], closure)
+        let localPlayer = GKLocalPlayer.local as GKPlayer
+
+        // TODO this probably isn't reliable. Not great to do anything
+        // programmatic based on displayName but I think it's the only shared
+        // identifier we have access to and makes things a lot easier than
+        // negotiating a host more correctly.
+        let defaultHost = match.players.reduce(localPlayer) { lowest, player in
+          switch player.displayName.compare(lowest.displayName)  {
+            case .orderedAscending:
+              return player
+            default:
+              return lowest
+          }
+        }
+
+        print("--default host--", defaultHost.displayName)
+
+        self.updateHost(player: defaultHost, closure)
       }
     }
   }
@@ -266,12 +277,11 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   func updateLastSeenRequest(
-    from player: String,
+    from sender: GKPlayer,
     type: DDNetworkRPCType,
-    metadata: DDRPCMetadataUnreliable
+    _ metadata: DDRPCMetadataUnreliable
   ) -> (oldIndex: RequestIndex?, newIndex: RequestIndex, wrapped: Bool) {
-    let senderID = metadata.sender
-
+    let senderID = sender.gamePlayerID
     var typeEntries = requestLastSeenFrom[type] ?? [:]
     requestLastSeenFrom[type] = typeEntries
 
@@ -294,7 +304,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Messaging
 
-  func receiveMessage(asHost data: Data, fromRemotePlayer player: GKPlayer) {
+  func receiveMessage(asHost data: Data, fromRemotePlayer sender: GKPlayer) {
     var binary = PropertyListSerialization.PropertyListFormat.binary
     let decoded = try! decoder.decode(
       DDRPC.self,
@@ -303,14 +313,14 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     switch decoded {
       case .lastSeen(let metadata, let data):
-        handleLastSeen(metadata: metadata, data: data)
+        handleLastSeen(from: sender, metadata: metadata, data: data)
         break
       case .playerUpdate(_, _):
         break
       case .registrationRequest(_, _):
         break
-      case .sceneSnapshot(let metadata, _):
-        fatalError("Received sceneSnapshot from non-host: \( metadata.sender )")
+      case .sceneSnapshot(_, _):
+        fatalError("Received sceneSnapshot from non-host: \( sender )")
     }
   }
 
@@ -323,7 +333,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     switch decoded {
       case .lastSeen(let metadata, let data):
-        handleLastSeen(metadata: metadata, data: data)
+        handleLastSeen(from: host!, metadata: metadata, data: data)
         break
       case .playerUpdate(_, _):
         fatalError("Received .playerUpdate as client")
@@ -338,11 +348,12 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   func shouldProcessMessage(
+    from sender: GKPlayer,
     type: DDNetworkRPCType,
-    metadata: DDRPCMetadataUnreliable
+    _ metadata: DDRPCMetadataUnreliable
   ) -> Bool {
     let (lastIndex, index, wrapped) = updateLastSeenRequest(
-      from: metadata.sender, type: type, metadata: metadata)
+      from: sender, type: type, metadata)
 
     guard let lastIndex = lastIndex else {
       return true
@@ -355,14 +366,15 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   // MARK: Message handlers
 
   func handleLastSeen(
+    from sender: GKPlayer,
     metadata: DDRPCMetadataUnreliable,
     data: DDRPCLastSeen
   ) {
-    guard shouldProcessMessage(type: .lastSeen, metadata: metadata) else {
+    guard shouldProcessMessage(from: sender, type: .lastSeen, metadata) else {
       return
     }
 
-    let receiverID = metadata.sender
+    let receiverID = sender.gamePlayerID
 
     var typeEntries = requestLastSeenBy[data.type] ?? [:]
     requestLastSeenBy[data.type] = typeEntries
@@ -386,7 +398,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     metadata: DDRPCMetadataUnreliable,
     data: DDRPCSceneSnapshot
   ) {
-    guard shouldProcessMessage(type: .sceneSnapshot, metadata: metadata) else {
+    guard shouldProcessMessage(
+      from: host!, type: .sceneSnapshot, metadata
+    ) else {
       return
     }
 

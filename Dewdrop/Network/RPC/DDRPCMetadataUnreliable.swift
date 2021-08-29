@@ -12,5 +12,4 @@ typealias RequestIndex = UInt16
 struct DDRPCMetadataUnreliable : Codable {
   let index: RequestIndex
   let indexWrapped: Bool
-  let sender: String
 }
