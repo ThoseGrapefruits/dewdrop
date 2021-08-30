@@ -42,9 +42,7 @@ class DDViewController: UIViewController {
           self.scene = DDScene(fileNamed: "DDScene")
           DDNetworkMatch.singleton.scene = self.scene
           print("--starting as host--")
-          self.startClient {
-            try! DDNetworkMatch.singleton.startServer()
-          }
+          try! DDNetworkMatch.singleton.startHost()
         } else {
           print("--starting as client--")
           self.startClient()
@@ -55,6 +53,7 @@ class DDViewController: UIViewController {
 
   func startClient(_ closure: (() -> Void)? = .none) {
     DDNetworkMatch.singleton.startClient { [weak self] in
+      // TODO waitForScene here
       guard
         let self = self,
         let scene = self.scene,
@@ -65,6 +64,7 @@ class DDViewController: UIViewController {
 
       let playerNode = DDPlayerNode()
       playerNode.mainCircle.position = DDViewController.START_POSITION
+      // TODO register the player node
       // playerNode.addToScene(scene: self.scene!)
 
       let cameraNode = DDCameraNode()
@@ -77,6 +77,11 @@ class DDViewController: UIViewController {
 
       playerNode.start()
       cameraNode.track(playerNode.mainCircle)
+
+      let statsNode = DDNetworkStatsNode()
+      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
+
+      cameraNode.addChild(statsNode)
 
       view.ignoresSiblingOrder = true
 

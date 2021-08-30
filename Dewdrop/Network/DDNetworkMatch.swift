@@ -31,8 +31,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   private static var _singleton: DDNetworkMatch? = .none
   private static let updateInterval: CGFloat = 1/30
 
-  // MARK: Properties
+  // MARK: Instances
 
+  let networkActivityTracker = DDNetworkActivityTracker()
   private let decoder = PropertyListDecoder()
 
   // MARK: References
@@ -44,12 +45,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   // MARK: External event handlers
 
   var onSceneLoaded: (() -> Void)? = .none
-  var registrationResponseDelegate: ((DDNetworkDelegate) -> Void)? = .none
 
   // MARK: Network registries
 
-  private var registry: [DDNodeID : DDNetworkDelegate] = [:]
+  private var registryByID: [DDNodeID : DDNetworkDelegate] = [:]
+  private var registryByNode: [SKNode : DDNetworkDelegate] = [:]
   private var registryIndex: DDNodeID = 0
+
   private var requestLastSeenBy:
     [DDNetworkRPCType : [GKPlayer: (RequestIndex, Bool)] ] = [:]
   private var requestLastSeenFrom:
@@ -69,8 +71,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     self.onSceneLoaded = closure
   }
 
-  func startServer() throws {
-    registerScene()
+  func startHost() throws {
+    try registerScene()
     try watchScene()
   }
 
@@ -79,7 +81,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       return
     }
 
-    let nodeSnapshots = registry.values.compactMap { delegate in
+    let nodeSnapshots = registryByID.values.compactMap { delegate in
       delegate.nextMessage()
     }
 
@@ -109,33 +111,52 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Registration
 
-  func register(node: SKNode, owner: GKPlayer) -> DDNetworkDelegate? {
+  func register(
+    node: SKNode,
+    owner: GKPlayer,
+    id: DDNodeID? = .none
+  ) -> DDNetworkDelegate {
     guard isHost else {
-      return nil
+      fatalError("Cannot register nodes on non-host")
     }
 
-    let id = registryIndex
-    registryIndex += 1
+    let id = id ?? {
+      let id = registryIndex
+      registryIndex += 1
+      return id
+    }()
 
     let delegate = DDNetworkDelegate(node: node, id: id, owner: owner)
-    registry[id] = delegate
+    registryByID[id] = delegate
+    registryByNode[node] = delegate
 
     return delegate
   }
 
-  func registerScene() {
+  func registerScene() throws {
     guard let host = host, let scene = scene else {
       return
     }
 
     var nodesToRegister: [SKNode] = [scene]
+    var nodesToSend: [DDRPCSpawnNode] = []
 
     while let node = nodesToRegister.popLast() {
-      let _ = register(node: node, owner: host)
+      let networkDelegate = register(node: node, owner: host)
+      nodesToSend.append(DDRPCSpawnNode(
+        id: networkDelegate.id,
+        parent: registryByNode[node]!.id,
+        properties: DDNodeSnapshot.capture(node, id: networkDelegate.id),
+        type: DDNodeType.of(node)))
       nodesToRegister.insert(contentsOf: node.children, at: 0)
     }
 
-    // TODO send update
+    let (index, indexWrapped) = getNextRequestSendIndex(
+      for: DDNetworkRPCType.spawnNodes)
+    let metadata = DDRPCMetadataReliable(
+      index: index, indexWrapped: indexWrapped)
+    let data = DDRPCSpawnNodes(nodes: nodesToSend)
+    try sendAll(DDRPC.spawnNodes(metadata, data), mode: .reliable)
   }
 
   func requestRegistration(
@@ -157,6 +178,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     didReceive data: Data,
     fromRemotePlayer player: GKPlayer
   ) {
+    networkActivityTracker.recordReceive(data: data)
+
     if isHost {
       receiveMessage(asHost: data, fromRemotePlayer: player)
     } else if host == player {
@@ -172,11 +195,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     forRecipient recipient: GKPlayer,
     fromRemotePlayer player: GKPlayer
   ) {
-    guard isHost else {
-      return
-    }
+    networkActivityTracker.recordReceive(data: data)
 
-    try! send(data, to: [recipient], mode: .unreliable)
+    fatalError("Proxied message sending is not in use, might be an accident?")
   }
 
   func match(
@@ -192,20 +213,27 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
   }
 
-
   // MARK: Network message sending
 
-  func send(_ data: Data, to: [GKPlayer], mode: GKMatch.SendDataMode) throws {
+  func send(_ data: Data, to recipients: [GKPlayer], mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
-    try match?.send(message, to: to, dataMode: mode)
+
+    print("--send--", recipients.map { p in p.displayName }, data)
+
+    networkActivityTracker.recordSend(data: message, to: recipients)
+    try match?.send(message, to: recipients, dataMode: mode)
   }
 
   func sendAll(_ data: DDRPC, mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
+
+    print("--send--", match!.players.map { p in p.displayName }, data)
+
+    networkActivityTracker.recordSend(data: message, to: match!.players)
     try match?.sendData(toAllPlayers: message, with: mode)
   }
 
@@ -214,9 +242,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       return
     }
 
+    print("--send--", host.displayName, data)
+
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
+
+    networkActivityTracker.recordSend(data: message, to: [host])
     try match?.send(message, to: [host], dataMode: mode)
   }
 
@@ -320,7 +352,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       case .registrationRequest(_, _):
         break
       case .sceneSnapshot(_, _):
-        fatalError("Received sceneSnapshot from non-host: \( sender )")
+        fatalError("Received .sceneSnapshot from non-host: \( sender )")
+      case .spawnNodes(_, _):
+        fatalError("Received .spawnNodes from non-host: \( sender )")
     }
   }
 
@@ -343,6 +377,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         break
       case .sceneSnapshot(let metadata, let data):
         handleSceneSnapshotAsClient(metadata: metadata, data: data)
+        break
+      case .spawnNodes(let metadata, let data):
+        handleSpawnNodesAsClient(metadata: metadata, data: data)
         break
     }
   }
@@ -405,7 +442,37 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
 
     for delta in data.nodes {
-      registry[delta.id]?.apply(delta: delta)
+      registryByID[delta.id]?.apply(delta: delta)
+    }
+  }
+
+  func handleSpawnNodesAsClient(
+    metadata: DDRPCMetadataReliable,
+    data: DDRPCSpawnNodes
+  ) {
+    for spawnNode in data.nodes {
+      let node = DDNodeType.instantiate(type: spawnNode.type)
+      let parent: SKNode = {
+        let parentID = spawnNode.parent
+        let parent = registryByID[parentID]?.node
+
+        guard let parent = parent else {
+          fatalError(
+            "Could not find parent \( parentID ) for node \( spawnNode.id )")
+        }
+
+        return parent
+      }()
+
+      node.move(toParent: parent)
+      spawnNode.properties.apply(to: node)
+      let _ = register(node: node, owner: host!, id: spawnNode.id)
+    }
+
+    let loadedScene = data.nodes.contains { node in node.type == .ddScene }
+    if loadedScene {
+      onSceneLoaded?()
+      onSceneLoaded = nil
     }
   }
 }

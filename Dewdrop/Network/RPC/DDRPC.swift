@@ -12,6 +12,76 @@ enum DDNetworkRPCType : Int8, Codable {
   case playerUpdate
   case registrationRequest
   case sceneSnapshot
+  case spawnNodes
+}
+
+enum DDRPC : Codable {
+
+  // MARK: Message types
+
+  //   Name                 Metadata    Data
+  case lastSeen            (DDRPCMetadataUnreliable, DDRPCLastSeen)
+  case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
+  case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
+  case sceneSnapshot       (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
+  case spawnNodes          (DDRPCMetadataReliable,   DDRPCSpawnNodes)
+
+  // MARK: Codable
+
+  enum CodingKeys: CodingKey {
+    case type, metadata, data
+  }
+
+  func encode(to encoder: Encoder) throws {
+    var container = encoder.container(keyedBy: CodingKeys.self)
+
+    switch self {
+      case .lastSeen(let metadata, let data):
+        try container.encode(type: .lastSeen, metadata: metadata, data: data)
+      case .registrationRequest(let metadata, let data):
+        try container.encode(
+          type: .registrationRequest, metadata: metadata, data: data)
+      case .playerUpdate(let metadata, let data):
+        try container.encode(
+          type: .playerUpdate, metadata: metadata, data: data)
+      case .sceneSnapshot(let metadata, let data):
+        try container.encode(
+          type: .sceneSnapshot, metadata: metadata, data: data)
+      case .spawnNodes(let metadata, let data):
+        try container.encode(
+          type: .spawnNodes, metadata: metadata, data: data)
+    }
+  }
+
+  init(from decoder: Decoder) throws {
+    let container = try decoder.container(keyedBy: CodingKeys.self)
+    let typeName = try container.decode(
+      DDNetworkRPCType.self,
+      forKey: .type)
+
+    switch typeName {
+      case .lastSeen:
+        let (metadata, data) = try container.decode(
+          unreliable: DDRPCLastSeen.self)
+        self = .lastSeen(metadata, data)
+      case .playerUpdate:
+        let (metadata, data) = try container.decode(
+          unreliable: DDRPCPlayerUpdate.self)
+        self = .playerUpdate(metadata, data)
+      case .registrationRequest:
+        let (metadata, data) = try container.decode(
+          reliable: DDRPCRegistrationRequest.self)
+        self = .registrationRequest(metadata, data)
+      case .sceneSnapshot:
+        let (metadata, data) = try container.decode(
+          unreliable: DDRPCSceneSnapshot.self)
+        self = .sceneSnapshot(metadata, data)
+      case .spawnNodes:
+        let (metadata, data) = try container.decode(
+          reliable: DDRPCSpawnNodes.self)
+        self = .spawnNodes(metadata, data)
+    }
+  }
 }
 
 private extension KeyedDecodingContainer where Key == DDRPC.CodingKeys {
@@ -64,7 +134,6 @@ private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
     try encode(data, forKey: .data)
   }
 
-
   mutating func encode<DataType>(
     type: DDNetworkRPCType,
     metadata: DDRPCMetadataReliable,
@@ -72,66 +141,5 @@ private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
   ) throws where DataType : Codable {
     try encode(type: type, metadata: metadata)
     try encode(data, forKey: .data)
-  }
-}
-
-enum DDRPC : Codable {
-
-  // MARK: Message types
-
-  //   Name                 Metadata    Data
-  case lastSeen            (DDRPCMetadataUnreliable, DDRPCLastSeen)
-  case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
-  case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
-  case sceneSnapshot       (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
-
-  // MARK: Codable
-
-  enum CodingKeys: CodingKey {
-    case type, metadata, data
-  }
-
-  func encode(to encoder: Encoder) throws {
-    var container = encoder.container(keyedBy: CodingKeys.self)
-
-    switch self {
-      case .lastSeen(let metadata, let data):
-        try container.encode(type: .lastSeen, metadata: metadata, data: data)
-      case .registrationRequest(let metadata, let data):
-        try container.encode(
-          type: .registrationRequest, metadata: metadata, data: data)
-      case .playerUpdate(let metadata, let data):
-        try container.encode(
-          type: .playerUpdate, metadata: metadata, data: data)
-      case .sceneSnapshot(let metadata, let data):
-        try container.encode(
-          type: .sceneSnapshot, metadata: metadata, data: data)
-    }
-  }
-
-  init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    let typeName = try container.decode(
-      DDNetworkRPCType.self,
-      forKey: .type)
-
-    switch typeName {
-      case .lastSeen:
-        let (metadata, data) = try container.decode(
-          unreliable: DDRPCLastSeen.self)
-        self = .lastSeen(metadata, data)
-      case .playerUpdate:
-        let (metadata, data) = try container.decode(
-          unreliable: DDRPCPlayerUpdate.self)
-        self = .playerUpdate(metadata, data)
-      case .registrationRequest:
-        let (metadata, data) = try container.decode(
-          reliable: DDRPCRegistrationRequest.self)
-        self = .registrationRequest(metadata, data)
-      case .sceneSnapshot:
-        let (metadata, data) = try container.decode(
-          unreliable: DDRPCSceneSnapshot.self)
-        self = .sceneSnapshot(metadata, data)
-    }
   }
 }

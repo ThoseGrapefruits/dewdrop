@@ -13,6 +13,7 @@ struct DDRPCSpawnNodes : Codable {
 
 struct DDRPCSpawnNode : Codable {
   let id: DDNodeID
-  let parent: DDNodeID?
+  let parent: DDNodeID
   let properties: DDNodeSnapshot
+  let type: DDNodeType
 }
