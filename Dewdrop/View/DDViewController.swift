@@ -39,10 +39,11 @@ class DDViewController: UIViewController {
         }
 
         if DDNetworkMatch.singleton.isHost {
-          self.scene = DDScene(fileNamed: "DDScene")
+          self.scene = DDScene(fileNamed: "Scene")!
           DDNetworkMatch.singleton.scene = self.scene
           print("--starting as host--")
           try! DDNetworkMatch.singleton.startHost()
+          self.startLocalGame()
         } else {
           print("--starting as client--")
           self.startClient()
@@ -52,42 +53,47 @@ class DDViewController: UIViewController {
   }
 
   func startClient(_ closure: (() -> Void)? = .none) {
-    DDNetworkMatch.singleton.startClient { [weak self] in
-      // TODO waitForScene here
-      guard
-        let self = self,
-        let scene = self.scene,
-        let view = self.view as! SKView?
-      else {
+    DDNetworkMatch.singleton.startClient { [weak self] scene in
+      guard let self = self else {
         return
       }
 
-      let playerNode = DDPlayerNode()
-      playerNode.mainCircle.position = DDViewController.START_POSITION
-      // TODO register the player node
-      // playerNode.addToScene(scene: self.scene!)
-
-      let cameraNode = DDCameraNode()
-      scene.addChild(cameraNode)
-      cameraNode.position = DDViewController.START_POSITION
-      scene.camera = cameraNode
-
-      // Present the scene
-      view.presentScene(self.scene!)
-
-      playerNode.start()
-      cameraNode.track(playerNode.mainCircle)
-
-      let statsNode = DDNetworkStatsNode()
-      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
-
-      cameraNode.addChild(statsNode)
-
-      view.ignoresSiblingOrder = true
-
-      view.showsFPS = true
-      view.showsNodeCount = true
+      self.scene = scene
+      self.startLocalGame()
     }
+  }
+
+  func startLocalGame() {
+    guard let scene = scene, let view = self.view as! DDView? else {
+      return
+    }
+
+    let playerNode = DDPlayerNode()
+    // TODO positioning should be host-controlled
+    playerNode.mainCircle.position = DDViewController.START_POSITION
+    // TODO register the player node
+    // playerNode.addToScene(scene: self.scene!)
+
+    let cameraNode = DDCameraNode()
+    scene.addChild(cameraNode)
+    cameraNode.position = DDViewController.START_POSITION
+    scene.camera = cameraNode
+
+    // Present the scene
+    view.presentScene(self.scene!)
+
+    playerNode.start()
+    cameraNode.track(playerNode.mainCircle)
+
+    let statsNode = DDNetworkStatsNode()
+    statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
+
+    cameraNode.addChild(statsNode)
+
+    view.ignoresSiblingOrder = true
+
+    view.showsFPS = true
+    view.showsNodeCount = true
   }
 
   override var shouldAutorotate: Bool {

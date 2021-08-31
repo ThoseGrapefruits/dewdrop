@@ -29,7 +29,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   private static var _singleton: DDNetworkMatch? = .none
-  private static let updateInterval: CGFloat = 1/30
+  private static let updateInterval: CGFloat = 1/10
 
   // MARK: Instances
 
@@ -40,11 +40,11 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   var host: GKPlayer? = .none
   var match: GKMatch? = .none
-  var scene: SKScene? = .none
+  var scene: DDScene? = .none
 
   // MARK: External event handlers
 
-  var onSceneLoaded: (() -> Void)? = .none
+  var onSceneLoaded: ((DDScene) -> Void)? = .none
 
   // MARK: Network registries
 
@@ -67,7 +67,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Game loops
 
-  func startClient(_ closure: @escaping () -> Void) {
+  func startClient(_ closure: @escaping (DDScene) -> Void) {
     self.onSceneLoaded = closure
   }
 
@@ -104,7 +104,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         try self.watchScene()
       } catch {
         // TODO probably leave the match
-        fatalError(error.localizedDescription)
+        fatalError("--watchScene-- \( error.localizedDescription )")
       }
     }
   }
@@ -116,10 +116,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     owner: GKPlayer,
     id: DDNodeID? = .none
   ) -> DDNetworkDelegate {
-    guard isHost else {
-      fatalError("Cannot register nodes on non-host")
-    }
-
     let id = id ?? {
       let id = registryIndex
       registryIndex += 1
@@ -141,14 +137,17 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     var nodesToRegister: [SKNode] = [scene]
     var nodesToSend: [DDRPCSpawnNode] = []
 
-    while let node = nodesToRegister.popLast() {
+    // breadth-first search
+    while !nodesToRegister.isEmpty {
+      let node = nodesToRegister.removeFirst()
       let networkDelegate = register(node: node, owner: host)
       nodesToSend.append(DDRPCSpawnNode(
         id: networkDelegate.id,
-        parent: registryByNode[node]!.id,
-        properties: DDNodeSnapshot.capture(node, id: networkDelegate.id),
+        parent: node.parent == nil ? .none : registryByNode[node.parent!]?.id,
+        // only nil if node is nil, bang is safe
+        properties: networkDelegate.captureSnapshot()!,
         type: DDNodeType.of(node)))
-      nodesToRegister.insert(contentsOf: node.children, at: 0)
+      nodesToRegister.append(contentsOf: node.children)
     }
 
     let (index, indexWrapped) = getNextRequestSendIndex(
@@ -180,13 +179,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) {
     networkActivityTracker.recordReceive(data: data)
 
-    if isHost {
-      receiveMessage(asHost: data, fromRemotePlayer: player)
-    } else if host == player {
-      receiveMessage(fromHost: data)
-    } else {
-      fatalError("Received direct message from other non-host: \( data )")
-    }
+    receiveMessage(data, fromRemotePlayer: player)
   }
 
   func match(
@@ -195,7 +188,10 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     forRecipient recipient: GKPlayer,
     fromRemotePlayer player: GKPlayer
   ) {
-    networkActivityTracker.recordReceive(data: data)
+    guard recipient != GKLocalPlayer.local else {
+      // I dunno why this has to exist but apparently it does
+      return self.match(match, didReceive: data, fromRemotePlayer: player)
+    }
 
     fatalError("Proxied message sending is not in use, might be an accident?")
   }
@@ -215,7 +211,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Network message sending
 
-  func send(_ data: Data, to recipients: [GKPlayer], mode: GKMatch.SendDataMode) throws {
+  func send(_ data: DDRPC, to recipients: [GKPlayer], mode: GKMatch.SendDataMode) throws {
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
@@ -231,10 +227,14 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     encoder.outputFormat = .binary
     let message = try encoder.encode(data)
 
-    print("--send--", match!.players.map { p in p.displayName }, data)
+    guard let match = match else {
+      return
+    }
 
-    networkActivityTracker.recordSend(data: message, to: match!.players)
-    try match?.sendData(toAllPlayers: message, with: mode)
+    print("--send--", match.players.map { p in p.displayName }, data)
+
+    networkActivityTracker.recordSend(data: message, to: match.players)
+    try match.sendData(toAllPlayers: message, with: mode)
   }
 
   func sendHost(_ data: DDRPC, mode: GKMatch.SendDataMode) throws {
@@ -260,9 +260,21 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) {
     if let player = player {
       host = player
+      if isHost {
+        let (index, wrapped) = getNextRequestSendIndex(for: .hostChange)
+        let metadata = DDRPCMetadataReliable(
+          index: index, indexWrapped: wrapped)
+        // This acts as a sort of lock. Because it and the scene snapshots are
+        // sent via the .reliable channel, they have to arrive in order,
+        // meaning that the host will definitely be set on all clients before
+        // they receive the .spawnNodes command
+        try? sendAll(.hostChange(metadata), mode: .reliable)
+      }
       closure(player)
       return
     }
+
+    print("--picking host--")
 
     match?.chooseBestHostingPlayer { [weak self] player in
       guard let self = self, let match = self.match else {
@@ -275,16 +287,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       } else {
         let localPlayer = GKLocalPlayer.local as GKPlayer
 
-        // TODO this probably isn't reliable. Not great to do anything
-        // programmatic based on displayName but I think it's the only shared
-        // identifier we have access to and makes things a lot easier than
-        // negotiating a host more correctly.
+        // TODO sometimes one player gets the optimal and the other doesn't???
         let defaultHost = match.players.reduce(localPlayer) { lowest, player in
-          switch player.displayName.compare(lowest.displayName)  {
+          switch lowest.displayName.compare(player.displayName)  {
             case .orderedAscending:
-              return player
-            default:
               return lowest
+            default:
+              return player
           }
         }
 
@@ -313,17 +322,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     type: DDNetworkRPCType,
     _ metadata: DDRPCMetadataUnreliable
   ) -> (oldIndex: RequestIndex?, newIndex: RequestIndex, wrapped: Bool) {
-    let senderID = sender.gamePlayerID
     var typeEntries = requestLastSeenFrom[type] ?? [:]
     requestLastSeenFrom[type] = typeEntries
-
-    let sender = match?.players.first { player in
-      player.gamePlayerID == senderID
-    }
-
-    guard let sender = sender else {
-      fatalError("Unknown sender ID: \( senderID )")
-    }
 
     let oldIndex = typeEntries[sender]?.0
     let newIndex = metadata.index
@@ -336,20 +336,36 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Messaging
 
-  func receiveMessage(asHost data: Data, fromRemotePlayer sender: GKPlayer) {
+  func receiveMessage(_ data: Data, fromRemotePlayer sender: GKPlayer) {
     var binary = PropertyListSerialization.PropertyListFormat.binary
     let decoded = try! decoder.decode(
       DDRPC.self,
       from: data,
       format: &binary)
 
-    switch decoded {
+    print("--recv--", sender.displayName, decoded)
+
+    if isHost {
+      receiveMessage(asHost: decoded, from: sender)
+    } else if host == sender {
+      receiveMessage(fromHost: decoded)
+    } else {
+      receiveMessage(asPeer: decoded, from: sender)
+    }
+  }
+
+  func receiveMessage(asHost message: DDRPC, from sender: GKPlayer) {
+    switch message {
+      case .hostChange(_):
+        fatalError("Received .hostChange as host")
       case .lastSeen(let metadata, let data):
         handleLastSeen(from: sender, metadata: metadata, data: data)
         break
       case .playerUpdate(_, _):
+        // TODO
         break
       case .registrationRequest(_, _):
+        // TODO
         break
       case .sceneSnapshot(_, _):
         fatalError("Received .sceneSnapshot from non-host: \( sender )")
@@ -358,14 +374,22 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
   }
 
-  func receiveMessage(fromHost data: Data) {
-    var binary = PropertyListSerialization.PropertyListFormat.binary
-    let decoded = try! decoder.decode(
-      DDRPC.self,
-      from: data,
-      format: &binary)
+  func receiveMessage(asPeer message: DDRPC, from sender: GKPlayer) {
+    switch message {
+      case .hostChange(let metadata):
+        handleHostChange(from: sender, metadata: metadata)
+      default:
+        fatalError("Received as peer: \( message )")
+    }
+  }
 
-    switch decoded {
+  func receiveMessage(fromHost message: DDRPC) {
+    switch message {
+      case .hostChange(_):
+        // This is fine. Means we set the host normally and didn't have to rely
+        // on the queued request. Should happen more often than not, but maybe
+        // not when clients are connected over LAN.
+        break
       case .lastSeen(let metadata, let data):
         handleLastSeen(from: host!, metadata: metadata, data: data)
         break
@@ -401,6 +425,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
 
   // MARK: Message handlers
+
+  func handleHostChange(
+    from sender: GKPlayer,
+    metadata: DDRPCMetadataReliable
+  ) {
+    self.host = sender
+  }
 
   func handleLastSeen(
     from sender: GKPlayer,
@@ -452,26 +483,26 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) {
     for spawnNode in data.nodes {
       let node = DDNodeType.instantiate(type: spawnNode.type)
-      let parent: SKNode = {
-        let parentID = spawnNode.parent
+      if let parentID = spawnNode.parent {
         let parent = registryByID[parentID]?.node
 
         guard let parent = parent else {
-          fatalError(
-            "Could not find parent \( parentID ) for node \( spawnNode.id )")
+          fatalError("No parent \( parentID ) found for node \( spawnNode.id )")
         }
 
-        return parent
-      }()
+        node.move(toParent: parent)
+      }
 
-      node.move(toParent: parent)
       spawnNode.properties.apply(to: node)
       let _ = register(node: node, owner: host!, id: spawnNode.id)
+
+      if let scene = node as? DDScene {
+        self.scene = scene
+      }
     }
 
-    let loadedScene = data.nodes.contains { node in node.type == .ddScene }
-    if loadedScene {
-      onSceneLoaded?()
+    if let scene = scene {
+      onSceneLoaded?(scene)
       onSceneLoaded = nil
     }
   }

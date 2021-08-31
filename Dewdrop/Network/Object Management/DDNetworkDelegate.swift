@@ -26,7 +26,8 @@ class DDNetworkDelegate {
 
   // MARK: Snapshots
 
-  // TODO(optimisation): Hold 2 of these and swap between them to reduce malloc
+  // TODO: hold history of snapshots w/ request indices, probs need argument to
+  // captureSnapshot and nextMessage
   private var lastSnapshot: DDNodeSnapshot? = .none
 
   var capturedFields = DDNetworkDelegate.defaultCapturedFields
@@ -52,13 +53,6 @@ class DDNetworkDelegate {
     delta.apply(to: node)
   }
 
-  func nextMessage() -> DDNodeDelta? {
-    let lastSnapshot = lastSnapshot
-    let snapshot = captureSnapshot()
-
-    return snapshot?.delta(from: lastSnapshot, id: id)
-  }
-
   func captureSnapshot() -> DDNodeSnapshot? {
     guard let node = node else {
       return .none
@@ -67,5 +61,12 @@ class DDNetworkDelegate {
     let snapshot = DDNodeSnapshot.capture(node, id: id)
     lastSnapshot = snapshot
     return snapshot
+  }
+
+  func nextMessage() -> DDNodeDelta? {
+    let lastSnapshot = lastSnapshot
+    let snapshot = captureSnapshot()
+
+    return snapshot?.delta(from: lastSnapshot, id: id)
   }
 }

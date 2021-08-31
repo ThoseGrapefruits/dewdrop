@@ -26,7 +26,7 @@ class DDNetworkDataTests: XCTestCase {
 
   func testRegistrationRequest() throws {
     let hostChange = DDRPC.registrationRequest(
-      DDRPCMetadataReliable(index: 0, indexWrapped: false, sender: "walrus"),
+      DDRPCMetadataReliable(index: 0, indexWrapped: false),
       DDRPCRegistrationRequest(
         type: DDNodeType.ddGun,
         snapshot: DDNodeSnapshot(
@@ -49,7 +49,6 @@ class DDNetworkDataTests: XCTestCase {
     ) = (hostChange, hostChangeDecoded) {
       XCTAssertEqual(metadata.index,        metadataDecoded.index)
       XCTAssertEqual(metadata.indexWrapped, metadataDecoded.indexWrapped)
-      XCTAssertEqual(metadata.sender,       metadataDecoded.sender)
 
       let snapshot = data.snapshot, snapshotDecoded = dataDecoded.snapshot
       XCTAssertNil(snapshotDecoded.physicsBody)
@@ -59,27 +58,6 @@ class DDNetworkDataTests: XCTestCase {
       XCTAssertEqual(snapshot.zRotation,  snapshotDecoded.zRotation)
     } else {
       XCTFail("registrationRequest or registrationRequestDecoded not right")
-    }
-  }
-
-  func testPing() throws {
-    let ping = DDRPC.ping(
-      DDRPCMetadataReliable(index: 0, indexWrapped: false, sender: "banana"))
-    let encoder = encoder
-    let decoder = decoder
-
-    let pingEncoded = try encoder.encode(ping)
-    let pingDecoded = try decoder.decode(
-      DDRPC.self,
-      from: pingEncoded)
-
-    if case (
-      .ping(let metadata),
-      .ping(let metadataDecoded)
-    ) = (ping, pingDecoded) {
-      XCTAssertEqual(metadata.sender, metadataDecoded.sender)
-    } else {
-      XCTFail("ping or pingDecoded was not a ping")
     }
   }
 }

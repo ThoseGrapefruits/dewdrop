@@ -8,6 +8,7 @@
 import Foundation
 
 enum DDNetworkRPCType : Int8, Codable {
+  case hostChange
   case lastSeen
   case playerUpdate
   case registrationRequest
@@ -15,11 +16,25 @@ enum DDNetworkRPCType : Int8, Codable {
   case spawnNodes
 }
 
+extension DDRPC : CustomStringConvertible {
+  var description: String {
+    switch self {
+      case .hostChange(_):            return ".hostChange"
+      case .lastSeen(_, _):            return ".lastSeen"
+      case .playerUpdate(_, _):        return ".playerUpdate"
+      case .registrationRequest(_, _): return ".registrationRequest"
+      case .sceneSnapshot(_, _):       return ".sceneSnapshot"
+      case .spawnNodes(_, _):          return ".spawnNodes"
+    }
+  }
+}
+
 enum DDRPC : Codable {
 
   // MARK: Message types
 
   //   Name                 Metadata    Data
+  case hostChange          (DDRPCMetadataReliable)
   case lastSeen            (DDRPCMetadataUnreliable, DDRPCLastSeen)
   case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
   case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
@@ -36,6 +51,8 @@ enum DDRPC : Codable {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     switch self {
+      case .hostChange(let metadata):
+        try container.encode(type: .hostChange, metadata: metadata)
       case .lastSeen(let metadata, let data):
         try container.encode(type: .lastSeen, metadata: metadata, data: data)
       case .registrationRequest(let metadata, let data):
@@ -60,6 +77,9 @@ enum DDRPC : Codable {
       forKey: .type)
 
     switch typeName {
+      case .hostChange:
+        let metadata = try container.decodeMetadataReliable()
+        self = .hostChange(metadata)
       case .lastSeen:
         let (metadata, data) = try container.decode(
           unreliable: DDRPCLastSeen.self)

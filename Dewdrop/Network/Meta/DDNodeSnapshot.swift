@@ -8,8 +8,50 @@
 import Foundation
 import SpriteKit
 
-func setIfChanged<T : Equatable>(from old: T?, to new: T) -> DDFieldChange<T> {
-  return old == new ? .none : DDFieldChange.set(new)
+struct DDNodeSnapshot : Codable {
+
+  // MARK: Network metadata
+
+  let id: DDNodeID
+
+  // MARK: Stored fields
+
+  let physicsBody: PhysicsBodySnapshot?
+  let position: CGPoint
+  let zPosition: CGFloat
+  let zRotation: CGFloat
+
+  // MARK: Static API
+
+  static func capture(_ node: SKNode, id: DDNodeID)
+    -> DDNodeSnapshot {
+    return DDNodeSnapshot(
+      id: id,
+      physicsBody: PhysicsBodySnapshot.capture(node.physicsBody),
+      position: node.position,
+      zPosition: node.zPosition,
+      zRotation: node.zRotation)
+  }
+
+  // MARK: API
+
+  func delta(from: DDNodeSnapshot?, id: DDNodeID) -> DDNodeDelta {
+    return DDNodeDelta(
+      id: id,
+      physicsBody: physicsBody?.delta(from: from?.physicsBody),
+      position: setIfChanged(from: from?.position, to: position),
+      zPosition: setIfChanged(from: from?.zPosition, to: zPosition),
+      zRotation: setIfChanged(from: from?.zRotation, to: zRotation)
+    )
+  }
+
+  func apply(to node: SKNode) {
+    physicsBody?.apply(to: node.physicsBody)
+
+    node.position = position
+    node.zPosition = zPosition
+    node.zRotation = zRotation
+  }
 }
 
 struct PhysicsBodySnapshot : Codable {
@@ -78,48 +120,40 @@ struct PhysicsBodySnapshot : Codable {
   }
 }
 
-struct DDNodeSnapshot : Codable {
+// MARK: Utility functions
 
-  // MARK: Network metadata
-
-  let id: DDNodeID
-
-  // MARK: Stored fields
-
-  let physicsBody: PhysicsBodySnapshot?
-  let position: CGPoint
-  let zPosition: CGFloat
-  let zRotation: CGFloat
-
-  // MARK: Static API
-
-  static func capture(_ node: SKNode, id: DDNodeID)
-    -> DDNodeSnapshot {
-    return DDNodeSnapshot(
-      id: id,
-      physicsBody: PhysicsBodySnapshot.capture(node.physicsBody),
-      position: node.position,
-      zPosition: node.zPosition,
-      zRotation: node.zRotation)
+func setIfChanged(
+  from old: CGFloat?,
+  to new: CGFloat,
+  by precision: CGFloat = 0.001
+) -> DDFieldChange<CGFloat> {
+  guard let old = old else {
+    return DDFieldChange.set(new)
   }
 
-  // MARK: API
+  return abs(old.distance(to: new)) < precision ? .none : DDFieldChange.set(new)
+}
 
-  func delta(from: DDNodeSnapshot?, id: DDNodeID) -> DDNodeDelta {
-    return DDNodeDelta(
-      id: id,
-      physicsBody: physicsBody?.delta(from: from?.physicsBody),
-      position: setIfChanged(from: from?.position, to: position),
-      zPosition: setIfChanged(from: from?.zPosition, to: zPosition),
-      zRotation: setIfChanged(from: from?.zRotation, to: zRotation)
-    )
+func setIfChanged(
+  from old: CGPoint?,
+  to new: CGPoint,
+  by precision: CGFloat = 0.001
+) -> DDFieldChange<CGPoint> {
+  guard let old = old else {
+    return DDFieldChange.set(new)
   }
 
-  func apply(to node: SKNode) {
-    physicsBody?.apply(to: node.physicsBody)
+  return old.distance(to: new) < precision ? .none : DDFieldChange.set(new)
+}
 
-    node.position = position
-    node.zPosition = zPosition
-    node.zRotation = zRotation
+func setIfChanged(
+  from old: CGVector?,
+  to new: CGVector,
+  by precision: CGFloat = 0.001
+) -> DDFieldChange<CGVector> {
+  guard let old = old else {
+    return DDFieldChange.set(new)
   }
+
+  return old.distance(to: new) < precision ? .none : DDFieldChange.set(new)
 }
