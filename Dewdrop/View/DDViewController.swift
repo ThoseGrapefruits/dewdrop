@@ -38,32 +38,40 @@ class DDViewController: UIViewController {
           return
         }
 
+        self.scene = DDScene(fileNamed: "Scene")!
+        DDNetworkMatch.singleton.scene = self.scene
+
         if DDNetworkMatch.singleton.isHost {
-          self.scene = DDScene(fileNamed: "Scene")!
-          DDNetworkMatch.singleton.scene = self.scene
           print("--starting as host--")
+
+          self.startLocalGame() { [weak self] in
+            self?.scene?.start()
+          }
+
           try! DDNetworkMatch.singleton.startHost()
-          self.startLocalGame()
         } else {
           print("--starting as client--")
-          self.startClient()
+          self.startLocalGame()  { [weak self] in
+            self?.scene?.start()
+          }
         }
       }
     }
   }
 
-  func startClient(_ closure: (() -> Void)? = .none) {
-    DDNetworkMatch.singleton.startClient { [weak self] scene in
+  func startLocalGame(_ closure: (() -> Void)? = .none) {
+    DDNetworkMatch.singleton.waitForSceneSync { [weak self] scene in
       guard let self = self else {
         return
       }
 
       self.scene = scene
-      self.startLocalGame()
+      self.spawnLocalPlayerObjects()
+      closure?()
     }
   }
 
-  func startLocalGame() {
+  func spawnLocalPlayerObjects() {
     guard let scene = scene, let view = self.view as! DDView? else {
       return
     }

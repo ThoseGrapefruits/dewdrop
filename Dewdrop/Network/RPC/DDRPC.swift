@@ -13,17 +13,19 @@ enum DDNetworkRPCType : Int8, Codable {
   case playerUpdate
   case registrationRequest
   case sceneSnapshot
+  case sceneSync
   case spawnNodes
 }
 
 extension DDRPC : CustomStringConvertible {
   var description: String {
     switch self {
-      case .hostChange(_):            return ".hostChange"
+      case .hostChange(_):             return ".hostChange"
       case .lastSeen(_, _):            return ".lastSeen"
       case .playerUpdate(_, _):        return ".playerUpdate"
       case .registrationRequest(_, _): return ".registrationRequest"
       case .sceneSnapshot(_, _):       return ".sceneSnapshot"
+      case .sceneSync(_, _):           return ".sceneSync"
       case .spawnNodes(_, _):          return ".spawnNodes"
     }
   }
@@ -39,6 +41,7 @@ enum DDRPC : Codable {
   case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
   case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
   case sceneSnapshot       (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
+  case sceneSync           (DDRPCMetadataReliable,   DDRPCSceneSync)
   case spawnNodes          (DDRPCMetadataReliable,   DDRPCSpawnNodes)
 
   // MARK: Codable
@@ -64,6 +67,9 @@ enum DDRPC : Codable {
       case .sceneSnapshot(let metadata, let data):
         try container.encode(
           type: .sceneSnapshot, metadata: metadata, data: data)
+      case .sceneSync(let metadata, let data):
+        try container.encode(
+          type: .sceneSync, metadata: metadata, data: data)
       case .spawnNodes(let metadata, let data):
         try container.encode(
           type: .spawnNodes, metadata: metadata, data: data)
@@ -96,6 +102,10 @@ enum DDRPC : Codable {
         let (metadata, data) = try container.decode(
           unreliable: DDRPCSceneSnapshot.self)
         self = .sceneSnapshot(metadata, data)
+      case .sceneSync:
+        let (metadata, data) = try container.decode(
+          reliable: DDRPCSceneSync.self)
+        self = .sceneSync(metadata, data)
       case .spawnNodes:
         let (metadata, data) = try container.decode(
           reliable: DDRPCSpawnNodes.self)

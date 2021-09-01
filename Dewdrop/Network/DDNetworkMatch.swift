@@ -44,7 +44,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: External event handlers
 
-  var onSceneLoaded: ((DDScene) -> Void)? = .none
+  var onSceneSynced: ((DDScene) -> Void)? = .none
 
   // MARK: Network registries
 
@@ -67,8 +67,12 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Game loops
 
-  func startClient(_ closure: @escaping (DDScene) -> Void) {
-    self.onSceneLoaded = closure
+  func waitForSceneSync(_ closure: @escaping (DDScene) -> Void) {
+    guard onSceneSynced == nil else {
+      fatalError("Double call to waitForScene")
+    }
+
+    self.onSceneSynced = closure
   }
 
   func startHost() throws {
@@ -78,7 +82,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   func watchScene() throws {
     guard isHost, let scene = scene else {
-      return
+      fatalError("--not host or no scene!")
     }
 
     let nodeSnapshots = registryByID.values.compactMap { delegate in
@@ -97,7 +101,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       forDuration: DDNetworkMatch.updateInterval)
     scene.run(waitForInterval) { [weak self] in
       guard let self = self else {
-        return
+        fatalError("--no concept of self!")
       }
 
       do {
@@ -135,27 +139,27 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
 
     var nodesToRegister: [SKNode] = [scene]
-    var nodesToSend: [DDRPCSpawnNode] = []
+    var nodesToSync: [DDRPCSyncNode] = []
 
     // breadth-first search
     while !nodesToRegister.isEmpty {
       let node = nodesToRegister.removeFirst()
+      print("--send node--", node)
       let networkDelegate = register(node: node, owner: host)
-      nodesToSend.append(DDRPCSpawnNode(
+      nodesToSync.append(DDRPCSyncNode(
         id: networkDelegate.id,
-        parent: node.parent == nil ? .none : registryByNode[node.parent!]?.id,
-        // only nil if node is nil, bang is safe
-        properties: networkDelegate.captureSnapshot()!,
         type: DDNodeType.of(node)))
       nodesToRegister.append(contentsOf: node.children)
     }
 
-    let (index, indexWrapped) = getNextRequestSendIndex(
-      for: DDNetworkRPCType.spawnNodes)
+    let (index, indexWrapped) = getNextRequestSendIndex(for: .sceneSync)
     let metadata = DDRPCMetadataReliable(
       index: index, indexWrapped: indexWrapped)
-    let data = DDRPCSpawnNodes(nodes: nodesToSend)
-    try sendAll(DDRPC.spawnNodes(metadata, data), mode: .reliable)
+    let data = DDRPCSceneSync(nodes: nodesToSync)
+    try sendAll(DDRPC.sceneSync(metadata, data), mode: .reliable)
+
+    onSceneSynced?(scene)
+    onSceneSynced = nil
   }
 
   func requestRegistration(
@@ -369,6 +373,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         break
       case .sceneSnapshot(_, _):
         fatalError("Received .sceneSnapshot from non-host: \( sender )")
+      case .sceneSync(_, _):
+        fatalError("Received .sceneSync from non-host: \( sender )")
       case .spawnNodes(_, _):
         fatalError("Received .spawnNodes from non-host: \( sender )")
     }
@@ -401,6 +407,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
         break
       case .sceneSnapshot(let metadata, let data):
         handleSceneSnapshotAsClient(metadata: metadata, data: data)
+        break
+      case .sceneSync(let metadata, let data):
+        handleSceneSyncAsClient(metadata: metadata, data: data)
         break
       case .spawnNodes(let metadata, let data):
         handleSpawnNodesAsClient(metadata: metadata, data: data)
@@ -477,6 +486,39 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
   }
 
+  func handleSceneSyncAsClient(
+    metadata: DDRPCMetadataReliable,
+    data: DDRPCSceneSync
+  ) {
+    guard let scene = scene else {
+      fatalError("Cannot sync scene without scene")
+    }
+
+    var nodesToAdd: [SKNode] = [scene]
+    var nodesInScene: [SKNode] = []
+
+    while !nodesToAdd.isEmpty {
+      let node = nodesToAdd.removeFirst()
+      print("--localnode--", node)
+      nodesToAdd.append(contentsOf: node.children)
+      nodesInScene.append(node)
+    }
+
+    if nodesInScene.count != data.nodes.count {
+      fatalError(
+        "\( nodesInScene.count ) local nodes, received \( data.nodes.count )")
+    }
+
+    let matchedNodes = zip(nodesInScene, data.nodes)
+
+    for (localNode, remoteNode) in matchedNodes {
+      let _ = register(node: localNode, owner: host!, id: remoteNode.id)
+    }
+
+    onSceneSynced?(scene)
+    onSceneSynced = nil
+  }
+
   func handleSpawnNodesAsClient(
     metadata: DDRPCMetadataReliable,
     data: DDRPCSpawnNodes
@@ -495,15 +537,6 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
       spawnNode.properties.apply(to: node)
       let _ = register(node: node, owner: host!, id: spawnNode.id)
-
-      if let scene = node as? DDScene {
-        self.scene = scene
-      }
-    }
-
-    if let scene = scene {
-      onSceneLoaded?(scene)
-      onSceneLoaded = nil
     }
   }
 }
