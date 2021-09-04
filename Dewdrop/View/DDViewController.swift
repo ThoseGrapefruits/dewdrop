@@ -25,6 +25,8 @@ class DDViewController: UIViewController {
     super.viewDidLoad()
 
     matchmaking.findMatch(view: self) { [weak self] match, error in
+      print("--match--", GKLocalPlayer.local.gamePlayerID, match.players.map { p in p.gamePlayerID })
+
       guard error == nil else {
         // TODO actual error handling
         fatalError(error.debugDescription)
@@ -76,30 +78,37 @@ class DDViewController: UIViewController {
       return
     }
 
-    let playerNode = DDPlayerNode()
-    // TODO positioning should be host-controlled
-    playerNode.mainCircle.position = DDViewController.START_POSITION
-    // TODO register the player node
-    // playerNode.addToScene(scene: self.scene!)
+    // TODO: How do we state ownership to clients?
+    //       We could have the host know about each player's view of what all
+    //       the gamePlayerIDs are and use that to communicate things but that
+    //       also feels messy. Maybe this is the one place that we do full
+    //       mesh communication? Seems dum to do that just for this though.
 
-    let cameraNode = DDCameraNode()
-    scene.addChild(cameraNode)
-    cameraNode.position = DDViewController.START_POSITION
-    scene.camera = cameraNode
+    try! DDNetworkMatch.singleton.requestSpawn(
+      nodeType: .ddPlayerNode
+    ) { node in
+      guard let localPlayerNode = node as! DDPlayerNode? else {
+        fatalError("Spawned node is not a DDPlayerNode: \( node )")
+      }
+
+      let cameraNode = DDCameraNode()
+      scene.addChild(cameraNode)
+      cameraNode.position = DDViewController.START_POSITION
+      scene.camera = cameraNode
+
+      localPlayerNode.start()
+      cameraNode.track(localPlayerNode.mainCircle)
+
+      let statsNode = DDNetworkStatsNode()
+      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
+
+      cameraNode.addChild(statsNode)
+    }
 
     // Present the scene
     view.presentScene(self.scene!)
 
-    playerNode.start()
-    cameraNode.track(playerNode.mainCircle)
-
-    let statsNode = DDNetworkStatsNode()
-    statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
-
-    cameraNode.addChild(statsNode)
-
     view.ignoresSiblingOrder = true
-
     view.showsFPS = true
     view.showsNodeCount = true
   }

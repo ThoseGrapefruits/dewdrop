@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 struct DDRPCSpawnNodes : Codable {
   let nodes: [ DDRPCSpawnNode ]

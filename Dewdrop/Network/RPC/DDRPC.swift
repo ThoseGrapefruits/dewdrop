@@ -7,11 +7,12 @@
 
 import Foundation
 
-enum DDNetworkRPCType : Int8, Codable {
+enum DDRPCType : Int8, Codable {
   case hostChange
   case lastSeen
   case playerUpdate
-  case registrationRequest
+  case reply
+  case spawnRequest
   case sceneSnapshot
   case sceneSync
   case spawnNodes
@@ -20,13 +21,14 @@ enum DDNetworkRPCType : Int8, Codable {
 extension DDRPC : CustomStringConvertible {
   var description: String {
     switch self {
-      case .hostChange(_):             return ".hostChange"
-      case .lastSeen(_, _):            return ".lastSeen"
-      case .playerUpdate(_, _):        return ".playerUpdate"
-      case .registrationRequest(_, _): return ".registrationRequest"
-      case .sceneSnapshot(_, _):       return ".sceneSnapshot"
-      case .sceneSync(_, _):           return ".sceneSync"
-      case .spawnNodes(_, _):          return ".spawnNodes"
+      case .hostChange(_):       return ".hostChange"
+      case .lastSeen(_, _):      return ".lastSeen"
+      case .playerUpdate(_, _):  return ".playerUpdate"
+      case .reply(_, let data):  return ".reply(\(data.value.description))"
+      case .spawnRequest(_, _):  return ".spawnRequest"
+      case .sceneSnapshot(_, _): return ".sceneSnapshot"
+      case .sceneSync(_, _):     return ".sceneSync"
+      case .spawnNodes(_, _):    return ".spawnNodes"
     }
   }
 }
@@ -36,13 +38,15 @@ enum DDRPC : Codable {
   // MARK: Message types
 
   //   Name                 Metadata    Data
-  case hostChange          (DDRPCMetadataReliable)
-  case lastSeen            (DDRPCMetadataUnreliable, DDRPCLastSeen)
-  case playerUpdate        (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
-  case registrationRequest (DDRPCMetadataReliable,   DDRPCRegistrationRequest)
-  case sceneSnapshot       (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
-  case sceneSync           (DDRPCMetadataReliable,   DDRPCSceneSync)
-  case spawnNodes          (DDRPCMetadataReliable,   DDRPCSpawnNodes)
+  case hostChange    (DDRPCMetadataReliable)
+  case lastSeen      (DDRPCMetadataUnreliable, DDRPCLastSeen)
+  case playerUpdate  (DDRPCMetadataUnreliable, DDRPCPlayerUpdate)
+  case sceneSnapshot (DDRPCMetadataUnreliable, DDRPCSceneSnapshot)
+  case sceneSync     (DDRPCMetadataReliable,   DDRPCSceneSync)
+  case spawnNodes    (DDRPCMetadataReliable,   DDRPCSpawnNodes)
+  case spawnRequest  (DDRPCMetadataReliable,   DDRPCSpawnRequest)
+
+  case reply(DDRPCMetadataReliable, DDRPCReply)
 
   // MARK: Codable
 
@@ -54,13 +58,13 @@ enum DDRPC : Codable {
     var container = encoder.container(keyedBy: CodingKeys.self)
 
     switch self {
+      case .reply(let metadata, let data):
+        try container.encode(type: .reply, metadata: metadata, data: data)
+
       case .hostChange(let metadata):
         try container.encode(type: .hostChange, metadata: metadata)
       case .lastSeen(let metadata, let data):
         try container.encode(type: .lastSeen, metadata: metadata, data: data)
-      case .registrationRequest(let metadata, let data):
-        try container.encode(
-          type: .registrationRequest, metadata: metadata, data: data)
       case .playerUpdate(let metadata, let data):
         try container.encode(
           type: .playerUpdate, metadata: metadata, data: data)
@@ -73,13 +77,16 @@ enum DDRPC : Codable {
       case .spawnNodes(let metadata, let data):
         try container.encode(
           type: .spawnNodes, metadata: metadata, data: data)
+      case .spawnRequest(let metadata, let data):
+        try container.encode(
+          type: .spawnRequest, metadata: metadata, data: data)
     }
   }
 
   init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     let typeName = try container.decode(
-      DDNetworkRPCType.self,
+      DDRPCType.self,
       forKey: .type)
 
     switch typeName {
@@ -94,10 +101,10 @@ enum DDRPC : Codable {
         let (metadata, data) = try container.decode(
           unreliable: DDRPCPlayerUpdate.self)
         self = .playerUpdate(metadata, data)
-      case .registrationRequest:
+      case .reply:
         let (metadata, data) = try container.decode(
-          reliable: DDRPCRegistrationRequest.self)
-        self = .registrationRequest(metadata, data)
+          reliable: DDRPCReply.self)
+        self = .reply(metadata, data)
       case .sceneSnapshot:
         let (metadata, data) = try container.decode(
           unreliable: DDRPCSceneSnapshot.self)
@@ -110,6 +117,10 @@ enum DDRPC : Codable {
         let (metadata, data) = try container.decode(
           reliable: DDRPCSpawnNodes.self)
         self = .spawnNodes(metadata, data)
+      case .spawnRequest:
+        let (metadata, data) = try container.decode(
+          reliable: DDRPCSpawnRequest.self)
+        self = .spawnRequest(metadata, data)
     }
   }
 }
@@ -140,7 +151,7 @@ private extension KeyedDecodingContainer where Key == DDRPC.CodingKeys {
 
 private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
   mutating func encode(
-    type: DDNetworkRPCType,
+    type: DDRPCType,
     metadata: DDRPCMetadataUnreliable
   ) throws {
     try encode(type, forKey: .type)
@@ -148,7 +159,7 @@ private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
   }
 
   mutating func encode(
-    type: DDNetworkRPCType,
+    type: DDRPCType,
     metadata: DDRPCMetadataReliable
   ) throws {
     try encode(type, forKey: .type)
@@ -156,7 +167,7 @@ private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
   }
 
   mutating func encode<DataType>(
-    type: DDNetworkRPCType,
+    type: DDRPCType,
     metadata: DDRPCMetadataUnreliable,
     data: DataType
   ) throws where DataType : Codable {
@@ -165,7 +176,7 @@ private extension KeyedEncodingContainer where K == DDRPC.CodingKeys {
   }
 
   mutating func encode<DataType>(
-    type: DDNetworkRPCType,
+    type: DDRPCType,
     metadata: DDRPCMetadataReliable,
     data: DataType
   ) throws where DataType : Codable {

@@ -46,7 +46,13 @@ struct DDNodeSnapshot : Codable {
   }
 
   func apply(to node: SKNode) {
-    physicsBody?.apply(to: node.physicsBody)
+    if let physicsBody = physicsBody {
+      if node.physicsBody == nil {
+        node.physicsBody = SKPhysicsBody()
+      }
+
+      physicsBody.apply(to: node.physicsBody)
+    }
 
     node.position = position
     node.zPosition = zPosition

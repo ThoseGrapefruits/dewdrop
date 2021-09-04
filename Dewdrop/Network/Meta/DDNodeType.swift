@@ -23,8 +23,8 @@ enum DDNodeType : UInt8, Codable {
   case ddScene
   case skNode
 
-  static func instantiate<NodeType : SKNode>(type: DDNodeType) -> NodeType {
-    let TypeReference = ddNodeTypeRegistry[type]
+  func instantiate<NodeType : SKNode>() -> NodeType {
+    let TypeReference = ddNodeTypeRegistry[self]
 
     return TypeReference?.init() as! NodeType
   }

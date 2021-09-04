@@ -242,7 +242,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gun.start(playerNode: self)
   }
 
-  func trackMovementTouch() {
+  private func trackMovementTouch() {
     guard let ddScene = ddScene else {
       return
     }

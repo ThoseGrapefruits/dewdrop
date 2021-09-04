@@ -8,6 +8,6 @@
 import Foundation
 
 struct DDRPCLastSeen : Codable {
-  let type: DDNetworkRPCType
+  let type: DDRPCType
   let index: RequestIndex
 }
