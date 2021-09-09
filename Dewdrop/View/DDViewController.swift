@@ -10,8 +10,7 @@ import SpriteKit
 import GameKit
 import GameplayKit
 
-class DDViewController: UIViewController {
-
+class DDViewController: UIViewController, DDSpawnDelegate {
   // MARK: Constants
 
   static let START_POSITION = CGPoint(x: 0, y: 160)
@@ -20,6 +19,8 @@ class DDViewController: UIViewController {
 
   let matchmaking = DDMatchmaking()
   var scene: Optional<DDScene> = .none
+
+  // MARK: UIViewController
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -61,6 +62,33 @@ class DDViewController: UIViewController {
     }
   }
 
+  // MARK: DDSpawnDelegate
+
+  func handleSpawn(node: SKNode, from localGamePlayerID: String?) {
+    if localGamePlayerID == GKLocalPlayer.local.gamePlayerID {
+      guard let localPlayerNode = node as! DDPlayerNode? else {
+        fatalError("Spawned node is not a DDPlayerNode: \( node )")
+      }
+
+      let cameraNode = DDCameraNode()
+      scene!.addChild(cameraNode)
+      cameraNode.position = DDViewController.START_POSITION
+      scene!.camera = cameraNode
+
+      localPlayerNode.start()
+      cameraNode.track(localPlayerNode.mainCircle)
+
+      let statsNode = DDNetworkStatsNode()
+      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
+
+      cameraNode.addChild(statsNode)
+    }
+
+    // Other object sync, like the scene. Can ignore for now
+  }
+
+  // MARK: Helpers
+
   func startLocalGame(_ closure: (() -> Void)? = .none) {
     DDNetworkMatch.singleton.waitForSceneSync { [weak self] scene in
       guard let self = self else {
@@ -74,36 +102,13 @@ class DDViewController: UIViewController {
   }
 
   func spawnLocalPlayerObjects() {
-    guard let scene = scene, let view = self.view as! DDView? else {
+    guard let view = self.view as! DDView? else {
       return
     }
 
-    // TODO: How do we state ownership to clients?
-    //       We could have the host know about each player's view of what all
-    //       the gamePlayerIDs are and use that to communicate things but that
-    //       also feels messy. Maybe this is the one place that we do full
-    //       mesh communication? Seems dum to do that just for this though.
+    DDNetworkMatch.singleton.spawnDelegate = self
 
-    try! DDNetworkMatch.singleton.requestSpawn(
-      nodeType: .ddPlayerNode
-    ) { node in
-      guard let localPlayerNode = node as! DDPlayerNode? else {
-        fatalError("Spawned node is not a DDPlayerNode: \( node )")
-      }
-
-      let cameraNode = DDCameraNode()
-      scene.addChild(cameraNode)
-      cameraNode.position = DDViewController.START_POSITION
-      scene.camera = cameraNode
-
-      localPlayerNode.start()
-      cameraNode.track(localPlayerNode.mainCircle)
-
-      let statsNode = DDNetworkStatsNode()
-      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
-
-      cameraNode.addChild(statsNode)
-    }
+    try! DDNetworkMatch.singleton.requestSpawn(nodeType: .ddPlayerNode)
 
     // Present the scene
     view.presentScene(self.scene!)

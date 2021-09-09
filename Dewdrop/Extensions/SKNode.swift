@@ -10,6 +10,19 @@ import SpriteKit
 
 extension SKNode {
 
+  func bfs() -> [SKNode] {
+    var queue: [SKNode] = [self]
+    var nodes: [SKNode] = []
+
+    while !queue.isEmpty {
+      let node = queue.removeFirst()
+      nodes.append(node)
+      queue.append(contentsOf: node.children)
+    }
+
+    return nodes
+  }
+
   // MARK: getPositionAndRotation
 
   func getPosition(within ancestor: SKNode) -> CGPoint {

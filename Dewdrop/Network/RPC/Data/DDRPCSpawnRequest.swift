@@ -10,5 +10,5 @@ import SpriteKit
 
 struct DDRPCSpawnRequest : Codable {
   let type: DDNodeType
-  let snapshot: DDNodeSnapshot?
+  let localGamePlayerID: String
 }

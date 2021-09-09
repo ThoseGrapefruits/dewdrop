@@ -15,9 +15,6 @@ struct SentRequest {
   var index: RequestIndex = 0
   var wrapped: Bool = false
 
-  var replyHandler: ((GKPlayer, DDRPCReply) -> Void)? = .none
-  var repliesAnticipated: Set<GKPlayer>? = .none
-
   mutating func increment() {
     wrapped = index == RequestIndex.max
     index = wrapped ? 0 : index + 1
@@ -54,6 +51,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   var host: GKPlayer? = .none
   var match: GKMatch? = .none
   var scene: DDScene? = .none
+  var spawnDelegate: DDSpawnDelegate? = .none
 
   // MARK: External event handlers
 
@@ -104,13 +102,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       delegate.nextMessage()
     }
 
-    let sentRequest = getNextRequestSendIndex(
-      for: .sceneSnapshot, to: match!.players)
-    let metadata = DDRPCMetadataUnreliable(
-      index: sentRequest.index,
-      indexWrapped: sentRequest.wrapped)
     let data = DDRPCSceneSnapshot(nodes: nodeSnapshots)
-    let message = DDRPC.sceneSnapshot(metadata, data)
+    let message = DDRPCData.sceneSnapshot(data)
     try sendAll(message, mode: .unreliable)
 
     let waitForInterval = SKAction.wait(
@@ -130,6 +123,10 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   }
 
   // MARK: Registration
+
+  func apply(delta: DDNodeDelta) {
+    registryByID[delta.id]?.apply(delta: delta)
+  }
 
   func register(
     node: SKNode,
@@ -159,101 +156,20 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       return
     }
 
-    var nodesToRegister: [SKNode] = [scene]
-    var nodesToSync: [DDRPCSyncNode] = []
-
-    // breadth-first search
-    while !nodesToRegister.isEmpty {
-      let node = nodesToRegister.removeFirst()
-      print("--send node--", node)
-      let networkDelegate = register(node: node, owner: host)
-      nodesToSync.append(DDRPCSyncNode(
-        id: networkDelegate.id,
-        type: DDNodeType.of(node)))
-      nodesToRegister.append(contentsOf: node.children)
+    let nodesToSync = scene.bfs().map { node in
+      return DDRPCSyncNode(
+        id: register(node: node, owner: host).id,
+        type: DDNodeType.of(node)
+      )
     }
 
-    let sentRequest = getNextRequestSendIndex(
-      for: .sceneSync, to: match!.players)
-    let metadata = DDRPCMetadataReliable(
-      index: sentRequest.index, indexWrapped: sentRequest.wrapped)
-    let data = DDRPCSceneSync(nodes: nodesToSync)
-    try sendAll(DDRPC.sceneSync(metadata, data), mode: .reliable)
+    let data = DDRPCSyncNodes(
+      nodes: nodesToSync,
+      sourceLocalGamePlayerID: .none)
+    try sendAll(DDRPCData.syncNodes(data), mode: .reliable)
 
     onSceneSynced?(scene)
     onSceneSynced = nil
-  }
-
-  func requestSpawn(
-    nodeType: DDNodeType,
-    snapshot: DDNodeSnapshot? = .none,
-    _ callback: ((SKNode) -> Void)? = .none
-  ) throws {
-    guard !isHost else {
-      switch nodeType {
-        case .ddPlayerNode:
-          let playerNode: DDPlayerNode = nodeType.instantiate()
-          playerNode.addToScene(scene: scene!)
-
-          var queue: [SKNode] = [playerNode]
-          var nodesToSpawn: [DDRPCSpawnNode] = []
-
-          // BFS
-          while !queue.isEmpty {
-            let node = queue.removeFirst()
-            let networkDelegate = register(node: node, owner: host!)
-            nodesToSpawn.append(DDRPCSpawnNode(
-              id: networkDelegate.id,
-              parent: node.parent == nil
-                ? nil
-                : registryByNode[node.parent!]?.id,
-              properties: networkDelegate.captureSnapshot()!,
-              type: DDNodeType.of(node)))
-            queue.append(contentsOf: node.children)
-          }
-
-          let data = DDRPCSpawnNodes(nodes: nodesToSpawn)
-          let sendRequest = getNextRequestSendIndex(
-            for: .spawnNodes, to: match!.players)
-          let metadata = DDRPCMetadataReliable(
-            index: sendRequest.index, indexWrapped: sendRequest.wrapped)
-          let message = DDRPC.spawnNodes(metadata, data)
-          try sendAll(message, mode: .reliable)
-
-          callback?(playerNode)
-        default:
-          let node = nodeType.instantiate()
-          callback?(node)
-      }
-      return
-    }
-
-    let sentRequest = getNextRequestSendIndex(
-      for: .spawnRequest, to: [host!]
-    ) { [weak self] player, reply in
-      guard let self = self else {
-        return
-      }
-
-      guard case DDRPC.spawnNodes(_, let data) = reply.value else {
-        fatalError(".spawnRequest response had wrong type: \(reply.value)")
-      }
-
-      var firstNode: SKNode? = .none
-
-      for node in data.nodes {
-        let delegate = self.spawn(node: node)
-        firstNode = firstNode ?? delegate.node
-      }
-
-      callback?(firstNode!)
-    }
-
-    let metadata = DDRPCMetadataReliable(
-      index: sentRequest.index, indexWrapped: sentRequest.wrapped)
-    let data = DDRPCSpawnRequest(type: nodeType, snapshot: snapshot)
-    let message = DDRPC.spawnRequest(metadata, data)
-    try sendHost(message, mode: .reliable)
   }
 
   // MARK: Network message receiving
@@ -261,11 +177,25 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   func match(
     _ match: GKMatch,
     didReceive data: Data,
-    fromRemotePlayer player: GKPlayer
+    fromRemotePlayer sender: GKPlayer
   ) {
     networkActivityTracker.recordReceive(data: data)
 
-    receiveMessage(data, fromRemotePlayer: player)
+    var binary = PropertyListSerialization.PropertyListFormat.binary
+    let decoded = try! decoder.decode(
+      DDRPCData.self,
+      from: data,
+      format: &binary)
+
+    print("--recv--", sender.displayName, decoded)
+
+    if isHost {
+      receiveMessage(asHost: decoded, from: sender)
+    } else if host == sender {
+      receiveMessage(fromHost: decoded)
+    } else {
+      receiveMessage(asPeer: decoded, from: sender)
+    }
   }
 
   func match(
@@ -275,11 +205,33 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     fromRemotePlayer player: GKPlayer
   ) {
     guard recipient != GKLocalPlayer.local else {
-      // I dunno why this has to exist but apparently it does
+      // I dunno why this happens, but I've seen it happen.
       return self.match(match, didReceive: data, fromRemotePlayer: player)
     }
 
     fatalError("Proxied message sending is not in use, might be an accident?")
+  }
+
+  func match(
+    _ match: GKMatch,
+    didReceive data: Data,
+    fromLocalHost sender: GKPlayer
+  ) {
+    var binary = PropertyListSerialization.PropertyListFormat.binary
+    let decoded = try! decoder.decode(
+      DDRPC.self,
+      from: data,
+      format: &binary)
+
+    guard shouldProcessMessage(
+      from: sender,
+      type: .sceneSnapshot,
+      metadata: decoded.metadata
+    ) else {
+      return
+    }
+
+    receiveMessage(fromHost: decoded.data)
   }
 
   func match(
@@ -295,40 +247,42 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     }
   }
 
-  // MARK: Network message sending
+  // MARK: Network sending — host
 
-  func send(_ data: DDRPC, to recipients: [GKPlayer], mode: GKMatch.SendDataMode) throws {
-    let encoder = PropertyListEncoder()
-    encoder.outputFormat = .binary
-    let message = try encoder.encode(data)
-
-    print("--send--", recipients.map { p in p.displayName }, data)
-
-    networkActivityTracker.recordSend(data: message, to: recipients)
-    try match?.send(message, to: recipients, dataMode: mode)
-  }
-
-  func sendAll(_ data: DDRPC, mode: GKMatch.SendDataMode) throws {
-    let encoder = PropertyListEncoder()
-    encoder.outputFormat = .binary
-    let message = try encoder.encode(data)
-
+  func sendAll(_ data: DDRPCData, mode: GKMatch.SendDataMode) throws {
     guard let match = match else {
       return
     }
 
-    print("--send--", match.players.map { p in p.displayName }, data)
+    let sendRequest = getNextRequestSendIndex(for: DDRPCType.of(data))
+    let metadata = DDRPCMetadata(
+      index: sendRequest.index, indexWrapped: sendRequest.wrapped)
+
+    let rpc = DDRPC(metadata: metadata, data: data)
+
+    let encoder = PropertyListEncoder()
+    encoder.outputFormat = .binary
+    let message = try encoder.encode(rpc)
+
+    print(
+      "--send--",
+      (match.players + [GKLocalPlayer.local]).map { p in p.displayName },
+      rpc)
 
     networkActivityTracker.recordSend(data: message, to: match.players)
+    self.match(
+      match,
+      didReceive: message,
+      fromLocalHost: GKLocalPlayer.local)
     try match.sendData(toAllPlayers: message, with: mode)
   }
 
-  func sendHost(_ data: DDRPC, mode: GKMatch.SendDataMode) throws {
+  // MARK: Network sending — client
+
+  func sendHost(_ data: DDRPCData, mode: GKMatch.SendDataMode) throws {
     guard let host = host else {
       return
     }
-
-    print("--send--", host.displayName, data)
 
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
@@ -348,15 +302,11 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     if let player = player {
       host = player
       if isHost {
-        let sentRequest = getNextRequestSendIndex(
-          for: .hostChange, to: match!.players)
-        let metadata = DDRPCMetadataReliable(
-          index: sentRequest.index, indexWrapped: sentRequest.wrapped)
         // This acts as a sort of lock. Because it and the scene snapshots are
         // sent via the .reliable channel, they have to arrive in order,
         // meaning that the host will definitely be set on all clients before
-        // they receive the .spawnNodes command
-        try? sendAll(.hostChange(metadata), mode: .reliable)
+        // they receive any .syncNodes commands
+        try? sendAll(.hostChange, mode: .reliable)
       }
       closure(player)
       return
@@ -375,8 +325,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       } else {
         let localPlayer = GKLocalPlayer.local as GKPlayer
 
-        // TODO: sometimes one player gets the optimal and the other doesn't???
-        //       this is dum and means I have to have a host negotiation fallbak
+        // TODO: sometimes one player gets the optimal and the other doesn't ???
+        // this is dum. need to do host negotiation fallback
         let defaultHost = match.players.reduce(localPlayer) { lowest, player in
           switch lowest.displayName.compare(player.displayName)  {
             case .orderedAscending:
@@ -395,12 +345,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   // MARK: Network message indices
 
-  func getNextRequestSendIndex(
-    for type: DDRPCType,
-    to recipients: [GKPlayer],
-    _ handleReply: ((GKPlayer, DDRPCReply) -> Void)? = .none
-  )
-  -> SentRequest {
+  func getNextRequestSendIndex(for type: DDRPCType) -> SentRequest {
     var sentRequest = requestIndicesSent[type]
 
     if var sentRequest = sentRequest {
@@ -410,18 +355,13 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
       requestIndicesSent[type] = sentRequest
     }
 
-    if let handleReply = handleReply {
-      sentRequest!.repliesAnticipated = Set(recipients)
-      sentRequest!.replyHandler = handleReply
-    }
-
     return sentRequest!
   }
 
   func updateLastSeenRequest(
     from sender: GKPlayer,
     type: DDRPCType,
-    _ metadata: DDRPCMetadataUnreliable
+    _ metadata: DDRPCMetadata
   ) -> (oldIndex: RequestIndex?, newIndex: RequestIndex, wrapped: Bool) {
     var typeEntries = requestLastSeenFrom[type] ?? [:]
     requestLastSeenFrom[type] = typeEntries
@@ -435,94 +375,21 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     return (oldIndex, newIndex, wrapped)
   }
 
-  // MARK: Messaging
+  // MARK: Message dispatch
 
-  func receiveMessage(_ data: Data, fromRemotePlayer sender: GKPlayer) {
-    var binary = PropertyListSerialization.PropertyListFormat.binary
-    let decoded = try! decoder.decode(
-      DDRPC.self,
-      from: data,
-      format: &binary)
-
-    print("--recv--", sender.displayName, decoded)
-
-    if isHost {
-      receiveMessage(asHost: decoded, from: sender)
-    } else if host == sender {
-      receiveMessage(fromHost: decoded)
-    } else {
-      receiveMessage(asPeer: decoded, from: sender)
-    }
-  }
-
-  func receiveMessage(asHost message: DDRPC, from sender: GKPlayer) {
+  func receiveMessage(asPeer message: DDRPCData, from sender: GKPlayer) {
     switch message {
-      case .hostChange(_):
-        fatalError("Received .hostChange as host")
-      case .lastSeen(let metadata, let data):
-        handleLastSeen(from: sender, metadata: metadata, data: data)
-        break
-      case .playerUpdate(_, _):
-        // TODO
-        break
-      case .reply(let metadata, let data):
-        handleReply(from: sender, metadata: metadata, data: data)
-        break
-      case .spawnRequest(let metadata, let data):
-        handleSpawnRequest(from: sender, metadata: metadata, data: data)
-        break
-      case .sceneSnapshot(_, _):
-        fatalError("Received .sceneSnapshot from non-host: \( sender )")
-      case .sceneSync(_, _):
-        fatalError("Received .sceneSync from non-host: \( sender )")
-      case .spawnNodes(_, _):
-        fatalError("Received .spawnNodes from non-host: \( sender )")
-    }
-  }
-
-  func receiveMessage(asPeer message: DDRPC, from sender: GKPlayer) {
-    switch message {
-      case .hostChange(let metadata):
-        handleHostChange(from: sender, metadata: metadata)
+      case .hostChange:
+        handleHostChange(from: sender)
       default:
         fatalError("Received as peer: \( message )")
-    }
-  }
-
-  func receiveMessage(fromHost message: DDRPC) {
-    switch message {
-      case .hostChange(_):
-        // This is fine. Means we set the host normally and didn't have to rely
-        // on the queued request. Should happen more often than not, but maybe
-        // not when clients are connected over LAN.
-        break
-      case .lastSeen(let metadata, let data):
-        handleLastSeen(from: host!, metadata: metadata, data: data)
-        break
-      case .playerUpdate(_, _):
-        fatalError("Received .playerUpdate as client")
-        break
-      case .reply(let metadata, let data):
-        handleReply(from: host!, metadata: metadata, data: data)
-      case .spawnRequest(_, _):
-        fatalError("Received .registrationRequest as client")
-        break
-      case .sceneSnapshot(let metadata, let data):
-        handleSceneSnapshotAsClient(metadata: metadata, data: data)
-        break
-      case .sceneSync(let metadata, let data):
-        handleSceneSyncAsClient(metadata: metadata, data: data)
-        break
-      case .spawnNodes(let metadata, let data):
-        handleSpawnNodesAsClient(metadata: metadata, data: data)
-        break
     }
   }
 
   func shouldProcessMessage(
     from sender: GKPlayer,
     type: DDRPCType,
-    _ metadata: DDRPCMetadataUnreliable
+    metadata: DDRPCMetadata
   ) -> Bool {
     let (lastIndex, index, wrapped) = updateLastSeenRequest(
       from: sender, type: type, metadata)
@@ -534,25 +401,16 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     return wrapped || lastIndex < index
   }
 
-
   // MARK: Message handlers
 
-  func handleHostChange(
-    from sender: GKPlayer,
-    metadata: DDRPCMetadataReliable
-  ) {
+  func handleHostChange(from sender: GKPlayer) {
     self.host = sender
   }
 
   func handleLastSeen(
     from sender: GKPlayer,
-    metadata: DDRPCMetadataUnreliable,
     data: DDRPCLastSeen
   ) {
-    guard shouldProcessMessage(from: sender, type: .lastSeen, metadata) else {
-      return
-    }
-
     let receiverID = sender.gamePlayerID
 
     var typeEntries = requestLastSeenBy[data.type] ?? [:]
@@ -571,110 +429,5 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     let wrapped = oldIndex != nil && newIndex < oldIndex!
 
     typeEntries[sender] = (newIndex, wrapped)
-  }
-
-  func handleReply(
-    from sender: GKPlayer,
-    metadata replyMetadata: DDRPCMetadataReliable,
-    data replyData: DDRPCReply
-  ) {
-    switch replyData.value {
-      case .reply(_, _):
-        fatalError("Multiple nested .reply messages found.")
-      case .spawnNodes(let metadata, let data):
-        let sentRequest = requestIndicesSent[.spawnRequest]
-        if
-          let sentRequest = sentRequest,
-          sentRequest.index == replyData.originalRequestIndex,
-          let replyHandler = sentRequest.replyHandler {
-          replyHandler(sender, replyData)
-        } else {
-          let _ = handleSpawnNodesAsClient(metadata: metadata, data: data)
-        }
-      default:
-        fatalError(".reply handler not implemented: \(replyData.value)")
-    }
-  }
-
-  func handleSceneSnapshotAsClient(
-    metadata: DDRPCMetadataUnreliable,
-    data: DDRPCSceneSnapshot
-  ) {
-    guard shouldProcessMessage(
-      from: host!, type: .sceneSnapshot, metadata
-    ) else {
-      return
-    }
-
-    for delta in data.nodes {
-      registryByID[delta.id]?.apply(delta: delta)
-    }
-  }
-
-  func handleSceneSyncAsClient(
-    metadata: DDRPCMetadataReliable,
-    data: DDRPCSceneSync
-  ) {
-    guard let scene = scene else {
-      fatalError("Cannot sync scene without scene")
-    }
-
-    var nodesToAdd: [SKNode] = [scene]
-    var nodesInScene: [SKNode] = []
-
-    while !nodesToAdd.isEmpty {
-      let node = nodesToAdd.removeFirst()
-      print("--localnode--", node)
-      nodesToAdd.append(contentsOf: node.children)
-      nodesInScene.append(node)
-    }
-
-    if nodesInScene.count != data.nodes.count {
-      fatalError(
-        "\( nodesInScene.count ) local nodes, received \( data.nodes.count )")
-    }
-
-    let matchedNodes = zip(nodesInScene, data.nodes)
-
-    for (localNode, remoteNode) in matchedNodes {
-      let _ = register(node: localNode, owner: host!, id: remoteNode.id)
-    }
-
-    onSceneSynced?(scene)
-    onSceneSynced = nil
-  }
-
-  func handleSpawnNodesAsClient(
-    metadata: DDRPCMetadataReliable,
-    data: DDRPCSpawnNodes
-  ) {
-    for node in data.nodes {
-      let _ = spawn(node: node)
-    }
-  }
-
-  func handleSpawnRequest(
-    from sender: GKPlayer,
-    metadata: DDRPCMetadataReliable,
-    data: DDRPCSpawnRequest
-  ) {
-    let instance = data.type.instantiate()
-    data.snapshot?.apply(to: instance)
-  }
-
-  func spawn(node spawnNode: DDRPCSpawnNode) -> DDNetworkDelegate {
-    let node = spawnNode.type.instantiate()
-    if let parentID = spawnNode.parent {
-      let parent = registryByID[parentID]?.node
-
-      guard let parent = parent else {
-        fatalError("No parent \( parentID ) found for node \( spawnNode.id )")
-      }
-
-      node.move(toParent: parent)
-    }
-
-    spawnNode.properties.apply(to: node)
-    return register(node: node, owner: host!, id: spawnNode.id)
   }
 }

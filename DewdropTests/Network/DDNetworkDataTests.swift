@@ -25,8 +25,8 @@ class DDNetworkDataTests: XCTestCase {
   }
 
   func testRegistrationRequest() throws {
-    let hostChange = DDRPC.spawnRequest(
-      DDRPCMetadataReliable(index: 0, indexWrapped: false),
+    let hostChange = DDRPCData.spawnRequest(
+      DDRPCMetadata(index: 0, indexWrapped: false),
       DDRPCSpawnRequest(
         type: DDNodeType.ddGun,
         snapshot: DDNodeSnapshot(
@@ -40,7 +40,7 @@ class DDNetworkDataTests: XCTestCase {
 
     let hostChangeEncoded = try encoder.encode(hostChange)
     let hostChangeDecoded = try decoder.decode(
-      DDRPC.self,
+      DDRPCData.self,
       from: hostChangeEncoded)
 
     if case (
