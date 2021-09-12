@@ -45,12 +45,39 @@ extension DDNetworkMatch {
     let instance = spawnRequest.type.instantiate()
     (instance as! DDSceneAddable?)?.addToScene(scene: scene!)
 
+    let parent = instance.parent
+
+    guard let parent = parent else {
+      fatalError("addToScene did not set the node's parent")
+    }
+
+    guard let parentDelegate = getDelegateFor(node: parent) else {
+      fatalError("Couldn't find delegate for spawn parent")
+    }
+
+    var nodes = instance.bfs().map { node in DDRPCSyncNode(
+      id: register(node: node, owner: sender).id,
+      spawn: true,
+      type: DDNodeType.of(node))
+    }
+
+    nodes.insert(
+      DDRPCSyncNode(
+        id: parentDelegate.id,
+        spawn: false,
+        type: DDNodeType.of(parentDelegate.node!)
+      ),
+      at: 0
+    )
+
     let data = DDRPCSyncNodes(
-      nodes: instance.bfs().map { node in DDRPCSyncNode(
-        id: register(node: node, owner: sender).id,
-        type: DDNodeType.of(node))
-      },
+      nodes: nodes,
       sourceLocalGamePlayerID: spawnRequest.localGamePlayerID
+    )
+
+    spawnDelegate?.handleSpawn(
+      node: instance,
+      from: spawnRequest.localGamePlayerID
     )
 
     try sendAll(DDRPCData.syncNodes(data), mode: .reliable)

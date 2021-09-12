@@ -67,7 +67,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   func addToScene(scene: DDScene) {
     scene.addChild(self)
-    scene.playerNode = self
     ddScene = scene
 
     physicsBody = SKPhysicsBody()

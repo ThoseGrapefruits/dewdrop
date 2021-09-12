@@ -9,7 +9,7 @@ import SpriteKit
 import GameplayKit
 import Combine
 
-class DDScene: SKScene, SKPhysicsContactDelegate {
+class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var graphs = [String : GKGraph]()
   var moveTouch: Optional<UITouch> = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
@@ -22,9 +22,15 @@ class DDScene: SKScene, SKPhysicsContactDelegate {
 
   // MARK: Initialization
 
-  func start() {
-    vivifyBouncyLeaves()
+  func addToScene(scene: DDScene) {
+    if (scene != self) {
+      fatalError("no")
+    }
 
+    vivifyBouncyLeaves()
+  }
+
+  func start() {
     aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
 

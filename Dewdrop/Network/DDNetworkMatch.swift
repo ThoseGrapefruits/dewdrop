@@ -15,9 +15,11 @@ struct SentRequest {
   var index: RequestIndex = 0
   var wrapped: Bool = false
 
-  mutating func increment() {
-    wrapped = index == RequestIndex.max
-    index = wrapped ? 0 : index + 1
+  func increment() -> SentRequest {
+    let wrapped = index == RequestIndex.max
+    return SentRequest(
+      index: wrapped ? 0 : index + 1,
+      wrapped: wrapped)
   }
 }
 
@@ -45,6 +47,8 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   let networkActivityTracker = DDNetworkActivityTracker()
   private let decoder = PropertyListDecoder()
+  private var decoderFormat =
+    PropertyListSerialization.PropertyListFormat.binary
 
   // MARK: References
 
@@ -95,7 +99,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
   func watchScene() throws {
     guard isHost, let scene = scene else {
-      fatalError("--not host or no scene!")
+      fatalError("Not host or no scene!")
     }
 
     let nodeSnapshots = registryByID.values.compactMap { delegate in
@@ -109,23 +113,22 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     let waitForInterval = SKAction.wait(
       forDuration: DDNetworkMatch.updateInterval)
     scene.run(waitForInterval) { [weak self] in
-      guard let self = self else {
-        fatalError("--no concept of self!")
-      }
-
-      do {
-        try self.watchScene()
-      } catch {
-        // TODO leave the match? retry?
-        fatalError("--watchScene-- \( error.localizedDescription )")
-      }
+      try! self?.watchScene()
     }
   }
 
   // MARK: Registration
 
   func apply(delta: DDNodeDelta) {
-    registryByID[delta.id]?.apply(delta: delta)
+    getDelegateFor(id: delta.id)?.apply(delta: delta)
+  }
+
+  func getDelegateFor(id: DDNodeID) -> DDNetworkDelegate? {
+    return registryByID[id]
+  }
+
+  func getDelegateFor(node: SKNode) -> DDNetworkDelegate? {
+    return registryByNode[node]
   }
 
   func register(
@@ -133,7 +136,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     owner: GKPlayer,
     id: DDNodeID? = .none
   ) -> DDNetworkDelegate {
-    guard registryByNode[node] == nil else {
+    guard getDelegateFor(node: node) == nil else {
       fatalError(
         "Already registered node: \( node ), id: \( String(describing: id) )")
     }
@@ -159,6 +162,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     let nodesToSync = scene.bfs().map { node in
       return DDRPCSyncNode(
         id: register(node: node, owner: host).id,
+        spawn: false,
         type: DDNodeType.of(node)
       )
     }
@@ -181,57 +185,28 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   ) {
     networkActivityTracker.recordReceive(data: data)
 
-    var binary = PropertyListSerialization.PropertyListFormat.binary
-    let decoded = try! decoder.decode(
-      DDRPCData.self,
-      from: data,
-      format: &binary)
-
-    print("--recv--", sender.displayName, decoded)
-
-    if isHost {
-      receiveMessage(asHost: decoded, from: sender)
-    } else if host == sender {
-      receiveMessage(fromHost: decoded)
-    } else {
-      receiveMessage(asPeer: decoded, from: sender)
-    }
-  }
-
-  func match(
-    _ match: GKMatch,
-    didReceive data: Data,
-    forRecipient recipient: GKPlayer,
-    fromRemotePlayer player: GKPlayer
-  ) {
-    guard recipient != GKLocalPlayer.local else {
-      // I dunno why this happens, but I've seen it happen.
-      return self.match(match, didReceive: data, fromRemotePlayer: player)
-    }
-
-    fatalError("Proxied message sending is not in use, might be an accident?")
-  }
-
-  func match(
-    _ match: GKMatch,
-    didReceive data: Data,
-    fromLocalHost sender: GKPlayer
-  ) {
-    var binary = PropertyListSerialization.PropertyListFormat.binary
-    let decoded = try! decoder.decode(
+    let rpc = try! decoder.decode(
       DDRPC.self,
       from: data,
-      format: &binary)
+      format: &decoderFormat)
 
     guard shouldProcessMessage(
       from: sender,
-      type: .sceneSnapshot,
-      metadata: decoded.metadata
+      type: DDRPCType.of(rpc.data),
+      metadata: rpc.metadata
     ) else {
       return
     }
 
-    receiveMessage(fromHost: decoded.data)
+    print("--recv--", sender.displayName, rpc)
+
+    if isHost {
+      receiveMessage(asHost: rpc.data, from: sender)
+    } else if host == sender {
+      receiveMessage(fromHost: rpc.data)
+    } else {
+      receiveMessage(asPeer: rpc.data, from: sender)
+    }
   }
 
   func match(
@@ -264,16 +239,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
     encoder.outputFormat = .binary
     let message = try encoder.encode(rpc)
 
-    print(
-      "--send--",
-      (match.players + [GKLocalPlayer.local]).map { p in p.displayName },
-      rpc)
+    print("--send--", match.players.map { p in p.displayName }, rpc)
 
     networkActivityTracker.recordSend(data: message, to: match.players)
-    self.match(
-      match,
-      didReceive: message,
-      fromLocalHost: GKLocalPlayer.local)
     try match.sendData(toAllPlayers: message, with: mode)
   }
 
@@ -286,10 +254,17 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     let encoder = PropertyListEncoder()
     encoder.outputFormat = .binary
-    let message = try encoder.encode(data)
+
+    let sendRequest = getNextRequestSendIndex(for: DDRPCType.of(data))
+    let metadata = DDRPCMetadata(
+      index: sendRequest.index, indexWrapped: sendRequest.wrapped)
+
+    let rpc = DDRPC(metadata: metadata, data: data)
+
+    let message = try encoder.encode(rpc)
     let recipients = [host]
 
-    networkActivityTracker.recordSend(data: message, to: [host])
+    networkActivityTracker.recordSend(data: message, to: recipients)
     try match?.send(message, to: recipients, dataMode: mode)
   }
 
@@ -348,14 +323,12 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   func getNextRequestSendIndex(for type: DDRPCType) -> SentRequest {
     var sentRequest = requestIndicesSent[type]
 
-    if var sentRequest = sentRequest {
-      sentRequest.increment()
-    } else {
-      sentRequest = SentRequest()
-      requestIndicesSent[type] = sentRequest
-    }
+    let new: SentRequest = sentRequest?.increment() ??
+      SentRequest(index: 0, wrapped: false)
 
-    return sentRequest!
+    requestIndicesSent[type] = new
+
+    return new
   }
 
   func updateLastSeenRequest(

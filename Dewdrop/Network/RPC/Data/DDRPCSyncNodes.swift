@@ -19,5 +19,6 @@ struct DDRPCSyncNodes : Codable {
 
 struct DDRPCSyncNode: Codable {
   let id: DDNodeID
+  let spawn: Bool
   let type: DDNodeType
 }

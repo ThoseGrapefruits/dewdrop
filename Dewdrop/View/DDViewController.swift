@@ -26,37 +26,31 @@ class DDViewController: UIViewController, DDSpawnDelegate {
     super.viewDidLoad()
 
     matchmaking.findMatch(view: self) { [weak self] match, error in
-      print("--match--", GKLocalPlayer.local.gamePlayerID, match.players.map { p in p.gamePlayerID })
-
       guard error == nil else {
         // TODO actual error handling
         fatalError(error.debugDescription)
       }
 
+      guard let self = self else {
+        return
+      }
+
+      print("--match--", GKLocalPlayer.local.gamePlayerID, match.players.map { p in p.gamePlayerID })
+
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 
-      DDNetworkMatch.singleton.updateHost { [weak self] host in
-        guard let self = self else {
-          return
-        }
+      self.scene = DDScene(fileNamed: "Scene")!
+      self.scene!.addToScene(scene: self.scene!)
+      DDNetworkMatch.singleton.scene = self.scene
 
-        self.scene = DDScene(fileNamed: "Scene")!
-        DDNetworkMatch.singleton.scene = self.scene
+      print("--starting client--")
+      self.startLocalGame()
 
+      DDNetworkMatch.singleton.updateHost { host in
         if DDNetworkMatch.singleton.isHost {
-          print("--starting as host--")
-
-          self.startLocalGame() { [weak self] in
-            self?.scene?.start()
-          }
-
+          print("--starting host--")
           try! DDNetworkMatch.singleton.startHost()
-        } else {
-          print("--starting as client--")
-          self.startLocalGame()  { [weak self] in
-            self?.scene?.start()
-          }
         }
       }
     }
@@ -70,11 +64,16 @@ class DDViewController: UIViewController, DDSpawnDelegate {
         fatalError("Spawned node is not a DDPlayerNode: \( node )")
       }
 
-      let cameraNode = DDCameraNode()
-      scene!.addChild(cameraNode)
-      cameraNode.position = DDViewController.START_POSITION
-      scene!.camera = cameraNode
+      guard let scene = scene else {
+        fatalError("No scene???")
+      }
 
+      let cameraNode = DDCameraNode()
+      scene.addChild(cameraNode)
+      cameraNode.position = DDViewController.START_POSITION
+      scene.camera = cameraNode
+
+      scene.playerNode = localPlayerNode
       localPlayerNode.start()
       cameraNode.track(localPlayerNode.mainCircle)
 
@@ -89,15 +88,14 @@ class DDViewController: UIViewController, DDSpawnDelegate {
 
   // MARK: Helpers
 
-  func startLocalGame(_ closure: (() -> Void)? = .none) {
+  func startLocalGame() {
     DDNetworkMatch.singleton.waitForSceneSync { [weak self] scene in
       guard let self = self else {
         return
       }
 
-      self.scene = scene
       self.spawnLocalPlayerObjects()
-      closure?()
+      self.scene!.start()
     }
   }
 
