@@ -81,6 +81,8 @@ class DDViewController: UIViewController, DDSpawnDelegate {
       statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
 
       cameraNode.addChild(statsNode)
+
+      scene.start()
     }
 
     // Other object sync, like the scene. Can ignore for now
@@ -95,7 +97,6 @@ class DDViewController: UIViewController, DDSpawnDelegate {
       }
 
       self.spawnLocalPlayerObjects()
-      self.scene!.start()
     }
   }
 

@@ -70,16 +70,27 @@ extension DDNetworkMatch {
       fatalError("Cannot sync nodes without scene")
     }
 
-    let parent = data.nodes[0]
+    print("--syncnodes--", data.nodes[1]);
 
-    if let parentDelegate = getDelegateFor(id: parent.id) {
+    let parentSyncNode = data.nodes[0]
+
+    if let parentDelegate = getDelegateFor(id: parentSyncNode.id) {
       // Syncing a node within the scene
 
       let targetSyncNode = data.nodes[1]
       let targetNode = targetSyncNode.spawn
         ? {
           let node = targetSyncNode.type.instantiate()
-          node.move(toParent: parentDelegate.node!)
+          if let node = node as! DDSceneAddable? {
+            if parentSyncNode.type != .ddScene {
+              fatalError("Cannot sync DDSceneAddable into non-scene parent")
+            }
+
+            node.addToScene(scene: scene)
+          } else {
+            node.move(toParent: parentDelegate.node!)
+          }
+          print("--syncnodes new--", node)
           return node;
         }()
         : parentDelegate.node!.children.first { node in
@@ -91,14 +102,15 @@ extension DDNetworkMatch {
       }
 
       let nodesInTarget = targetNode.bfs()
+      let nodesInData   = data.nodes.dropFirst()
 
-      if !targetSyncNode.spawn && nodesInTarget.count != data.nodes.count {
+      if nodesInTarget.count != nodesInData.count {
         fatalError(
           "\( nodesInTarget.count ) local nodes, received \( data.nodes.count )")
       }
 
       // The parent (first node) is already added.
-      let zipped = zip(nodesInTarget.dropFirst(), data.nodes.dropFirst())
+      let zipped = zip(nodesInTarget, nodesInData)
 
       for (localNode, remoteNode) in zipped {
         let _ = register(node: localNode, owner: host!, id: remoteNode.id)
@@ -110,11 +122,7 @@ extension DDNetworkMatch {
           from: data.sourceLocalGamePlayerID
         )
       }
-    } else {
-      if parent.type != .ddScene {
-        fatalError("Found non-scene sync node with unknown parent")
-      }
-
+    } else if parentSyncNode.type == .ddScene {
       let nodesInScene = scene.bfs()
 
       if nodesInScene.count != data.nodes.count {
@@ -130,6 +138,8 @@ extension DDNetworkMatch {
 
       onSceneSynced?(scene)
       onSceneSynced = nil
+    } else {
+      fatalError("Found non-scene sync node with unknown parent")
     }
   }
 
