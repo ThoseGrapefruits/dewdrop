@@ -11,22 +11,24 @@ import Combine
 
 class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var graphs = [String : GKGraph]()
-  var moveTouch: Optional<UITouch> = .none
+  var moveTouch: UITouch? = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
-  let moveTouchPressureSubject = PassthroughSubject<CGFloat, Never>()
 
-  var aimTouch: Optional<UITouch> = .none
+  var aimTouch: UITouch? = .none
   var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
 
-  var playerNode: Optional<DDPlayerNode> = .none
+  var playerNode: DDPlayerNode? = .none
+  var spawnPointParent: SKNode? = .none
+  var spawnPointIndex: Int = 0;
 
   // MARK: Initialization
 
-  func addToScene(scene: DDScene) {
+  func addToScene(scene: DDScene, position: CGPoint? = .none) {
     if (scene != self) {
       fatalError("no")
     }
 
+    collectSpawnPoints()
     vivifyBouncyLeaves()
   }
 
@@ -39,6 +41,30 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
     physicsWorld.contactDelegate = self
   }
+
+  // MARK: Spawn points
+
+  func collectSpawnPoints() {
+    spawnPointParent = children.first { child in
+      child.userData?["isSpawnPointParent"] as? Bool ?? false
+    }
+
+    guard spawnPointParent != nil else {
+      fatalError("Scene has no spawnPointParent")
+    }
+  }
+
+  func getNextSpawnPoint() -> CGPoint {
+    spawnPointIndex += 1
+
+    if spawnPointIndex == spawnPointParent!.children.endIndex {
+      spawnPointIndex = 0
+    }
+
+    return spawnPointParent!.children[spawnPointIndex].position
+  }
+
+  // MARK: Leaf physics
 
   func vivifyBouncyLeaves() {
     let leafAnchors = children

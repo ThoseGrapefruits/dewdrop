@@ -64,8 +64,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   // MARK: protocol SceneAddable
-
   func addToScene(scene: DDScene) {
+    addToScene(scene: scene, position: .none)
+  }
+
+  func addToScene(scene: DDScene, position: CGPoint? = .none) {
     scene.addChild(self)
     ddScene = scene
 
@@ -75,7 +78,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     physicsBody!.isDynamic = false
     physicsBody!.pinned = true
 
-    initMainCircle()
+    initMainCircle(position: position)
     initGun()
     initWetChildren()
   }
@@ -84,18 +87,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     for i in 0..<PD_COUNT_INIT {
       let wetChild = DDPlayerDroplet(circleOfRadius: PD_RADIUS)
 
-      wetChild.name = "PD \(name ?? "unnamed") \(i)"
-
       let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
       let offsetX = cos(angle) * DDPlayerNode.PLAYER_RADIUS
       let offsetY = sin(angle) * DDPlayerNode.PLAYER_RADIUS
 
-      wetChild.position = CGPoint(
-        x: mainCircle.position.x + offsetX,
-        y: mainCircle.position.y + offsetY)
       wetChild.name = "PD \(i)"
 
-      baptiseWetChild(newChild: wetChild)
+      baptiseWetChild(newChild: wetChild, position: CGPoint(
+        x: mainCircle.position.x + offsetX,
+        y: mainCircle.position.y + offsetY)
+      )
     }
   }
 
@@ -126,9 +127,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.addChild(gunAnchor)
   }
 
-  func initMainCircle() {
+  func initMainCircle(position: CGPoint? = .none) {
     mainCircle.name = "\(name ?? "unnamed") main circle"
-    mainCircle.strokeColor = .clear
+    mainCircle.strokeColor = .blue
 
     mainCircle.physicsBody = SKPhysicsBody(
       circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
@@ -142,11 +143,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       DDBitmask.all ^ DDBitmask.playerGun
 
     addChild(mainCircle)
+
+    if let position = position {
+      mainCircle.position = position
+    }
   }
 
   // MARK: Helpers
 
-  func baptiseWetChild(newChild: DDPlayerDroplet, resetPosition: Bool = false) {
+  func baptiseWetChild(newChild: DDPlayerDroplet, position: CGPoint? = .none) {
     if wetChildren.contains(newChild) {
       return;
     }
@@ -167,7 +172,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       newChild.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet
     }
 
-    if newChild.parent != nil {
+    if newChild.parent == nil {
+      addChild(newChild)
+
+      if let position = position {
+        newChild.position = position
+      }
+
+      linkArms(wetChild: newChild)
+    } else {
       let childPosition = newChild.getPosition(within: scene!)
       let mainCirclePosition = mainCircle.getPosition(within: scene!)
       let angle = mainCirclePosition.angle(to: childPosition)
@@ -186,9 +199,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       // Previous position, so it can be pulled in by the joint. We assume that
       // the actual DDPlayerNode is still at (0,0) [invariant]
       newChild.position = childPosition
-    } else {
-      addChild(newChild)
-      linkArms(wetChild: newChild)
     }
 
     wetChildren.insert(newChild)

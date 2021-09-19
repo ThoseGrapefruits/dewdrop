@@ -15,6 +15,9 @@ struct DDRPCSyncNodes : Codable {
   // The gamePlayerID of the sender, according to the sender. This is nil if
   // the message was sent from the server.
   let sourceLocalGamePlayerID: String?
+
+  // The intended position of the target node. Used for spawning.
+  let targetPosition: CGPoint?
 }
 
 struct DDRPCSyncNode: Codable {

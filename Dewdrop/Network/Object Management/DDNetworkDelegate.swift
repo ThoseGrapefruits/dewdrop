@@ -27,7 +27,8 @@ class DDNetworkDelegate {
   // MARK: Snapshots
 
   // TODO: hold history of snapshots w/ request indices, probs need argument to
-  // captureSnapshot and nextMessage
+  // captureSnapshot and nextMessage, or at least hold lastDataSent so we know
+  // what fields we can really avoid updating.
   private var lastSnapshot: DDNodeSnapshot? = .none
 
   var capturedFields = DDNetworkDelegate.defaultCapturedFields

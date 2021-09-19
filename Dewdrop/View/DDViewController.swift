@@ -40,7 +40,7 @@ class DDViewController: UIViewController, DDSpawnDelegate {
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 
-      self.scene = DDScene(fileNamed: "Scene")!
+      self.scene = DDScene(fileNamed: "TestLevel")!
       self.scene!.addToScene(scene: self.scene!)
       DDNetworkMatch.singleton.scene = self.scene
 

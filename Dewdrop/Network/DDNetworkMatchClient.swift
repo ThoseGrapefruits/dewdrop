@@ -86,11 +86,11 @@ extension DDNetworkMatch {
               fatalError("Cannot sync DDSceneAddable into non-scene parent")
             }
 
-            node.addToScene(scene: scene)
+            node.addToScene(scene: scene, position: data.targetPosition)
           } else {
             node.move(toParent: parentDelegate.node!)
           }
-          print("--syncnodes new--", node)
+
           return node;
         }()
         : parentDelegate.node!.children.first { node in

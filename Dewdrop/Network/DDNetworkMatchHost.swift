@@ -43,7 +43,10 @@ extension DDNetworkMatch {
     }
 
     let instance = spawnRequest.type.instantiate()
-    (instance as! DDSceneAddable?)?.addToScene(scene: scene!)
+    (instance as! DDSceneAddable?)?.addToScene(
+      scene: scene!,
+      position: scene!.getNextSpawnPoint()
+    )
 
     let parent = instance.parent
 
@@ -72,7 +75,8 @@ extension DDNetworkMatch {
 
     let data = DDRPCSyncNodes(
       nodes: nodes,
-      sourceLocalGamePlayerID: spawnRequest.localGamePlayerID
+      sourceLocalGamePlayerID: spawnRequest.localGamePlayerID,
+      targetPosition: instance.position
     )
 
     spawnDelegate?.handleSpawn(

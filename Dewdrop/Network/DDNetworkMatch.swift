@@ -169,7 +169,9 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
 
     let data = DDRPCSyncNodes(
       nodes: nodesToSync,
-      sourceLocalGamePlayerID: .none)
+      sourceLocalGamePlayerID: .none,
+      targetPosition: .none
+    )
     try sendAll(DDRPCData.syncNodes(data), mode: .reliable)
 
     onSceneSynced?(scene)
@@ -321,9 +323,7 @@ class DDNetworkMatch : NSObject, GKMatchDelegate {
   // MARK: Network message indices
 
   func getNextRequestSendIndex(for type: DDRPCType) -> SentRequest {
-    var sentRequest = requestIndicesSent[type]
-
-    let new: SentRequest = sentRequest?.increment() ??
+    let new: SentRequest = requestIndicesSent[type]?.increment() ??
       SentRequest(index: 0, wrapped: false)
 
     requestIndicesSent[type] = new
