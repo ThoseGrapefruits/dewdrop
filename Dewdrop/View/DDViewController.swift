@@ -68,20 +68,13 @@ class DDViewController: UIViewController, DDSpawnDelegate {
         fatalError("No scene???")
       }
 
-      let cameraNode = DDCameraNode()
-      scene.addChild(cameraNode)
-      cameraNode.position = DDViewController.START_POSITION
-      scene.camera = cameraNode
-
       scene.playerNode = localPlayerNode
+
+      let hud = DDHUD()
+      hud.addToScene(scene: scene, position: localPlayerNode.position)
+      hud.track(localPlayerNode)
+
       localPlayerNode.start()
-      cameraNode.track(localPlayerNode.mainCircle)
-
-      let statsNode = DDNetworkStatsNode()
-      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
-
-      cameraNode.addChild(statsNode)
-
       scene.start()
     }
 

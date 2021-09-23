@@ -19,10 +19,11 @@ struct TimeSeriesEntry {
 }
 
 struct TimeSeriesStats {
-  var meanBytes: Float
-  var medianBytes: Int
-  var count: Int
-  var largest: Int
+  let count: Int
+  let largest: Int
+  let meanBytes: Float
+  let medianBytes: Int
+  let smallest: Int
 }
 
 typealias TimeSeries = [ TimeSeriesEntry ]
@@ -32,14 +33,15 @@ extension TimeSeriesView {
   func getStats() -> TimeSeriesStats {
     let sortedByBytes = sorted { e1, e2 in e1.bytes < e2.bytes }
     return TimeSeriesStats(
-      meanBytes: count == 0
-        ? Float.zero
-        : Float(reduce(0, { acc, entry in acc + entry.bytes })) / Float(count),
-      medianBytes: count == 0
-        ? Int.zero
-        : sortedByBytes[sortedByBytes.count / 2].bytes,
       count: count,
-      largest: sortedByBytes.last?.bytes ?? 0)
+      largest: sortedByBytes.last?.bytes ?? 0,
+      meanBytes: count == 0
+      ? Float.zero
+      : Float(reduce(0, { acc, entry in acc + entry.bytes })) / Float(count),
+      medianBytes: count == 0
+      ? Int.zero
+      : sortedByBytes[sortedByBytes.count / 2].bytes,
+      smallest: sortedByBytes.first?.bytes ?? 0)
   }
 }
 

@@ -57,6 +57,7 @@
 		DCDF5C3926DEFCDA00C312A7 /* DDRPCSpawnRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF5C3826DEFCDA00C312A7 /* DDRPCSpawnRequest.swift */; };
 		DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD726DA8975001229CB /* DDNodeType.swift */; };
 		DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */; };
+		DCEBE05B26FCD27F00F3F916 /* DDHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */; };
 		DCF9815726983FD400430005 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
 		DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNode.swift */; };
 /* End PBXBuildFile section */
@@ -135,6 +136,7 @@
 		DCDF5C3826DEFCDA00C312A7 /* DDRPCSpawnRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSpawnRequest.swift; sourceTree = "<group>"; };
 		DCE10DD726DA8975001229CB /* DDNodeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeType.swift; sourceTree = "<group>"; };
 		DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCSpawnNodes.swift; sourceTree = "<group>"; };
+		DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDHUD.swift; sourceTree = "<group>"; };
 		DCF9815626983FD400430005 /* DDBitmask.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDBitmask.swift; sourceTree = "<group>"; };
 		DCFE14E9269B4EE200896428 /* SKNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNode.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -304,6 +306,7 @@
 				DC04E8E8268F83850040F7A9 /* DDScene.swift */,
 				DCCD192F2693E026002F5585 /* DDView.swift */,
 				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
+				DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -561,6 +564,7 @@
 				DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */,
 				DC04E8E3268F83840040F7A9 /* AppDelegate.swift in Sources */,
 				DC9C1F3326E9A82600733995 /* DDNetworkMatchClient.swift in Sources */,
+				DCEBE05B26FCD27F00F3F916 /* DDHUD.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

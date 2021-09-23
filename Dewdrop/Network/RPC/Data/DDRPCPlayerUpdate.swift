@@ -6,7 +6,13 @@
 //
 
 import Foundation
+import SceneKit
+
+struct DDPlayerInput : Codable {
+  let move: CGVector
+  let aim: CGVector
+}
 
 struct DDRPCPlayerUpdate : Codable {
-  
+  let input: DDPlayerInput
 }

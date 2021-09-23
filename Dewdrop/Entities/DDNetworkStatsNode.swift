@@ -19,11 +19,15 @@ class DDNetworkStatsNode : SKNode {
     SKLabelNode(text: "Mean bytes: "),
     SKLabelNode(text: "Median bytes: ")
   ]
-  let padding = 4
+  let padding: CGFloat = 4
 
   // MARK: Initialisation
 
   func start() {
+    position = CGPoint(
+      x: (-scene!.frame.width / 2) + padding,
+      y: (scene!.frame.height / 2) - padding)
+
     setupLines()
     trackNetwork()
   }
@@ -32,8 +36,14 @@ class DDNetworkStatsNode : SKNode {
     var i = 0
 
     for line in lines {
+      line.fontColor = .white
+      line.fontSize = 14
+      line.fontName = "Consolas"
+      line.horizontalAlignmentMode = .left
+      line.verticalAlignmentMode = .top
       line.move(toParent: self)
-      let y = (line.frame.height + CGFloat(padding)) * CGFloat(i)
+
+      let y = -(line.frame.height + padding) * CGFloat(i)
       line.position = CGPoint(x: 0, y: y)
 
       i += 1
@@ -47,10 +57,14 @@ class DDNetworkStatsNode : SKNode {
       let stats =
         tracker.getReceivedWithinLast(seconds: intervalSeconds).getStats()
 
-      lines[0].text = "Requests: \(stats.count)"
-      lines[1].text = "Largest: \(stats.largest)"
-      lines[1].text = "Mean bytes: \(stats.meanBytes)"
-      lines[1].text = "Median bytes: \(stats.meanBytes)"
+      lines[0].text =
+        "Requests: \(stats.count.formatted())"
+      lines[1].text =
+        "Range: \(stats.smallest.formatted()) \(stats.largest.formatted())"
+      lines[2].text =
+        "Mean bytes: \(stats.meanBytes.formatted())"
+      lines[3].text =
+        "Median bytes: \(stats.medianBytes.formatted())"
     }
 
     run(SKAction.wait(forDuration: intervalSeconds)) { [ weak self ] in
