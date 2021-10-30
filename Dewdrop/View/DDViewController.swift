@@ -31,6 +31,10 @@ class DDViewController: UIViewController, DDSpawnDelegate {
         fatalError(error.debugDescription)
       }
 
+      guard let match = match else {
+        fatalError("No match found but no error given")
+      }
+
       guard let self = self else {
         return
       }

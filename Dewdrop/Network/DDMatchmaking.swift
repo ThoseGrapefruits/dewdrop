@@ -9,6 +9,11 @@ import Foundation
 import GameKit
 import SpriteKit
 
+enum FindMatchError {
+  case cancelled
+  case other(Error)
+}
+
 class DDMatchmaking : NSObject,
                   GKGameCenterControllerDelegate,
                   GKInviteEventListener,
@@ -16,7 +21,8 @@ class DDMatchmaking : NSObject,
 
   // MARK: State
 
-  var findMatchClosure: ((_ match: GKMatch, _ error: Error?) -> Void)? = .none
+  var findMatchClosure:
+    ((_ match: GKMatch?, _ error: FindMatchError?) -> Void)? = .none
   var matchmakerViewController: GKMatchmakerViewController? = .none
 
   // MARK: Game Center
@@ -50,7 +56,7 @@ class DDMatchmaking : NSObject,
       }
 
       if GKLocalPlayer.local.isPersonalizedCommunicationRestricted {
-        // Disable in game communication UI.
+        // Disable in-game communication UI.
       }
 
       return closure()
@@ -59,7 +65,7 @@ class DDMatchmaking : NSObject,
 
   func findMatch(
     view: UIViewController,
-    _ closure: @escaping (_ match: GKMatch, _ error: Error?) -> Void
+    _ closure: @escaping (_ match: GKMatch?, _ error: FindMatchError?) -> Void
   ) {
     guard findMatchClosure == nil else {
       return
@@ -101,7 +107,8 @@ class DDMatchmaking : NSObject,
   func matchmakerViewControllerWasCancelled(
       _ viewController: GKMatchmakerViewController
   ) {
-    findMatchClosure = .none
+    findMatchClosure?(nil, .cancelled)
+    findMatchClosure = .none;
     viewController.dismiss(animated:true)
   }
 
@@ -109,6 +116,7 @@ class DDMatchmaking : NSObject,
     _ viewController: GKMatchmakerViewController,
     didFailWithError error: Error
   ) {
+    findMatchClosure?(nil, .other(error))
     findMatchClosure = .none
     viewController.dismiss(animated:true)
   }
