@@ -26,15 +26,9 @@ class DDNetworkDataTests: XCTestCase {
 
   func testRegistrationRequest() throws {
     let hostChange = DDRPCData.spawnRequest(
-      DDRPCMetadata(index: 0, indexWrapped: false),
       DDRPCSpawnRequest(
         type: DDNodeType.ddGun,
-        snapshot: DDNodeSnapshot(
-          id: DDNodeID.zero,
-          physicsBody: nil,
-          position: CGPoint.zero,
-          zPosition: CGFloat.zero,
-          zRotation: CGFloat.zero)))
+        localGamePlayerID: "TestID"))
     let encoder = encoder
     let decoder = decoder
 
@@ -44,18 +38,10 @@ class DDNetworkDataTests: XCTestCase {
       from: hostChangeEncoded)
 
     if case (
-      .spawnRequest(let metadata, let data),
-      .spawnRequest(let metadataDecoded, let dataDecoded)
+      .spawnRequest(let data),
+      .spawnRequest(let dataDecoded)
     ) = (hostChange, hostChangeDecoded) {
-      XCTAssertEqual(metadata.index,        metadataDecoded.index)
-      XCTAssertEqual(metadata.indexWrapped, metadataDecoded.indexWrapped)
-
-      let snapshot = data.snapshot, snapshotDecoded = dataDecoded.snapshot
-      XCTAssertNil(snapshotDecoded.physicsBody)
-      XCTAssertEqual(snapshot.id,        snapshotDecoded.id)
-      XCTAssertEqual(snapshot.position,  snapshotDecoded.position)
-      XCTAssertEqual(snapshot.zPosition, snapshotDecoded.zPosition)
-      XCTAssertEqual(snapshot.zRotation,  snapshotDecoded.zRotation)
+      XCTAssertEqual(data.localGamePlayerID, dataDecoded.localGamePlayerID)
     } else {
       XCTFail("registrationRequest or registrationRequestDecoded not right")
     }
