@@ -25,6 +25,7 @@ class DDAimTouchNode : SKNode {
 
   override init() {
     super.init()
+    self.name = "Aim Touch"
     initVisual()
   }
 

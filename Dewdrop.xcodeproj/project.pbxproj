@@ -49,6 +49,9 @@
 		DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
 		DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */; };
 		DCB9B6D426D84C30007627EF /* SKNodeCapturedFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */; };
+		DCBD2D952789BCAE00A0E461 /* DDSceneLeafHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBD2D942789BCAE00A0E461 /* DDSceneLeafHost.swift */; };
+		DCBD2D972789BE7B00A0E461 /* DDSceneContactDelegates.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBD2D962789BE7B00A0E461 /* DDSceneContactDelegates.swift */; };
+		DCBD2D9B2789C8EB00A0E461 /* DDSceneUIGestureRecognizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCBD2D9A2789C8EB00A0E461 /* DDSceneUIGestureRecognizer.swift */; };
 		DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29B98269206720023D58E /* DDPlayerNode.swift */; };
 		DCC29BA2269223ED0023D58E /* TestLevel.sks in Resources */ = {isa = PBXBuildFile; fileRef = DCC29BA1269223ED0023D58E /* TestLevel.sks */; };
 		DCC29BA4269226690023D58E /* DDSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29BA3269226690023D58E /* DDSceneAddable.swift */; };
@@ -128,6 +131,9 @@
 		DCB9A97D2698F28F00B396CC /* DDGun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDGun.swift; sourceTree = "<group>"; };
 		DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCLastSeen.swift; sourceTree = "<group>"; };
 		DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeCapturedFields.swift; sourceTree = "<group>"; };
+		DCBD2D942789BCAE00A0E461 /* DDSceneLeafHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneLeafHost.swift; sourceTree = "<group>"; };
+		DCBD2D962789BE7B00A0E461 /* DDSceneContactDelegates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneContactDelegates.swift; sourceTree = "<group>"; };
+		DCBD2D9A2789C8EB00A0E461 /* DDSceneUIGestureRecognizer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DDSceneUIGestureRecognizer.swift; sourceTree = "<group>"; };
 		DCC29B98269206720023D58E /* DDPlayerNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerNode.swift; sourceTree = "<group>"; };
 		DCC29BA1269223ED0023D58E /* TestLevel.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = TestLevel.sks; sourceTree = "<group>"; };
 		DCC29BA3269226690023D58E /* DDSceneAddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneAddable.swift; sourceTree = "<group>"; };
@@ -304,6 +310,9 @@
 			children = (
 				DC572302269C81D00027E6DB /* DDCameraNode.swift */,
 				DC04E8E8268F83850040F7A9 /* DDScene.swift */,
+				DCBD2D962789BE7B00A0E461 /* DDSceneContactDelegates.swift */,
+				DCBD2D942789BCAE00A0E461 /* DDSceneLeafHost.swift */,
+				DCBD2D9A2789C8EB00A0E461 /* DDSceneUIGestureRecognizer.swift */,
 				DCCD192F2693E026002F5585 /* DDView.swift */,
 				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
 				DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */,
@@ -532,6 +541,7 @@
 				DCDF5C3926DEFCDA00C312A7 /* DDRPCSpawnRequest.swift in Sources */,
 				DC882C8D26DC436900E80E7B /* DDNetworkActivityTracker.swift in Sources */,
 				DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */,
+				DCBD2D9B2789C8EB00A0E461 /* DDSceneUIGestureRecognizer.swift in Sources */,
 				DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */,
 				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,
 				DC09EC1126D0273500CCDE49 /* DDNetworkMatch.swift in Sources */,
@@ -539,6 +549,7 @@
 				DCC29BA4269226690023D58E /* DDSceneAddable.swift in Sources */,
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
 				DCB6530C26A901E60097839C /* DDAudioNodeGroup.swift in Sources */,
+				DCBD2D972789BE7B00A0E461 /* DDSceneContactDelegates.swift in Sources */,
 				DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */,
 				DC882C8F26DC508300E80E7B /* DDNetworkStatsNode.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
@@ -557,6 +568,7 @@
 				DC49820926D47F1B000359FE /* DDNodeDelta.swift in Sources */,
 				DC2A7BE526D0605F009C7AAF /* DDRPCData.swift in Sources */,
 				DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */,
+				DCBD2D952789BCAE00A0E461 /* DDSceneLeafHost.swift in Sources */,
 				DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */,
 				DC0E80B926C9955700A37917 /* DDNetworkDelegate.swift in Sources */,
 				DCF9815726983FD400430005 /* DDBitmask.swift in Sources */,

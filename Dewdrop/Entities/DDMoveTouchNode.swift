@@ -25,6 +25,7 @@ class DDMoveTouchNode : SKNode {
 
   override init() {
     super.init()
+    self.name = "Move touch"
     initVisual()
   }
 

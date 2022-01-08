@@ -39,8 +39,6 @@ class DDViewController: UIViewController, DDSpawnDelegate {
         return
       }
 
-      print("--match--", GKLocalPlayer.local.gamePlayerID, match.players.map { p in p.gamePlayerID })
-
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 

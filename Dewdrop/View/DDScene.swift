@@ -21,6 +21,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var spawnPointParent: SKNode? = .none
   var spawnPointIndex: Int = 0;
 
+  let swipeUp = UISwipeGestureRecognizer()
+
   // MARK: Initialization
 
   func addToScene(scene: DDScene, position: CGPoint? = .none) {
@@ -33,13 +35,14 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   }
 
   func start() {
-    aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
-
-    moveTouchNode.name = "Movement touch"
     addChild(moveTouchNode)
 
     physicsWorld.contactDelegate = self
+
+    swipeUp.delegate = self
+    swipeUp.direction = UISwipeGestureRecognizer.Direction.up
+    self.view!.addGestureRecognizer(swipeUp)
   }
 
   // MARK: Spawn points
@@ -64,77 +67,13 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     return spawnPointParent!.children[spawnPointIndex].position
   }
 
-  // MARK: Leaf physics
-
-  func vivifyBouncyLeaves() {
-    let leafAnchors = children
-      .filter { child in child.userData?["isLeafAnchor"] as? Bool ?? false }
-
-    for leafAnchor in leafAnchors {
-      let leaf = leafAnchor.children.first!
-
-      leafAnchor.physicsBody = SKPhysicsBody()
-      leafAnchor.physicsBody?.pinned = true
-
-      leaf.physicsBody!.categoryBitMask = DDBitmask.ground
-      leaf.physicsBody!.collisionBitMask = DDBitmask.all ^ DDBitmask.ground
-
-      let leafAnchorScenePosition = leafAnchor.getPosition(within: scene!)
-      let leafScenePosition = leaf.getPosition(within: scene!)
-
-      let anchorDistance = leafScenePosition.x - leafAnchorScenePosition.x
-      let springOffsetX = 3 * anchorDistance
-      let springOffsetY = 2 * abs(anchorDistance)
-
-      let leafAttachPoint = CGPoint(
-        x: leafScenePosition.x + anchorDistance,
-        y: leafScenePosition.y)
-
-      // TODO(logan): there are some assumptions being made around leaf neutral
-      // positions being horizontal. This isn't a terrible idea, but I think in
-      // reality it will look better to have the true angles varied a bit. Might
-      // never vary enough to actually matter. It'd be worth testing with angled
-      // leaves to see what breaks.
-      let springJointPrimary = SKPhysicsJointSpring.joint(
-        withBodyA: leaf.physicsBody!,
-        bodyB: physicsBody!,
-        anchorA: leafAttachPoint,
-        anchorB: CGPoint(
-          x: leafScenePosition.x + springOffsetX,
-          y: leafScenePosition.y + springOffsetY))
-
-      let springJointAntirotation = SKPhysicsJointSpring.joint(
-        withBodyA: leaf.physicsBody!,
-        bodyB: physicsBody!,
-        anchorA: leafAttachPoint,
-        anchorB: CGPoint(
-          x: leafScenePosition.x - springOffsetX,
-          y: leafScenePosition.y + springOffsetY))
-
-      let damping = CGFloat(leafAnchor.userData!["damping"] as! Float)
-      let frequency = CGFloat(leafAnchor.userData!["frequency"] as! Float)
-      springJointPrimary.damping = damping
-      springJointPrimary.frequency = frequency
-      springJointAntirotation.damping = damping / 2
-      springJointAntirotation.frequency = frequency / 2
-
-      let pinJoint = SKPhysicsJointPin.joint(
-        withBodyA: leaf.physicsBody!,
-        bodyB: physicsBody!,
-        anchor: leafAnchorScenePosition)
-
-      physicsWorld.add(pinJoint)
-      physicsWorld.add(springJointPrimary)
-      physicsWorld.add(springJointAntirotation)
-    }
-  }
-
   // MARK: Touch handling
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     guard let mt = moveTouch else {
       moveTouch = touches.first
       updateMoveTouch()
+      print("touches \(String(describing: event?.touches(for: swipeUp)))")
       return
     }
 
@@ -185,21 +124,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   // MARK: SKPhysicsContactDelegate
 
   func didBegin(_ contact: SKPhysicsContact) {
-    guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
-          let dropletB = contact.bodyB.node as? DDPlayerDroplet
-    else {
-      return
-    }
-
-    guard (dropletA.owner == nil) != (dropletB.owner == nil),
-          let newOwner = dropletA.owner ?? dropletB.owner
-    else {
-      return
-    }
-
-    let ownerless = dropletA.owner == nil ? dropletA : dropletB
-
-    newOwner.baptiseWetChild(newChild: ownerless)
+    handleContactDidBeginDroplets(contact)
   }
 
   // MARK: Helpers
