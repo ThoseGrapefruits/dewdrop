@@ -109,7 +109,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gunAnchor.physicsBody!.pinned = true
     gunAnchor.physicsBody!.mass = 4
     gunAnchor.physicsBody!.categoryBitMask = DDBitmask.playerGun
-    gunAnchor.physicsBody!.collisionBitMask = DDBitmask.none
+    gunAnchor.physicsBody!.collisionBitMask = DDBitmask.NONE
 
     gun.name = "\(name ?? "unnamed") gun"
 
@@ -120,7 +120,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
     gun.physicsBody!.categoryBitMask = DDBitmask.playerGun
-    gun.physicsBody!.collisionBitMask = DDBitmask.none
+    gun.physicsBody!.collisionBitMask = DDBitmask.NONE
     gun.physicsBody!.mass = GUN_MASS
 
     gunAnchor.addChild(gun)
@@ -140,7 +140,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.mass = 14.0
     mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
     mainCircle.physicsBody!.collisionBitMask =
-      DDBitmask.all ^ DDBitmask.playerGun
+      DDBitmask.ALL ^ DDBitmask.playerGun
 
     addChild(mainCircle)
 
@@ -168,7 +168,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       newChild.physicsBody!.mass = PD_MASS
       newChild.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
       newChild.physicsBody!.collisionBitMask =
-        DDBitmask.all ^ DDBitmask.playerGun
+        DDBitmask.ALL ^ DDBitmask.playerGun
       newChild.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet
     }
 

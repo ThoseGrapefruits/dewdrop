@@ -73,8 +73,8 @@ class DDGun : SKShapeNode {
       chamberedCategoryBitmask = dropletPhysicsBody.categoryBitMask
       chamberedCollisionBitmask = dropletPhysicsBody.collisionBitMask
 
-      dropletPhysicsBody.categoryBitMask = DDBitmask.none
-      dropletPhysicsBody.collisionBitMask = DDBitmask.none
+      dropletPhysicsBody.categoryBitMask = DDBitmask.NONE
+      dropletPhysicsBody.collisionBitMask = DDBitmask.NONE
     }
 
     droplet.removeFromParent()
@@ -134,7 +134,7 @@ class DDGun : SKShapeNode {
 
     self.chambered = .none
 
-    audioChamber.playRandom()
+    audioLaunch.playRandom()
   }
 
   // MARK: Game loops

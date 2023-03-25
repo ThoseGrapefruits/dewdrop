@@ -3,14 +3,66 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 55;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		026AD55629B6745100947BE2 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
+		026AD56029B686C800947BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD55F29B686C800947BE2 /* AppDelegate.swift */; };
+		026AD56229B686C800947BE2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56129B686C800947BE2 /* GameScene.sks */; };
+		026AD56429B686C800947BE2 /* Actions.sks in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56329B686C800947BE2 /* Actions.sks */; };
+		026AD56829B686C800947BE2 /* DDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD56729B686C800947BE2 /* DDViewController.swift */; };
+		026AD56B29B686C800947BE2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56929B686C800947BE2 /* Main.storyboard */; };
+		026AD56D29B686C900947BE2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56C29B686C900947BE2 /* Assets.xcassets */; };
+		026AD57029B686C900947BE2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56E29B686C900947BE2 /* LaunchScreen.storyboard */; };
+		026AD57A29B686C900947BE2 /* DewdropTVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD57929B686C900947BE2 /* DewdropTVTests.swift */; };
+		026AD58429B686CA00947BE2 /* DewdropTVUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD58329B686CA00947BE2 /* DewdropTVUITests.swift */; };
+		026AD58629B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD58529B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift */; };
+		02B9BE7729CF3C4B00ED31A6 /* DDViewControllerNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B9BE7629CF3C4B00ED31A6 /* DDViewControllerNetwork.swift */; };
+		02B9BE7829CF41D200ED31A6 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
+		02B9BE7929CF41D200ED31A6 /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
+		02B9BE7A29CF41D200ED31A6 /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
+		02B9BE7B29CF41D200ED31A6 /* DDNetworkStatsNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC882C8E26DC508300E80E7B /* DDNetworkStatsNode.swift */; };
+		02B9BE7C29CF41D200ED31A6 /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
+		02B9BE7D29CF41D200ED31A6 /* DDPlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29B98269206720023D58E /* DDPlayerNode.swift */; };
+		02B9BE7E29CF41D200ED31A6 /* DDSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29BA3269226690023D58E /* DDSceneAddable.swift */; };
+		02B9BE7F29CF41D200ED31A6 /* SKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNode.swift */; };
+		02B9BE8029CF41D200ED31A6 /* CGFloat.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC82AC93269B9AC60076CB92 /* CGFloat.swift */; };
+		02B9BE8129CF41D200ED31A6 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC018D1C269EA7260087A835 /* CGPoint.swift */; };
+		02B9BE8229CF41D200ED31A6 /* CGVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB42DE826DDD5A900866ACF /* CGVector.swift */; };
+		02B9BE8329CF41D200ED31A6 /* DDBitmask.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9815626983FD400430005 /* DDBitmask.swift */; };
+		02B9BE8429CF41D200ED31A6 /* PIDController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192D2693DABB002F5585 /* PIDController.swift */; };
+		02B9BE8529CF41D200ED31A6 /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
+		02B9BE8629CF41D200ED31A6 /* DDScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8E8268F83850040F7A9 /* DDScene.swift */; };
+		02B9BE8729CF41D200ED31A6 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
+		02B9BE8829CF41D200ED31A6 /* DDHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */; };
+		02B9BE8C29CF41E000ED31A6 /* DDAudioNodeGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */; };
+		02B9BE8D29CF41EA00ED31A6 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
+		02B9BE8E29CF41EA00ED31A6 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */; };
+		02B9BE8F29CF420200ED31A6 /* DDNetworkDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0E80B826C9955700A37917 /* DDNetworkDelegate.swift */; };
+		02B9BE9029CF420200ED31A6 /* SKNodeCapturedFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */; };
+		02B9BE9129CF420200ED31A6 /* DDFieldChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820626D47B93000359FE /* DDFieldChange.swift */; };
+		02B9BE9229CF420200ED31A6 /* DDNodeDelta.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820826D47F1B000359FE /* DDNodeDelta.swift */; };
+		02B9BE9329CF420200ED31A6 /* DDNodeSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820226D46D85000359FE /* DDNodeSnapshot.swift */; };
+		02B9BE9429CF420200ED31A6 /* DDNodeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD726DA8975001229CB /* DDNodeType.swift */; };
+		02B9BE9529CF420200ED31A6 /* DDRPCPlayerUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */; };
+		02B9BE9629CF420200ED31A6 /* DDRPCSceneSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */; };
+		02B9BE9729CF420200ED31A6 /* DDRPCLastSeen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */; };
+		02B9BE9829CF420200ED31A6 /* DDRPCSpawnNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE10DD926DACF09001229CB /* DDRPCSpawnNodes.swift */; };
+		02B9BE9929CF420200ED31A6 /* DDRPCSyncNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB31926DDF583005838D2 /* DDRPCSyncNodes.swift */; };
+		02B9BE9A29CF420200ED31A6 /* DDRPCSpawnRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCDF5C3826DEFCDA00C312A7 /* DDRPCSpawnRequest.swift */; };
+		02B9BE9B29CF420200ED31A6 /* DDRPCData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE426D0605F009C7AAF /* DDRPCData.swift */; };
+		02B9BE9C29CF420200ED31A6 /* DDRPCMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */; };
+		02B9BE9D29CF420200ED31A6 /* DDRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3826E9B95A00733995 /* DDRPC.swift */; };
+		02B9BE9E29CF420200ED31A6 /* DDMatchmaking.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0E80BA26C99C0800A37917 /* DDMatchmaking.swift */; };
+		02B9BE9F29CF420200ED31A6 /* DDNetworkMatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC09EC1026D0273500CCDE49 /* DDNetworkMatch.swift */; };
+		02B9BEA029CF420200ED31A6 /* DDNetworkMatchClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3226E9A82600733995 /* DDNetworkMatchClient.swift */; };
+		02B9BEA129CF420200ED31A6 /* DDNetworkMatchHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3626E9AD7300733995 /* DDNetworkMatchHost.swift */; };
+		02B9BEA229CF420200ED31A6 /* DDNetworkActivityTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC882C8C26DC436900E80E7B /* DDNetworkActivityTracker.swift */; };
+		02B9BEA329CF420200ED31A6 /* DDSpawnDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC18D2B326ED5A3000A78B91 /* DDSpawnDelegate.swift */; };
 		DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC018D1C269EA7260087A835 /* CGPoint.swift */; };
 		DC04E8E3268F83840040F7A9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8E2268F83840040F7A9 /* AppDelegate.swift */; };
 		DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8E8268F83850040F7A9 /* DDScene.swift */; };
-		DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8EA268F83850040F7A9 /* DDViewController.swift */; };
 		DC04E8EE268F83850040F7A9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DC04E8EC268F83850040F7A9 /* Main.storyboard */; };
 		DC04E8F0268F83880040F7A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DC04E8EF268F83880040F7A9 /* Assets.xcassets */; };
 		DC04E8FB268F83890040F7A9 /* DewdropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC04E8FA268F83890040F7A9 /* DewdropTests.swift */; };
@@ -24,14 +76,13 @@
 		DC1A3D1026C45BA6008850ED /* CGFloatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC1A3D0F26C45BA6008850ED /* CGFloatTests.swift */; };
 		DC2A7BE526D0605F009C7AAF /* DDRPCData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2A7BE426D0605F009C7AAF /* DDRPCData.swift */; };
 		DC2AB31A26DDF583005838D2 /* DDRPCSyncNodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC2AB31926DDF583005838D2 /* DDRPCSyncNodes.swift */; };
-		DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		DC465C5526D524F6009DCE05 /* DDRPCPlayerUpdate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5426D524F6009DCE05 /* DDRPCPlayerUpdate.swift */; };
 		DC465C5726D5250A009DCE05 /* DDRPCSceneSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC465C5626D5250A009DCE05 /* DDRPCSceneSnapshot.swift */; };
 		DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820226D46D85000359FE /* DDNodeSnapshot.swift */; };
 		DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820626D47B93000359FE /* DDFieldChange.swift */; };
 		DC49820926D47F1B000359FE /* DDNodeDelta.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820826D47F1B000359FE /* DDNodeDelta.swift */; };
 		DC4EFC8B26D183AC00B4EE64 /* DDNetworkDataTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4EFC8A26D183AC00B4EE64 /* DDNetworkDataTests.swift */; };
-		DC5347ED26A69E62004DF564 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */; };
+		DC5347ED26A69E62004DF564 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */; };
 		DC572303269C81D00027E6DB /* DDCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC572302269C81D00027E6DB /* DDCameraNode.swift */; };
 		DC59CC7426C70C7100971935 /* CGPointTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC59CC7326C70C7100971935 /* CGPointTests.swift */; };
 		DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */; };
@@ -42,7 +93,7 @@
 		DC9C1F3326E9A82600733995 /* DDNetworkMatchClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3226E9A82600733995 /* DDNetworkMatchClient.swift */; };
 		DC9C1F3726E9AD7300733995 /* DDNetworkMatchHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3626E9AD7300733995 /* DDNetworkMatchHost.swift */; };
 		DC9C1F3926E9B95A00733995 /* DDRPC.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC9C1F3826E9B95A00733995 /* DDRPC.swift */; };
-		DCAE32CE26A66A4D0079BCC7 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSChamberDroplet.aif */; };
+		DCAE32CE26A66A4D0079BCC7 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
 		DCB42DE926DDD5A900866ACF /* CGVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB42DE826DDD5A900866ACF /* CGVector.swift */; };
 		DCB6530C26A901E60097839C /* DDAudioNodeGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */; };
 		DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
@@ -63,6 +114,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		026AD57629B686C900947BE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC04E8D7268F83840040F7A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 026AD55C29B686C800947BE2;
+			remoteInfo = DewdropTV;
+		};
+		026AD58029B686CA00947BE2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DC04E8D7268F83840040F7A9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 026AD55C29B686C800947BE2;
+			remoteInfo = DewdropTV;
+		};
 		DC04E8F7268F83890040F7A9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DC04E8D7268F83840040F7A9 /* Project object */;
@@ -80,11 +145,25 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0258850928936C310017898B /* Dewdrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dewdrop.entitlements; sourceTree = "<group>"; };
+		026AD55D29B686C800947BE2 /* DewdropTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DewdropTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		026AD55F29B686C800947BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		026AD56129B686C800947BE2 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
+		026AD56329B686C800947BE2 /* Actions.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = Actions.sks; sourceTree = "<group>"; };
+		026AD56729B686C800947BE2 /* DDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDViewController.swift; sourceTree = "<group>"; };
+		026AD56A29B686C800947BE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		026AD56C29B686C900947BE2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		026AD56F29B686C900947BE2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		026AD57529B686C900947BE2 /* DewdropTVTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DewdropTVTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		026AD57929B686C900947BE2 /* DewdropTVTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropTVTests.swift; sourceTree = "<group>"; };
+		026AD57F29B686C900947BE2 /* DewdropTVUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DewdropTVUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		026AD58329B686CA00947BE2 /* DewdropTVUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropTVUITests.swift; sourceTree = "<group>"; };
+		026AD58529B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropTVUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		02B9BE7629CF3C4B00ED31A6 /* DDViewControllerNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDViewControllerNetwork.swift; sourceTree = "<group>"; };
 		DC018D1C269EA7260087A835 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		DC04E8DF268F83840040F7A9 /* Dewdrop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dewdrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DC04E8E2268F83840040F7A9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DC04E8E8268F83850040F7A9 /* DDScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDScene.swift; sourceTree = "<group>"; };
-		DC04E8EA268F83850040F7A9 /* DDViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDViewController.swift; sourceTree = "<group>"; };
 		DC04E8ED268F83850040F7A9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		DC04E8EF268F83880040F7A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DC04E8F1268F83880040F7A9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -110,7 +189,7 @@
 		DC49820626D47B93000359FE /* DDFieldChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDFieldChange.swift; sourceTree = "<group>"; };
 		DC49820826D47F1B000359FE /* DDNodeDelta.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNodeDelta.swift; sourceTree = "<group>"; };
 		DC4EFC8A26D183AC00B4EE64 /* DDNetworkDataTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkDataTests.swift; sourceTree = "<group>"; };
-		DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
+		DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSChamberDroplet.aif; sourceTree = "<group>"; };
 		DC572302269C81D00027E6DB /* DDCameraNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDCameraNode.swift; sourceTree = "<group>"; };
 		DC59CC7326C70C7100971935 /* CGPointTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPointTests.swift; sourceTree = "<group>"; };
 		DC74AFC626D17CB300498E41 /* DDRPCMetadata.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCMetadata.swift; sourceTree = "<group>"; };
@@ -121,7 +200,7 @@
 		DC9C1F3226E9A82600733995 /* DDNetworkMatchClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkMatchClient.swift; sourceTree = "<group>"; };
 		DC9C1F3626E9AD7300733995 /* DDNetworkMatchHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDNetworkMatchHost.swift; sourceTree = "<group>"; };
 		DC9C1F3826E9B95A00733995 /* DDRPC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPC.swift; sourceTree = "<group>"; };
-		DCAE32CD26A66A4D0079BCC7 /* FSChamberDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSChamberDroplet.aif; sourceTree = "<group>"; };
+		DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
 		DCB42DE826DDD5A900866ACF /* CGVector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGVector.swift; sourceTree = "<group>"; };
 		DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAudioNodeGroup.swift; sourceTree = "<group>"; };
 		DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerDroplet.swift; sourceTree = "<group>"; };
@@ -142,11 +221,32 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		026AD55A29B686C800947BE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57229B686C900947BE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57C29B686C900947BE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC04E8DC268F83840040F7A9 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DC3BB91126AC870F0097A9AA /* GameKit.framework in Frameworks */,
+				026AD55629B6745100947BE2 /* GameKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +267,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		026AD55E29B686C800947BE2 /* DewdropTV */ = {
+			isa = PBXGroup;
+			children = (
+				026AD55F29B686C800947BE2 /* AppDelegate.swift */,
+				026AD56129B686C800947BE2 /* GameScene.sks */,
+				026AD56329B686C800947BE2 /* Actions.sks */,
+				026AD56729B686C800947BE2 /* DDViewController.swift */,
+				026AD56929B686C800947BE2 /* Main.storyboard */,
+				026AD56C29B686C900947BE2 /* Assets.xcassets */,
+				026AD56E29B686C900947BE2 /* LaunchScreen.storyboard */,
+			);
+			path = DewdropTV;
+			sourceTree = "<group>";
+		};
+		026AD57829B686C900947BE2 /* DewdropTVTests */ = {
+			isa = PBXGroup;
+			children = (
+				026AD57929B686C900947BE2 /* DewdropTVTests.swift */,
+			);
+			path = DewdropTVTests;
+			sourceTree = "<group>";
+		};
+		026AD58229B686CA00947BE2 /* DewdropTVUITests */ = {
+			isa = PBXGroup;
+			children = (
+				026AD58329B686CA00947BE2 /* DewdropTVUITests.swift */,
+				026AD58529B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift */,
+			);
+			path = DewdropTVUITests;
+			sourceTree = "<group>";
+		};
 		DC0073F626D5BD600027814A /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -186,6 +317,9 @@
 				DC04E8E1268F83840040F7A9 /* Dewdrop */,
 				DC04E8F9268F83890040F7A9 /* DewdropTests */,
 				DC04E904268F83890040F7A9 /* DewdropUITests */,
+				026AD55E29B686C800947BE2 /* DewdropTV */,
+				026AD57829B686C900947BE2 /* DewdropTVTests */,
+				026AD58229B686CA00947BE2 /* DewdropTVUITests */,
 				DC04E8E0268F83840040F7A9 /* Products */,
 				DC3BB90F26AC870F0097A9AA /* Frameworks */,
 			);
@@ -197,6 +331,9 @@
 				DC04E8DF268F83840040F7A9 /* Dewdrop.app */,
 				DC04E8F6268F83890040F7A9 /* DewdropTests.xctest */,
 				DC04E901268F83890040F7A9 /* DewdropUITests.xctest */,
+				026AD55D29B686C800947BE2 /* DewdropTV.app */,
+				026AD57529B686C900947BE2 /* DewdropTVTests.xctest */,
+				026AD57F29B686C900947BE2 /* DewdropTVUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -204,6 +341,7 @@
 		DC04E8E1268F83840040F7A9 /* Dewdrop */ = {
 			isa = PBXGroup;
 			children = (
+				0258850928936C310017898B /* Dewdrop.entitlements */,
 				DC382C4F26F638D600A3AE0A /* Levels */,
 				DC04E8E2268F83840040F7A9 /* AppDelegate.swift */,
 				DC04E8EF268F83880040F7A9 /* Assets.xcassets */,
@@ -305,8 +443,8 @@
 				DC572302269C81D00027E6DB /* DDCameraNode.swift */,
 				DC04E8E8268F83850040F7A9 /* DDScene.swift */,
 				DCCD192F2693E026002F5585 /* DDView.swift */,
-				DC04E8EA268F83850040F7A9 /* DDViewController.swift */,
 				DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */,
+				02B9BE7629CF3C4B00ED31A6 /* DDViewControllerNetwork.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -367,8 +505,8 @@
 		DCAE32CC26A658FB0079BCC7 /* Gun */ = {
 			isa = PBXGroup;
 			children = (
-				DCAE32CD26A66A4D0079BCC7 /* FSChamberDroplet.aif */,
-				DC5347EC26A69E62004DF564 /* FSLaunchDroplet.aif */,
+				DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */,
+				DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */,
 			);
 			path = Gun;
 			sourceTree = "<group>";
@@ -395,6 +533,59 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		026AD55C29B686C800947BE2 /* DewdropTV */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 026AD58729B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTV" */;
+			buildPhases = (
+				026AD55929B686C800947BE2 /* Sources */,
+				026AD55A29B686C800947BE2 /* Frameworks */,
+				026AD55B29B686C800947BE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = DewdropTV;
+			productName = DewdropTV;
+			productReference = 026AD55D29B686C800947BE2 /* DewdropTV.app */;
+			productType = "com.apple.product-type.application";
+		};
+		026AD57429B686C900947BE2 /* DewdropTVTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 026AD58A29B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTVTests" */;
+			buildPhases = (
+				026AD57129B686C900947BE2 /* Sources */,
+				026AD57229B686C900947BE2 /* Frameworks */,
+				026AD57329B686C900947BE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				026AD57729B686C900947BE2 /* PBXTargetDependency */,
+			);
+			name = DewdropTVTests;
+			productName = DewdropTVTests;
+			productReference = 026AD57529B686C900947BE2 /* DewdropTVTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		026AD57E29B686C900947BE2 /* DewdropTVUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 026AD58D29B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTVUITests" */;
+			buildPhases = (
+				026AD57B29B686C900947BE2 /* Sources */,
+				026AD57C29B686C900947BE2 /* Frameworks */,
+				026AD57D29B686C900947BE2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				026AD58129B686CA00947BE2 /* PBXTargetDependency */,
+			);
+			name = DewdropTVUITests;
+			productName = DewdropTVUITests;
+			productReference = 026AD57F29B686C900947BE2 /* DewdropTVUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		DC04E8DE268F83840040F7A9 /* Dewdrop */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DC04E90A268F83890040F7A9 /* Build configuration list for PBXNativeTarget "Dewdrop" */;
@@ -454,9 +645,20 @@
 		DC04E8D7268F83840040F7A9 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1240;
+				LastSwiftUpdateCheck = 1420;
 				LastUpgradeCheck = 1240;
 				TargetAttributes = {
+					026AD55C29B686C800947BE2 = {
+						CreatedOnToolsVersion = 14.2;
+					};
+					026AD57429B686C900947BE2 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = 026AD55C29B686C800947BE2;
+					};
+					026AD57E29B686C900947BE2 = {
+						CreatedOnToolsVersion = 14.2;
+						TestTargetID = 026AD55C29B686C800947BE2;
+					};
 					DC04E8DE268F83840040F7A9 = {
 						CreatedOnToolsVersion = 12.4;
 					};
@@ -471,7 +673,7 @@
 				};
 			};
 			buildConfigurationList = DC04E8DA268F83840040F7A9 /* Build configuration list for PBXProject "Dewdrop" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -486,19 +688,50 @@
 				DC04E8DE268F83840040F7A9 /* Dewdrop */,
 				DC04E8F5268F83890040F7A9 /* DewdropTests */,
 				DC04E900268F83890040F7A9 /* DewdropUITests */,
+				026AD55C29B686C800947BE2 /* DewdropTV */,
+				026AD57429B686C900947BE2 /* DewdropTVTests */,
+				026AD57E29B686C900947BE2 /* DewdropTVUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		026AD55B29B686C800947BE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02B9BE8D29CF41EA00ED31A6 /* FSLaunchDroplet.aif in Resources */,
+				02B9BE8E29CF41EA00ED31A6 /* FSChamberDroplet.aif in Resources */,
+				026AD56B29B686C800947BE2 /* Main.storyboard in Resources */,
+				026AD56229B686C800947BE2 /* GameScene.sks in Resources */,
+				026AD56D29B686C900947BE2 /* Assets.xcassets in Resources */,
+				026AD57029B686C900947BE2 /* LaunchScreen.storyboard in Resources */,
+				026AD56429B686C800947BE2 /* Actions.sks in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57329B686C900947BE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57D29B686C900947BE2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC04E8DD268F83840040F7A9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				DC04E8EE268F83850040F7A9 /* Main.storyboard in Resources */,
-				DC5347ED26A69E62004DF564 /* FSLaunchDroplet.aif in Resources */,
+				DC5347ED26A69E62004DF564 /* FSChamberDroplet.aif in Resources */,
 				DC04E8F0268F83880040F7A9 /* Assets.xcassets in Resources */,
-				DCAE32CE26A66A4D0079BCC7 /* FSChamberDroplet.aif in Resources */,
+				DCAE32CE26A66A4D0079BCC7 /* FSLaunchDroplet.aif in Resources */,
 				DCC29BA2269223ED0023D58E /* TestLevel.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -520,6 +753,71 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		026AD55929B686C800947BE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				02B9BE8F29CF420200ED31A6 /* DDNetworkDelegate.swift in Sources */,
+				02B9BE9029CF420200ED31A6 /* SKNodeCapturedFields.swift in Sources */,
+				02B9BE9129CF420200ED31A6 /* DDFieldChange.swift in Sources */,
+				02B9BE9229CF420200ED31A6 /* DDNodeDelta.swift in Sources */,
+				02B9BE9329CF420200ED31A6 /* DDNodeSnapshot.swift in Sources */,
+				02B9BE9429CF420200ED31A6 /* DDNodeType.swift in Sources */,
+				02B9BE9529CF420200ED31A6 /* DDRPCPlayerUpdate.swift in Sources */,
+				02B9BE9629CF420200ED31A6 /* DDRPCSceneSnapshot.swift in Sources */,
+				02B9BE9729CF420200ED31A6 /* DDRPCLastSeen.swift in Sources */,
+				02B9BE9829CF420200ED31A6 /* DDRPCSpawnNodes.swift in Sources */,
+				02B9BE9929CF420200ED31A6 /* DDRPCSyncNodes.swift in Sources */,
+				02B9BE9A29CF420200ED31A6 /* DDRPCSpawnRequest.swift in Sources */,
+				02B9BE9B29CF420200ED31A6 /* DDRPCData.swift in Sources */,
+				02B9BE9C29CF420200ED31A6 /* DDRPCMetadata.swift in Sources */,
+				02B9BE9D29CF420200ED31A6 /* DDRPC.swift in Sources */,
+				02B9BE9E29CF420200ED31A6 /* DDMatchmaking.swift in Sources */,
+				02B9BE9F29CF420200ED31A6 /* DDNetworkMatch.swift in Sources */,
+				02B9BEA029CF420200ED31A6 /* DDNetworkMatchClient.swift in Sources */,
+				02B9BEA129CF420200ED31A6 /* DDNetworkMatchHost.swift in Sources */,
+				02B9BEA229CF420200ED31A6 /* DDNetworkActivityTracker.swift in Sources */,
+				02B9BEA329CF420200ED31A6 /* DDSpawnDelegate.swift in Sources */,
+				02B9BE8C29CF41E000ED31A6 /* DDAudioNodeGroup.swift in Sources */,
+				02B9BE7829CF41D200ED31A6 /* DDAimTouchNode.swift in Sources */,
+				02B9BE7929CF41D200ED31A6 /* DDGun.swift in Sources */,
+				02B9BE7A29CF41D200ED31A6 /* DDMoveTouchNode.swift in Sources */,
+				02B9BE7B29CF41D200ED31A6 /* DDNetworkStatsNode.swift in Sources */,
+				02B9BE7C29CF41D200ED31A6 /* DDPlayerDroplet.swift in Sources */,
+				02B9BE7D29CF41D200ED31A6 /* DDPlayerNode.swift in Sources */,
+				02B9BE7E29CF41D200ED31A6 /* DDSceneAddable.swift in Sources */,
+				02B9BE7F29CF41D200ED31A6 /* SKNode.swift in Sources */,
+				02B9BE8029CF41D200ED31A6 /* CGFloat.swift in Sources */,
+				02B9BE8129CF41D200ED31A6 /* CGPoint.swift in Sources */,
+				02B9BE8229CF41D200ED31A6 /* CGVector.swift in Sources */,
+				02B9BE8329CF41D200ED31A6 /* DDBitmask.swift in Sources */,
+				02B9BE8429CF41D200ED31A6 /* PIDController.swift in Sources */,
+				02B9BE8529CF41D200ED31A6 /* DDCameraNode.swift in Sources */,
+				02B9BE8629CF41D200ED31A6 /* DDScene.swift in Sources */,
+				02B9BE8729CF41D200ED31A6 /* DDView.swift in Sources */,
+				02B9BE8829CF41D200ED31A6 /* DDHUD.swift in Sources */,
+				026AD56829B686C800947BE2 /* DDViewController.swift in Sources */,
+				026AD56029B686C800947BE2 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57129B686C900947BE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				026AD57A29B686C900947BE2 /* DewdropTVTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		026AD57B29B686C900947BE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				026AD58629B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift in Sources */,
+				026AD58429B686CA00947BE2 /* DewdropTVUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DC04E8DB268F83840040F7A9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -543,9 +841,9 @@
 				DC882C8F26DC508300E80E7B /* DDNetworkStatsNode.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,
+				02B9BE7729CF3C4B00ED31A6 /* DDViewControllerNetwork.swift in Sources */,
 				DC0E80BB26C99C0800A37917 /* DDMatchmaking.swift in Sources */,
 				DCFE14EA269B4EE200896428 /* SKNode.swift in Sources */,
-				DC04E8EB268F83850040F7A9 /* DDViewController.swift in Sources */,
 				DC74AFC726D17CB300498E41 /* DDRPCMetadata.swift in Sources */,
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DC9C1F3726E9AD7300733995 /* DDNetworkMatchHost.swift in Sources */,
@@ -591,6 +889,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		026AD57729B686C900947BE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 026AD55C29B686C800947BE2 /* DewdropTV */;
+			targetProxy = 026AD57629B686C900947BE2 /* PBXContainerItemProxy */;
+		};
+		026AD58129B686CA00947BE2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 026AD55C29B686C800947BE2 /* DewdropTV */;
+			targetProxy = 026AD58029B686CA00947BE2 /* PBXContainerItemProxy */;
+		};
 		DC04E8F8268F83890040F7A9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DC04E8DE268F83840040F7A9 /* Dewdrop */;
@@ -604,6 +912,22 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		026AD56929B686C800947BE2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				026AD56A29B686C800947BE2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		026AD56E29B686C900947BE2 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				026AD56F29B686C900947BE2 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 		DC04E8EC268F83850040F7A9 /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -615,6 +939,146 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		026AD58829B686CA00947BE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Debug;
+		};
+		026AD58929B686CA00947BE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Release;
+		};
+		026AD58B29B686CA00947BE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTVTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DewdropTV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DewdropTV";
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Debug;
+		};
+		026AD58C29B686CA00947BE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTVTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DewdropTV.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DewdropTV";
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Release;
+		};
+		026AD58E29B686CA00947BE2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTVUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = DewdropTV;
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Debug;
+		};
+		026AD58F29B686CA00947BE2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 242JB8SA83;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.DewdropTVUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_TARGET_NAME = DewdropTV;
+				TVOS_DEPLOYMENT_TARGET = 16.1;
+			};
+			name = Release;
+		};
 		DC04E908268F83890040F7A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -666,7 +1130,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -721,7 +1185,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -736,18 +1200,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Dewdrop/Dewdrop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.Dewdrop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Debug;
 		};
@@ -756,18 +1224,22 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Dewdrop/Dewdrop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 242JB8SA83;
 				INFOPLIST_FILE = Dewdrop/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.arcade-games";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = io.grapefruits.Dewdrop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = "1,2,6";
 			};
 			name = Release;
 		};
@@ -858,6 +1330,33 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		026AD58729B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTV" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				026AD58829B686CA00947BE2 /* Debug */,
+				026AD58929B686CA00947BE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		026AD58A29B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTVTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				026AD58B29B686CA00947BE2 /* Debug */,
+				026AD58C29B686CA00947BE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		026AD58D29B686CA00947BE2 /* Build configuration list for PBXNativeTarget "DewdropTVUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				026AD58E29B686CA00947BE2 /* Debug */,
+				026AD58F29B686CA00947BE2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		DC04E8DA268F83840040F7A9 /* Build configuration list for PBXProject "Dewdrop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

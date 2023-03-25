@@ -53,7 +53,7 @@ class DDNetworkStatsNode : SKNode {
   // MARK: Game loops
 
   func trackNetwork() {
-    if let tracker = tracker {
+    if let tracker = self.tracker {
       let stats =
         tracker.getReceivedWithinLast(seconds: intervalSeconds).getStats()
 

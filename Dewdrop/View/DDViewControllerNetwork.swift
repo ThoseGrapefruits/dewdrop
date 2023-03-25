@@ -1,5 +1,5 @@
 //
-//  GameViewController.swift
+//  DDViewControllerNetwork.swift
 //  Dewdrop
 //
 //  Created by Logan Moore on 02.07.2021.
@@ -10,14 +10,14 @@ import SpriteKit
 import GameKit
 import GameplayKit
 
-class DDViewController: UIViewController, DDSpawnDelegate {
+class DDViewControllerNetwork: UIViewController, DDSpawnDelegate {
   // MARK: Constants
 
   static let START_POSITION = CGPoint(x: 0, y: 160)
 
   // MARK: State
 
-  let matchmaking = DDMatchmaking()
+  let matchmaking = DDMatchmaking();
   var scene: Optional<DDScene> = .none
 
   // MARK: UIViewController
@@ -25,6 +25,13 @@ class DDViewController: UIViewController, DDSpawnDelegate {
   override func viewDidLoad() {
     super.viewDidLoad()
 
+    self.findMatch()
+
+    self.scene = DDScene(fileNamed: "TestLevel")!
+    self.scene!.addToScene(scene: self.scene!)
+  }
+  
+  func findMatch() {
     matchmaking.findMatch(view: self) { [weak self] match, error in
       guard error == nil else {
         // TODO actual error handling
@@ -39,8 +46,6 @@ class DDViewController: UIViewController, DDSpawnDelegate {
         return
       }
 
-      print("--match--", GKLocalPlayer.local.gamePlayerID, match.players.map { p in p.gamePlayerID })
-
       DDNetworkMatch.singleton.match = match
       match.delegate = DDNetworkMatch.singleton
 
@@ -48,12 +53,10 @@ class DDViewController: UIViewController, DDSpawnDelegate {
       self.scene!.addToScene(scene: self.scene!)
       DDNetworkMatch.singleton.scene = self.scene
 
-      print("--starting client--")
       self.startLocalGame()
 
       DDNetworkMatch.singleton.updateHost { host in
         if DDNetworkMatch.singleton.isHost {
-          print("--starting host--")
           try! DDNetworkMatch.singleton.startHost()
         }
       }

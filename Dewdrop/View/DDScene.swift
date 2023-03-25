@@ -77,7 +77,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       leafAnchor.physicsBody?.pinned = true
 
       leaf.physicsBody!.categoryBitMask = DDBitmask.ground
-      leaf.physicsBody!.collisionBitMask = DDBitmask.all ^ DDBitmask.ground
+      leaf.physicsBody!.collisionBitMask = DDBitmask.ALL ^ DDBitmask.ground
 
       let leafAnchorScenePosition = leafAnchor.getPosition(within: scene!)
       let leafScenePosition = leaf.getPosition(within: scene!)

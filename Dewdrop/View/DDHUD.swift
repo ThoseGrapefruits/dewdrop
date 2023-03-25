@@ -14,7 +14,7 @@ class DDHUD: SKNode, DDSceneAddable {
 
   // MARK: Child references
   let cameraNode = DDCameraNode()
-  let statsNode = DDNetworkStatsNode()
+  let statsNode: DDNetworkStatsNode? = .none;
 
   // MARK: DDSceneAddable & initialisation
   func addToScene(scene: DDScene, position: CGPoint?) {
@@ -25,22 +25,27 @@ class DDHUD: SKNode, DDSceneAddable {
     }
 
     addChild(cameraNode)
-    addChild(statsNode)
 
     cameraNode.physicsBody = SKPhysicsBody()
     cameraNode.physicsBody!.pinned = true
     cameraNode.physicsBody!.affectedByGravity = false
-
-    statsNode.physicsBody = SKPhysicsBody()
-    statsNode.physicsBody!.pinned = true
-    statsNode.physicsBody!.affectedByGravity = false
+    
+    if let statsNode = self.statsNode {
+      addChild(statsNode)
+      
+      statsNode.physicsBody = SKPhysicsBody()
+      statsNode.physicsBody!.pinned = true
+      statsNode.physicsBody!.affectedByGravity = false
+    }
 
     initPhysics()
     let cameraNode = DDCameraNode()
     scene.camera = cameraNode
 
-    statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
-    statsNode.start()
+    if let statsNode = self.statsNode {
+      statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
+      statsNode.start()
+    }
   }
 
   func initPhysics() {
