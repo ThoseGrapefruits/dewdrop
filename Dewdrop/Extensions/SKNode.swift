@@ -40,13 +40,16 @@ extension SKNode {
       return (childPosition, childRotation)
     }
 
+    let cosZ = cos(zRotation)
+    let sinZ = sin(zRotation)
+
     let position = CGPoint(
         x: position.x
-           + cos(zRotation) * childPosition.x
-           - sin(zRotation) * childPosition.y,
+           + cosZ * childPosition.x
+           - sinZ * childPosition.y,
         y: position.y
-           + sin(zRotation) * childPosition.x
-           + cos(zRotation) * childPosition.y)
+           + sinZ * childPosition.x
+           + cosZ * childPosition.y)
 
     let rotation = (childRotation + zRotation).wrap(around: CGFloat.pi)
 

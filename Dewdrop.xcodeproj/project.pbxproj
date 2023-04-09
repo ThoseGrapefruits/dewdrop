@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		02231A3729E2FF270015A59F /* TestLevel.sks in Resources */ = {isa = PBXBuildFile; fileRef = DCC29BA1269223ED0023D58E /* TestLevel.sks */; };
 		026AD55629B6745100947BE2 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		026AD56029B686C800947BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD55F29B686C800947BE2 /* AppDelegate.swift */; };
 		026AD56229B686C800947BE2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56129B686C800947BE2 /* GameScene.sks */; };
@@ -700,6 +701,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				02231A3729E2FF270015A59F /* TestLevel.sks in Resources */,
 				02B9BE8D29CF41EA00ED31A6 /* FSLaunchDroplet.aif in Resources */,
 				02B9BE8E29CF41EA00ED31A6 /* FSChamberDroplet.aif in Resources */,
 				026AD56B29B686C800947BE2 /* Main.storyboard in Resources */,
