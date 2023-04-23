@@ -8,6 +8,7 @@
 import Foundation
 import SpriteKit
 import SceneKit
+import GameController
 
 class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Constants
@@ -247,11 +248,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Game loops
 
   func start() {
-    trackMovementTouch()
+    if controller != nil {
+      self.setupControllerListeners()
+      self.trackInputController()
+    } else {
+      trackInputTouch()
+    }
     gun.start(playerNode: self)
   }
 
-  private func trackMovementTouch() {
+  private func trackInputTouch() {
     guard let ddScene = ddScene else {
       return
     }
@@ -259,7 +265,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard ddScene.moveTouchNode.fingerDown else {
       let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
       return run(wait) { [weak self] in
-        self?.trackMovementTouch()
+        self?.trackInputTouch()
       }
     }
 
@@ -275,22 +281,102 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       duration: DDPlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) { [weak self] in
-      self?.trackMovementTouch()
+      self?.trackInputTouch()
+    }
+  }
+  
+  // MARK: Controller handling
+  
+  var controller: GCController?;
+  
+  func set(controller: GCController) -> Self {
+    self.controller = controller;
+    
+    return self;
+  }
+  
+  func setupControllerListeners() {
+    print("--setup-controller-listeners--", controller?.vendorName)
+    guard let controller = controller else {
+      return
+    }
+
+    if let gamepad = controller.microGamepad {
+      gamepad.dpad.valueChangedHandler = { dpad, xValue, yValue in
+        // TODO handle dpad movement
+      }
+      gamepad.buttonA.valueChangedHandler = { button, _, pressed in
+        // TODO handle dpad press
+      }
+      gamepad.buttonX.valueChangedHandler = { button, _, pressed in
+          self.set(cravesJump: pressed)
+      }
+      gamepad.buttonMenu.valueChangedHandler = { button, _, pressed in
+        guard let scene = self.scene else {
+          return
+        }
+
+        scene.isPaused = !scene.isPaused
+      }
+    } else if let gamepad = controller.extendedGamepad {
+      gamepad.buttonA.valueChangedHandler = { button, _, pressed in
+        self.set(cravesJump: pressed)
+      }
+      gamepad.buttonMenu.valueChangedHandler = { button, _, pressed in
+        // TODO pause
+      }
+    }
+  }
+  
+  func trackInputController() {
+    guard let controller = controller else {
+      return
+    }
+    
+    var x: Float?;
+    var y: Float?;
+
+    if let gamepad = controller.microGamepad {
+      x = gamepad.dpad.xAxis.value
+      y = gamepad.dpad.yAxis.value
+    } else if let gamepad = controller.extendedGamepad {
+      x = gamepad.leftThumbstick.xAxis.value;
+      y = gamepad.leftThumbstick.yAxis.value;
+    }
+
+    guard let x = x, let y = y, y != 0, x != 0 else {
+      let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
+      return run(wait) { [weak self] in
+        self?.trackInputController()
+      }
+    }
+
+    let applyForce = SKAction.applyForce(
+      CGVector(
+        dx: (CGFloat(x) * 100).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
+        dy: (CGFloat(y) * 100).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
+      duration: DDPlayerNode.TICK_FOLLOW)
+
+    mainCircle.run(applyForce) { [weak self] in
+      self?.trackInputController()
     }
   }
 
   // MARK: Jumping
 
-  var jumpsSinceLastGroundTouch: Int = 0
+  var jumpsSinceLastGroundTouch: Int8 = 0
   var holdingJump = false
+  
+  func handleTouch(force: CGFloat) {
+    set(cravesJump: force > DDPlayerNode.TOUCH_FORCE_JUMP)
+  }
 
-  func updateTouchForce(_ force: CGFloat) {
-    let cravesJump = force > DDPlayerNode.TOUCH_FORCE_JUMP
+  func set(cravesJump: Bool) {
     guard holdingJump != cravesJump else {
       return
     }
 
-    holdingJump = !holdingJump
+    holdingJump = cravesJump
 
     guard cravesJump else {
       return

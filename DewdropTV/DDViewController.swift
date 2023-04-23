@@ -10,6 +10,8 @@ import SpriteKit
 import GameKit
 import GameplayKit
 
+var playerIndices: [GCControllerPlayerIndex] = getPlayerIndices()
+
 class DDViewController: UIViewController {
   // MARK: Constants
 
@@ -27,27 +29,47 @@ class DDViewController: UIViewController {
 
     self.scene = DDScene(fileNamed: "TestLevel")!
     self.scene!.addToScene(scene: self.scene!)
-    self.startLocalGame();
+    self.listenForControllers();
   }
 
   // MARK: Helpers
+  
+  func listenForControllers() {
+    NotificationCenter.default.addObserver(
+      forName: .GCControllerDidConnect,
+      object: nil,
+      queue: .main) { notification in
+        guard let controller = notification.object as? GCController else {
+          return
+        }
+       
+        guard playerIndices.count != 0 else {
+          return
+        }
 
-  func startLocalGame() {
-    return self.spawnLocalPlayerObject()
+        controller.playerIndex = playerIndices.removeFirst()
+        self.spawnLocalPlayerObject(withController: controller)
+      }
   }
 
-  func spawnLocalPlayerObject() {
-    guard let view = self.view as! DDView? else {
-      return
+  func spawnLocalPlayerObject(withController controller: GCController) {
+    guard let view = self.view as! DDView?, let scene = self.scene else {
+      fatalError("no scene or view")
     }
 
-    DDPlayerNode().addToScene(scene: self.scene!)
+    DDPlayerNode()
+      .set(controller: controller)
+      .addToScene(scene: scene)
 
     // Present the scene
-    view.presentScene(self.scene!)
+    view.presentScene(scene)
 
     view.ignoresSiblingOrder = true
     view.showsFPS = true
     view.showsNodeCount = true
   }
+}
+
+func getPlayerIndices() -> [GCControllerPlayerIndex] {
+  return [ .index1, .index2, .index3, .index4 ];
 }

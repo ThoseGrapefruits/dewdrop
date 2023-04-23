@@ -128,8 +128,11 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       physicsWorld.add(springJointAntirotation)
     }
   }
+  
+  // MARK: Controller input
+  
 
-  // MARK: Touch handling
+  // MARK: Touch input
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     guard let mt = moveTouch else {
@@ -148,7 +151,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if let mt = moveTouch, touches.contains(mt) {
       updateMoveTouch()
-      playerNode?.updateTouchForce(mt.force)
+      playerNode?.handleTouch(force: mt.force)
       moveTouchNode.touchPosition.strokeColor =
         mt.force > DDPlayerNode.TOUCH_FORCE_JUMP ? .red : .cyan
     }
