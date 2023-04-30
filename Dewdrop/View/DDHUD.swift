@@ -17,7 +17,7 @@ class DDHUD: SKNode, DDSceneAddable {
   let statsNode: DDNetworkStatsNode? = .none;
 
   // MARK: DDSceneAddable & initialisation
-  func addToScene(scene: DDScene, position: CGPoint?) {
+  func addToScene(scene: DDScene, position: CGPoint?) -> Self {
     move(toParent: scene)
 
     if let position = position {
@@ -46,6 +46,8 @@ class DDHUD: SKNode, DDSceneAddable {
       statsNode.tracker = DDNetworkMatch.singleton.networkActivityTracker
       statsNode.start()
     }
+    
+    return self
   }
 
   func initPhysics() {

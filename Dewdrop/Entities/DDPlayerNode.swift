@@ -65,11 +65,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   // MARK: protocol SceneAddable
-  func addToScene(scene: DDScene) {
-    addToScene(scene: scene, position: .none)
+  func addToScene(scene: DDScene) -> Self {
+    return addToScene(scene: scene, position: .none)
   }
 
-  func addToScene(scene: DDScene, position: CGPoint? = .none) {
+  func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
     scene.addChild(self)
     ddScene = scene
 
@@ -82,6 +82,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     initMainCircle(position: position)
     initGun()
     initWetChildren()
+    
+    return self
   }
 
   func initWetChildren() {
@@ -296,29 +298,43 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
   
   func setupControllerListeners() {
-    print("--setup-controller-listeners--", controller?.vendorName)
     guard let controller = controller else {
       return
     }
 
     if let gamepad = controller.microGamepad {
+      gamepad.allowsRotation = true;
+      print("--gamepad-- micro \(gamepad.dpad.description) \( gamepad.allTouchpads )")
+
+      // D-pad movement
       gamepad.dpad.valueChangedHandler = { dpad, xValue, yValue in
-        // TODO handle dpad movement
+          print("--button-- DPad \(xValue) \(yValue)")
+        // TODO
       }
+      
+      // D-Pad press
       gamepad.buttonA.valueChangedHandler = { button, _, pressed in
-        // TODO handle dpad press
+        print("--button-- A \(pressed)")
+        // TODO
       }
+      
+      // Play/Pause button
       gamepad.buttonX.valueChangedHandler = { button, _, pressed in
-          self.set(cravesJump: pressed)
+        print("--button-- X \(pressed)")
+        self.set(cravesJump: pressed)
       }
+      
+      // Menu button
       gamepad.buttonMenu.valueChangedHandler = { button, _, pressed in
-        guard let scene = self.scene else {
+        print("--button-- Menu \(pressed)")
+        guard let scene = self.scene, pressed else {
           return
         }
 
         scene.isPaused = !scene.isPaused
       }
     } else if let gamepad = controller.extendedGamepad {
+      print("--gamepad-- macro")
       gamepad.buttonA.valueChangedHandler = { button, _, pressed in
         self.set(cravesJump: pressed)
       }
@@ -336,12 +352,12 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     var x: Float?;
     var y: Float?;
 
-    if let gamepad = controller.microGamepad {
-      x = gamepad.dpad.xAxis.value
-      y = gamepad.dpad.yAxis.value
-    } else if let gamepad = controller.extendedGamepad {
+    if let gamepad = controller.extendedGamepad {
       x = gamepad.leftThumbstick.xAxis.value;
       y = gamepad.leftThumbstick.yAxis.value;
+    } else if let gamepad = controller.microGamepad {
+      x = gamepad.dpad.xAxis.value
+      y = gamepad.dpad.yAxis.value
     }
 
     guard let x = x, let y = y, y != 0, x != 0 else {
@@ -353,8 +369,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     let applyForce = SKAction.applyForce(
       CGVector(
-        dx: (CGFloat(x) * 100).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
-        dy: (CGFloat(y) * 100).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
+        dx: (CGFloat(x) * 20_000).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
+        dy: (CGFloat(y) * 6_000).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
       duration: DDPlayerNode.TICK_FOLLOW)
 
     mainCircle.run(applyForce) { [weak self] in

@@ -11,5 +11,5 @@ import SpriteKit
 protocol DDSceneAddable {
   /// Add self to the given `scene`
   /// - Returns: `true` if the object was sucessfully added, `false` otherwise.
-  func addToScene(scene: DDScene, position: CGPoint?) -> Void
+  func addToScene(scene: DDScene, position: CGPoint?) -> Self
 }

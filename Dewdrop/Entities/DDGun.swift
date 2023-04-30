@@ -7,6 +7,7 @@
 
 import Foundation
 import SpriteKit
+import GameController
 
 class DDGun : SKShapeNode {
   static let LAUNCH_FORCE: CGFloat = 400.0
@@ -23,12 +24,14 @@ class DDGun : SKShapeNode {
 
   // MARK: State
 
-  var chambered: Optional<DDPlayerDroplet> = .none
+  var chambered: DDPlayerDroplet? = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
   var cravesLaunch = false
-  var lastLaunchTarget: Optional<CGPoint> = .none
-  var playerNode: Optional<DDPlayerNode> = .none
+  var joystick: GCControllerDirectionPad? = .none;
+  var lastLaunchTarget: CGPoint? = .none
+  var lastTargetAngle: CGFloat = 0
+  var playerNode: DDPlayerNode? = .none
 
   // MARK: Initialisation
 
@@ -56,7 +59,9 @@ class DDGun : SKShapeNode {
 
   func start(playerNode: DDPlayerNode) {
     self.playerNode = playerNode
-    trackAimTouch();
+    
+    self.joystick = playerNode.controller?.extendedGamepad?.rightThumbstick
+    trackAim();
   }
 
   // MARK: Actions
@@ -139,7 +144,7 @@ class DDGun : SKShapeNode {
 
   // MARK: Game loops
 
-  func trackAimTouch() {
+  func trackAim() {
     guard let playerNode = playerNode,
           let gunAnchor = parent else {
       return
@@ -153,7 +158,8 @@ class DDGun : SKShapeNode {
     }
 
     let currentAngle = playerNode.mainCircle.zRotation + gunAnchor.zRotation
-    let targetAngle = getAimTargetAngle()
+    let targetAngle = getAimTargetAngle() ?? lastTargetAngle;
+    lastTargetAngle = targetAngle;
 
     let impulse = aimPID.step(
       error: (targetAngle - currentAngle).wrap(around: CGFloat.pi),
@@ -164,27 +170,32 @@ class DDGun : SKShapeNode {
       duration: DDPlayerNode.TICK_AIM)
 
     return gunAnchor.run(action) { [weak self] in
-      self?.trackAimTouch()
+      self?.trackAim()
     }
   }
 
   // MARK: Util
 
-  func getAimTargetAngle() -> CGFloat {
+  func getAimTargetAngle() -> CGFloat? {
     guard let playerNode = playerNode,
           let ddScene = playerNode.ddScene else {
-      return 0
+      return .none
     }
 
+    if let joystick = joystick {
+      return CGFloat(atan2(joystick.yAxis.value, joystick.xAxis.value))
+    }
+    
     let targetPosition = ddScene.aimTouchNode.fingerDown
       ? ddScene.aimTouchNode.position
       : cravesLaunch ? lastLaunchTarget : nil
 
     guard let targetPosition = targetPosition else {
-      return 0
+      return .none
     }
 
     let selfPosition = playerNode.mainCircle.position
+
     let targetPositionOffset = CGPoint(
       x: targetPosition.x,
       y: targetPosition.y + DDPlayerNode.AIM_OFFSET)

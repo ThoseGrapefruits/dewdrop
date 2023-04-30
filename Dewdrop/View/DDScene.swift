@@ -23,13 +23,15 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
   // MARK: Initialization
 
-  func addToScene(scene: DDScene, position: CGPoint? = .none) {
+  func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
     if (scene != self) {
       fatalError("no")
     }
 
     collectSpawnPoints()
     vivifyBouncyLeaves()
+    
+    return self
   }
 
   func start() {

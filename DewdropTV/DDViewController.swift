@@ -12,7 +12,7 @@ import GameplayKit
 
 var playerIndices: [GCControllerPlayerIndex] = getPlayerIndices()
 
-class DDViewController: UIViewController {
+class DDViewController: GCEventViewController {
   // MARK: Constants
 
   static let START_POSITION = CGPoint(x: 0, y: 160)
@@ -27,9 +27,10 @@ class DDViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
 
-    self.scene = DDScene(fileNamed: "TestLevel")!
-    self.scene!.addToScene(scene: self.scene!)
+    self.scene = DDScene(fileNamed: "TestLevel")
+    self.scene = self.scene!.addToScene(scene: self.scene!)
     self.listenForControllers();
+    self.controllerUserInteractionEnabled = false;
   }
 
   // MARK: Helpers
@@ -38,18 +39,22 @@ class DDViewController: UIViewController {
     NotificationCenter.default.addObserver(
       forName: .GCControllerDidConnect,
       object: nil,
-      queue: .main) { notification in
-        guard let controller = notification.object as? GCController else {
-          return
-        }
-       
-        guard playerIndices.count != 0 else {
-          return
-        }
-
-        controller.playerIndex = playerIndices.removeFirst()
-        self.spawnLocalPlayerObject(withController: controller)
+      queue: .main
+    ) { notification in
+      guard let controller = notification.object as? GCController else {
+        return
       }
+      
+      guard playerIndices.count != 0 else {
+        fatalError("2 many controllers")
+      }
+
+      if controller.extendedGamepad != nil {
+        controller.playerIndex = playerIndices.removeFirst()
+      }
+
+      self.spawnLocalPlayerObject(withController: controller)
+    }
   }
 
   func spawnLocalPlayerObject(withController controller: GCController) {
@@ -60,6 +65,7 @@ class DDViewController: UIViewController {
     DDPlayerNode()
       .set(controller: controller)
       .addToScene(scene: scene)
+      .start()
 
     // Present the scene
     view.presentScene(scene)
@@ -71,5 +77,5 @@ class DDViewController: UIViewController {
 }
 
 func getPlayerIndices() -> [GCControllerPlayerIndex] {
-  return [ .index1, .index2, .index3, .index4 ];
+  return [ .index1, .index2, .index3, .index4, .indexUnset ];
 }
