@@ -143,7 +143,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.mass = 14.0
     mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
     mainCircle.physicsBody!.collisionBitMask =
-      DDBitmask.ALL ^ DDBitmask.playerGun
+      DDBitmask.ALL ^ DDBitmask.playerGun ^ DDBitmask.playerDroplet
 
     addChild(mainCircle)
 
@@ -172,7 +172,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       newChild.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
       newChild.physicsBody!.collisionBitMask =
         DDBitmask.ALL ^ DDBitmask.playerGun
-      newChild.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet
+      newChild.physicsBody!.contactTestBitMask =
+        DDBitmask.playerDroplet ^ DDBitmask.ground
     }
 
     if newChild.parent == nil {
@@ -290,6 +291,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Controller handling
   
   var controller: GCController?;
+  var dpad = GCControllerDirectionPad();
   
   func set(controller: GCController) -> Self {
     self.controller = controller;
@@ -301,66 +303,51 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard let controller = controller else {
       return
     }
+    
+    var buttonMenu:  GCControllerButtonInput?;
+    var buttonJump:  GCControllerButtonInput?;
+    var buttonShoot: GCControllerButtonInput?;
 
-    if let gamepad = controller.microGamepad {
-      gamepad.allowsRotation = true;
-      print("--gamepad-- micro \(gamepad.dpad.description) \( gamepad.allTouchpads )")
+    if let gamepad = controller.extendedGamepad {
+      buttonJump = gamepad.buttonA
+      buttonShoot = gamepad.rightShoulder
+      buttonMenu = gamepad.buttonMenu
+      dpad = gamepad.leftThumbstick
+    } else if let gamepad = controller.microGamepad {
+      gamepad.allowsRotation = true
+      
+      buttonMenu = gamepad.buttonMenu
+      buttonJump = gamepad.buttonA
+      buttonShoot = gamepad.buttonX
+      dpad = gamepad.dpad
+    }
+    
+    buttonJump?.valueChangedHandler = { [weak self] button, _, pressed in
+      self?.set(cravesJump: pressed)
+    }
+    
+    buttonMenu?.valueChangedHandler = { [weak self] button, _, pressed in
+      guard pressed, let scene = self?.scene else {
+        return
+      }
 
-      // D-pad movement
-      gamepad.dpad.valueChangedHandler = { dpad, xValue, yValue in
-          print("--button-- DPad \(xValue) \(yValue)")
-        // TODO
-      }
-      
-      // D-Pad press
-      gamepad.buttonA.valueChangedHandler = { button, _, pressed in
-        print("--button-- A \(pressed)")
-        // TODO
-      }
-      
-      // Play/Pause button
-      gamepad.buttonX.valueChangedHandler = { button, _, pressed in
-        print("--button-- X \(pressed)")
-        self.set(cravesJump: pressed)
-      }
-      
-      // Menu button
-      gamepad.buttonMenu.valueChangedHandler = { button, _, pressed in
-        print("--button-- Menu \(pressed)")
-        guard let scene = self.scene, pressed else {
-          return
-        }
-
-        scene.isPaused = !scene.isPaused
-      }
-    } else if let gamepad = controller.extendedGamepad {
-      print("--gamepad-- macro")
-      gamepad.buttonA.valueChangedHandler = { button, _, pressed in
-        self.set(cravesJump: pressed)
-      }
-      gamepad.buttonMenu.valueChangedHandler = { button, _, pressed in
-        // TODO pause
+      scene.isPaused = !scene.isPaused
+    }
+    
+    buttonShoot?.valueChangedHandler = { [weak self] button, _, pressed in
+      if (pressed) {
+        self?.chamberDroplet()
+      } else {
+        self?.launchDroplet()
       }
     }
   }
   
   func trackInputController() {
-    guard let controller = controller else {
-      return
-    }
-    
-    var x: Float?;
-    var y: Float?;
+    let x = dpad.xAxis.value
+    let y = dpad.xAxis.value
 
-    if let gamepad = controller.extendedGamepad {
-      x = gamepad.leftThumbstick.xAxis.value;
-      y = gamepad.leftThumbstick.yAxis.value;
-    } else if let gamepad = controller.microGamepad {
-      x = gamepad.dpad.xAxis.value
-      y = gamepad.dpad.yAxis.value
-    }
-
-    guard let x = x, let y = y, y != 0, x != 0 else {
+    guard y != 0, x != 0 else {
       let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
       return run(wait) { [weak self] in
         self?.trackInputController()
@@ -383,8 +370,50 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   var jumpsSinceLastGroundTouch: Int8 = 0
   var holdingJump = false
   
-  func handleTouch(force: CGFloat) {
+  func getGroundContacts() -> [SKPhysicsBody: Int] {
+    return wetChildren
+      .compactMap { wetChild in wetChild.physicsBody }
+      .flatMap { wetBody in wetBody.allContactedBodies() }
+      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground }
+      .reduce(into: [SKPhysicsBody: Int]()) { counts, groundBody in
+        counts[groundBody] = (counts[groundBody] ?? 0) + 1
+      }
+  }
+  
+  func getGroundContactsTotalCount() -> Int {
+    return self.getGroundContactsTotalCount(withContacts: self.getGroundContacts())
+  }
+  
+  func getGroundContactsTotalCount(
+    withContacts groundContacts: [SKPhysicsBody: Int]
+  ) -> Int {
+    groundContacts.values.reduce(0) { sum, n in
+      sum + n
+    }
+  }
+  
+  func handleCollision(withGround: SKNode) {
+    self.resetJumps()
+  }
+  
+  func handleForceTouch(force: CGFloat) {
     set(cravesJump: force > DDPlayerNode.TOUCH_FORCE_JUMP)
+  }
+  
+  func resetJumps() {
+    self.resetJumps(withContacts: self.getGroundContacts())
+  }
+  
+  func resetJumps(withContacts groundContacts: [SKPhysicsBody: Int]) {
+    guard jumpsSinceLastGroundTouch != 0 else {
+      return
+    }
+
+    let contactCount = self.getGroundContactsTotalCount(withContacts: groundContacts)
+
+    if contactCount >= 4 {
+      jumpsSinceLastGroundTouch = 0
+    }
   }
 
   func set(cravesJump: Bool) {
@@ -397,24 +426,17 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard cravesJump else {
       return
     }
+    
+    let groundContacts = self.getGroundContacts()
+    let totalContactCount = self.getGroundContactsTotalCount(withContacts: groundContacts)
+    
+    self.resetJumps(withContacts: groundContacts)
 
-    let groundContacts = wetChildren
-      .compactMap { wetChild in wetChild.physicsBody }
-      .flatMap { wetBody in wetBody.allContactedBodies() }
-      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground }
-      .reduce(into: [SKPhysicsBody: Int]()) { counts, groundBody in
-        counts[groundBody] = (counts[groundBody] ?? 0) + 1
-      }
-
-    if groundContacts.count != 0 {
-      jumpsSinceLastGroundTouch = 0
-
-      let totalContact =
-        groundContacts.values.reduce(0) { sum, count in sum + count }
+    if totalContactCount >= 1 {
       let positionInScene = mainCircle.getPosition(within: scene!)
 
       for (body, contactCount) in groundContacts {
-        let fractionOfTotal = contactCount / totalContact
+        let fractionOfTotal = contactCount / totalContactCount
         body.applyImpulse(
           CGVector(dx: 0, dy: 1600 * fractionOfTotal),
           at: positionInScene)

@@ -28,7 +28,7 @@ class DDGun : SKShapeNode {
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
   var cravesLaunch = false
-  var joystick: GCControllerDirectionPad? = .none;
+  var dpadAim: GCControllerDirectionPad? = .none;
   var lastLaunchTarget: CGPoint? = .none
   var lastTargetAngle: CGFloat = 0
   var playerNode: DDPlayerNode? = .none
@@ -60,7 +60,14 @@ class DDGun : SKShapeNode {
   func start(playerNode: DDPlayerNode) {
     self.playerNode = playerNode
     
-    self.joystick = playerNode.controller?.extendedGamepad?.rightThumbstick
+    if let controller = playerNode.controller {
+      if let gamepad = controller.extendedGamepad {
+        dpadAim = gamepad.rightThumbstick
+      } else if let gamepad = controller.microGamepad {
+        dpadAim = gamepad.dpad
+      }
+    }
+
     trackAim();
   }
 
@@ -182,7 +189,7 @@ class DDGun : SKShapeNode {
       return .none
     }
 
-    if let joystick = joystick {
+    if let joystick = dpadAim {
       return CGFloat(atan2(joystick.yAxis.value, joystick.xAxis.value))
     }
     

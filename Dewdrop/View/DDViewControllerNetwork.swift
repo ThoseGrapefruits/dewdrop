@@ -77,9 +77,9 @@ class DDViewControllerNetwork: UIViewController, DDSpawnDelegate {
 
       scene.playerNode = localPlayerNode
 
-      let hud = DDHUD()
-      hud.addToScene(scene: scene, position: localPlayerNode.position)
-      hud.track(localPlayerNode)
+      DDHUD()
+        .addToScene(scene: scene, position: localPlayerNode.position)
+        .track(localPlayerNode)
 
       localPlayerNode.start()
       scene.start()

@@ -153,7 +153,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     if let mt = moveTouch, touches.contains(mt) {
       updateMoveTouch()
-      playerNode?.handleTouch(force: mt.force)
+      playerNode?.handleForceTouch(force: mt.force)
       moveTouchNode.touchPosition.strokeColor =
         mt.force > DDPlayerNode.TOUCH_FORCE_JUMP ? .red : .cyan
     }
@@ -190,21 +190,55 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   // MARK: SKPhysicsContactDelegate
 
   func didBegin(_ contact: SKPhysicsContact) {
-    guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
-          let dropletB = contact.bodyB.node as? DDPlayerDroplet
-    else {
+    guard !self.handleContactDropletDroplet(contact) else {
       return
+    }
+    
+    guard !self.handleContactDropletWorld(contact) else {
+      return
+    }
+  }
+  
+  func handleContactDropletDroplet(_ contact: SKPhysicsContact) -> Bool {
+    guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
+          let dropletB = contact.bodyB.node as? DDPlayerDroplet else {
+      return false
     }
 
     guard (dropletA.owner == nil) != (dropletB.owner == nil),
           let newOwner = dropletA.owner ?? dropletB.owner
     else {
-      return
+      return false
     }
 
     let ownerless = dropletA.owner == nil ? dropletA : dropletB
 
     newOwner.baptiseWetChild(newChild: ownerless)
+
+    return true
+  }
+  
+  func handleContactDropletWorld(_ contact: SKPhysicsContact) -> Bool {
+    guard let nodeA = contact.bodyA.node,
+          let nodeB = contact.bodyB.node else {
+      return false
+    }
+
+    let droplet = nodeA as? DDPlayerDroplet ?? nodeB as? DDPlayerDroplet
+
+    guard let droplet = droplet else {
+      return false
+    }
+
+    if nodeA.physicsBody?.categoryBitMask == DDBitmask.ground {
+      droplet.owner?.handleCollision(withGround: nodeA)
+    } else if nodeB.physicsBody?.categoryBitMask == DDBitmask.ground {
+      droplet.owner?.handleCollision(withGround: nodeB)
+    } else {
+      return false
+    }
+    
+    return true
   }
 
   // MARK: Helpers

@@ -9,8 +9,8 @@ import Foundation
 import SpriteKit
 
 class DDPlayerDroplet : SKShapeNode {
-  var lastOwner: Optional<DDPlayerNode> = .none
-  var owner: Optional<DDPlayerNode> = .none
+  weak var lastOwner: DDPlayerNode? = .none
+  weak var owner: DDPlayerNode? = .none
 
   func onCatch(by newOwner: DDPlayerNode) {
     owner = newOwner

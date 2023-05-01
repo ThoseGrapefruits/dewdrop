@@ -31,6 +31,8 @@ class DDViewController: GCEventViewController {
     self.scene = self.scene!.addToScene(scene: self.scene!)
     self.listenForControllers();
     self.controllerUserInteractionEnabled = false;
+    
+    self.scene!.start()
   }
 
   // MARK: Helpers
