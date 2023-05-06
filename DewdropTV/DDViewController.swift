@@ -66,7 +66,7 @@ class DDViewController: GCEventViewController {
 
     DDPlayerNode()
       .set(controller: controller)
-      .addToScene(scene: scene)
+      .addToScene(scene: scene, position: scene.getNextSpawnPoint())
       .start()
 
     // Present the scene

@@ -103,8 +103,10 @@ class DDGun : SKShapeNode {
       return
     }
 
+    #if os(iOS)
     lastLaunchTarget = playerNode?.ddScene?.aimTouchNode.position
-
+    #endif
+    
     guard abs(aimPID.lastError) < DDGun.LAUNCH_MAX_ERROR else {
       cravesLaunch = true
       return
@@ -170,11 +172,11 @@ class DDGun : SKShapeNode {
 
     let impulse = aimPID.step(
       error: (targetAngle - currentAngle).wrap(around: CGFloat.pi),
-      deltaTime: DDPlayerNode.TICK_AIM)
+      deltaTime: DDPlayerNode.WAIT_AIM.duration)
 
     let action = SKAction.applyAngularImpulse(
       impulse,
-      duration: DDPlayerNode.TICK_AIM)
+      duration: DDPlayerNode.WAIT_AIM.duration)
 
     return gunAnchor.run(action) { [weak self] in
       self?.trackAim()
@@ -193,6 +195,7 @@ class DDGun : SKShapeNode {
       return CGFloat(atan2(joystick.yAxis.value, joystick.xAxis.value))
     }
     
+    #if os(iOS)
     let targetPosition = ddScene.aimTouchNode.fingerDown
       ? ddScene.aimTouchNode.position
       : cravesLaunch ? lastLaunchTarget : nil
@@ -207,5 +210,8 @@ class DDGun : SKShapeNode {
       x: targetPosition.x,
       y: targetPosition.y + DDPlayerNode.AIM_OFFSET)
     return selfPosition.angle(to: targetPositionOffset)
+    #endif
+    
+    return .none
   }
 }

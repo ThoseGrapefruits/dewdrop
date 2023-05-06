@@ -19,6 +19,8 @@
 		026AD57A29B686C900947BE2 /* DewdropTVTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD57929B686C900947BE2 /* DewdropTVTests.swift */; };
 		026AD58429B686CA00947BE2 /* DewdropTVUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD58329B686CA00947BE2 /* DewdropTVUITests.swift */; };
 		026AD58629B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD58529B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift */; };
+		02A125282A03F4DD00818A3B /* DDWeatherCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */; };
+		02A1252A2A03F4E700818A3B /* DDSceneEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125292A03F4E700818A3B /* DDSceneEffect.swift */; };
 		02B9BE7729CF3C4B00ED31A6 /* DDViewControllerNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02B9BE7629CF3C4B00ED31A6 /* DDViewControllerNetwork.swift */; };
 		02B9BE7829CF41D200ED31A6 /* DDAimTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */; };
 		02B9BE7929CF41D200ED31A6 /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
@@ -160,6 +162,8 @@
 		026AD57F29B686C900947BE2 /* DewdropTVUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DewdropTVUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		026AD58329B686CA00947BE2 /* DewdropTVUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropTVUITests.swift; sourceTree = "<group>"; };
 		026AD58529B686CA00947BE2 /* DewdropTVUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DewdropTVUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDWeatherCycle.swift; sourceTree = "<group>"; };
+		02A125292A03F4E700818A3B /* DDSceneEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneEffect.swift; sourceTree = "<group>"; };
 		02B9BE7629CF3C4B00ED31A6 /* DDViewControllerNetwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDViewControllerNetwork.swift; sourceTree = "<group>"; };
 		DC018D1C269EA7260087A835 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		DC04E8DF268F83840040F7A9 /* Dewdrop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dewdrop.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -299,6 +303,15 @@
 			path = DewdropTVUITests;
 			sourceTree = "<group>";
 		};
+		02A125262A03F4AC00818A3B /* SceneEffects */ = {
+			isa = PBXGroup;
+			children = (
+				02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */,
+				02A125292A03F4E700818A3B /* DDSceneEffect.swift */,
+			);
+			path = SceneEffects;
+			sourceTree = "<group>";
+		};
 		DC0073F626D5BD600027814A /* Data */ = {
 			isa = PBXGroup;
 			children = (
@@ -342,6 +355,7 @@
 		DC04E8E1268F83840040F7A9 /* Dewdrop */ = {
 			isa = PBXGroup;
 			children = (
+				02A125262A03F4AC00818A3B /* SceneEffects */,
 				0258850928936C310017898B /* Dewdrop.entitlements */,
 				DC382C4F26F638D600A3AE0A /* Levels */,
 				DC04E8E2268F83840040F7A9 /* AppDelegate.swift */,
@@ -836,6 +850,7 @@
 				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,
 				DC09EC1126D0273500CCDE49 /* DDNetworkMatch.swift in Sources */,
 				DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */,
+				02A1252A2A03F4E700818A3B /* DDSceneEffect.swift in Sources */,
 				DCC29BA4269226690023D58E /* DDSceneAddable.swift in Sources */,
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
 				DCB6530C26A901E60097839C /* DDAudioNodeGroup.swift in Sources */,
@@ -850,6 +865,7 @@
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DC9C1F3726E9AD7300733995 /* DDNetworkMatchHost.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,
+				02A125282A03F4DD00818A3B /* DDWeatherCycle.swift in Sources */,
 				DC2AB31A26DDF583005838D2 /* DDRPCSyncNodes.swift in Sources */,
 				DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */,
 				DCB42DE926DDD5A900866ACF /* CGVector.swift in Sources */,

@@ -11,16 +11,19 @@ import Combine
 
 class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var graphs = [String : GKGraph]()
+  
+  #if os(iOS)
   var moveTouch: UITouch? = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
-
   var aimTouch: UITouch? = .none
   var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
+  var playerNode: DDPlayerNode? = .nil
+  #else
+  var playerNodes: [DDPlayerNode] = []
+  #endif
 
-  var playerNode: DDPlayerNode? = .none
   var spawnPointParent: SKNode? = .none
   var spawnPointIndex: Int = 0;
-
   // MARK: Initialization
 
   func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
@@ -35,13 +38,16 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   }
 
   func start() {
+    #if os(iOS)
     aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
 
     moveTouchNode.name = "Movement touch"
     addChild(moveTouchNode)
+    #endif
 
     physicsWorld.contactDelegate = self
+    physicsWorld.gravity.dy = -15
   }
 
   // MARK: Spawn points
@@ -58,12 +64,16 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
   func getNextSpawnPoint() -> CGPoint {
     spawnPointIndex += 1
+    
+    guard let scene = scene, let spawnPointParent = spawnPointParent else {
+      fatalError("No scene or spawnPointParent")
+    }
 
-    if spawnPointIndex == spawnPointParent!.children.endIndex {
+    if spawnPointIndex == spawnPointParent.children.endIndex {
       spawnPointIndex = 0
     }
 
-    return spawnPointParent!.children[spawnPointIndex].position
+    return spawnPointParent.children[spawnPointIndex].getPosition(within: scene)
   }
 
   // MARK: Leaf physics
@@ -134,6 +144,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   // MARK: Controller input
   
 
+  #if os(iOS)
   // MARK: Touch input
 
   override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -186,6 +197,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       updateAimTouch()
     }
   }
+  #endif
 
   // MARK: SKPhysicsContactDelegate
 
@@ -243,6 +255,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
   // MARK: Helpers
 
+  #if os(iOS)
   func updateMoveTouch() {
     if let mt = moveTouch {
       let touchPosition = mt.location(in: self)
@@ -272,4 +285,5 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       playerNode?.launchDroplet()
     }
   }
+  #endif
 }

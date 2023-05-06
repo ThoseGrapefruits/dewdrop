@@ -24,11 +24,13 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   static let AIM_OFFSET: CGFloat = 20.0
   static let TOUCH_FORCE_JUMP: CGFloat = 3.5
-  static let MOVEMENT_FORCE_LIMIT: CGVector = CGVector(dx: 16000.0, dy: 4000.0)
+  static let JUMP_SCALE: CGFloat = 2_000.0;
+  static let MOVEMENT_FORCE_LIMIT: CGVector = CGVector(dx: 25000.0, dy: 6000.0)
+  static let MOVEMENT_SPEED_LIMIT: CGVector = CGVector(dx: 500.0, dy: 1000.0)
   static let PLAYER_RADIUS: CGFloat = 12.0
-  static let TICK_AIM: TimeInterval = 0.05
-  static let TICK_CHARGE_SHOT: TimeInterval = 0.5
-  static let TICK_FOLLOW: TimeInterval = 0.1
+  static let WAIT_AIM = SKAction.wait(forDuration: 0.05)
+  static let WAIT_CHARGE_SHOT = SKAction.wait(forDuration: 0.5)
+  static let WAIT_FOLLOW = SKAction.wait(forDuration: 0.1)
 
   let GUN_MASS: CGFloat = 2.0
   let PD_MASS: CGFloat = 0.5
@@ -72,6 +74,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
     scene.addChild(self)
     ddScene = scene
+
+    #if !os(iOS)
+    ddScene!.playerNodes.append(self)
+    #endif
 
     physicsBody = SKPhysicsBody()
 
@@ -137,9 +143,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody = SKPhysicsBody(
       circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
 
-    mainCircle.physicsBody!.angularDamping = 5
+    mainCircle.physicsBody!.angularDamping = 3
     mainCircle.physicsBody!.isDynamic = true
     mainCircle.physicsBody!.affectedByGravity = false
+    mainCircle.physicsBody!.linearDamping = 0.8
     mainCircle.physicsBody!.mass = 14.0
     mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
     mainCircle.physicsBody!.collisionBitMask =
@@ -255,19 +262,21 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       self.setupControllerListeners()
       self.trackInputController()
     } else {
+      #if os(iOS)
       trackInputTouch()
+      #endif
     }
     gun.start(playerNode: self)
   }
 
+  #if os(iOS)
   private func trackInputTouch() {
     guard let ddScene = ddScene else {
       return
     }
 
     guard ddScene.moveTouchNode.fingerDown else {
-      let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
-      return run(wait) { [weak self] in
+      return run(DDPlayerNode.WAIT_FOLLOW) { [weak self] in
         self?.trackInputTouch()
       }
     }
@@ -277,16 +286,19 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     let diffX = touchNodePosition.x - mainCirclePosition.x
     let diffY = touchNodePosition.y - mainCirclePosition.y
-    let applyForce = SKAction.applyForce(
-      CGVector(
-        dx: (diffX * 800).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
-        dy: (diffY * 400).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
-      duration: DDPlayerNode.TICK_FOLLOW)
 
-    mainCircle.run(applyForce) { [weak self] in
+    let force = CGVector(
+      dx: (diffX * 800)
+        .clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx)
+        .clamp(within: clampX ? 0 : CGFloat.infinity),
+      dy: (diffY * 400)
+        .clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy))
+
+    applyMovementForce(force) { [weak self] in
       self?.trackInputTouch()
     }
   }
+  #endif
   
   // MARK: Controller handling
   
@@ -316,8 +328,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     } else if let gamepad = controller.microGamepad {
       gamepad.allowsRotation = true
       
-      buttonMenu = gamepad.buttonMenu
       buttonJump = gamepad.buttonA
+      buttonMenu = gamepad.buttonMenu
       buttonShoot = gamepad.buttonX
       dpad = gamepad.dpad
     }
@@ -346,23 +358,52 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   func trackInputController() {
     let x = dpad.xAxis.value
     let y = dpad.xAxis.value
-
+    
     guard y != 0, x != 0 else {
-      let wait = SKAction.wait(forDuration: DDPlayerNode.TICK_FOLLOW)
-      return run(wait) { [weak self] in
+      return run(DDPlayerNode.WAIT_FOLLOW) { [weak self] in
         self?.trackInputController()
       }
     }
-
-    let applyForce = SKAction.applyForce(
-      CGVector(
-        dx: (CGFloat(x) * 20_000).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
-        dy: (CGFloat(y) * 6_000).clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)),
-      duration: DDPlayerNode.TICK_FOLLOW)
-
-    mainCircle.run(applyForce) { [weak self] in
+    
+    let direction = CGVector(
+      dx: (CGFloat(x) * 20_000)
+        .clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dx),
+      dy: (CGFloat(y) * 6_000)
+        .clamp(within: DDPlayerNode.MOVEMENT_FORCE_LIMIT.dy)
+    )
+    
+    applyMovementForce(direction) { [weak self] in
       self?.trackInputController()
     }
+  }
+  
+  // MARK: Movement
+  
+  func applyMovementForce(
+    _ force: CGVector,
+    completion block: @escaping () -> Void
+  ) {
+    guard let physicsBody = mainCircle.physicsBody else {
+      return;
+    }
+    
+    let clampX =
+    force.dx.sign == physicsBody.velocity.dx.sign &&
+    physicsBody.velocity.dx.magnitude > DDPlayerNode.MOVEMENT_SPEED_LIMIT.dx;
+    
+    let clampY =
+    force.dy.sign == physicsBody.velocity.dy.sign &&
+    physicsBody.velocity.dy.magnitude > DDPlayerNode.MOVEMENT_SPEED_LIMIT.dy;
+    
+    let forceClamped = CGVector(
+      dx: force.dx.clamp(within: clampX ? 0 : .infinity),
+      dy: force.dy.clamp(within: clampY ? 0 : .infinity))
+      
+    self.mainCircle.run(
+      SKAction.applyForce(
+        forceClamped,
+        duration: DDPlayerNode.WAIT_FOLLOW.duration),
+      completion: block)
   }
 
   // MARK: Jumping
@@ -436,9 +477,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       let positionInScene = mainCircle.getPosition(within: scene!)
 
       for (body, contactCount) in groundContacts {
-        let fractionOfTotal = contactCount / totalContactCount
+        let fractionOfTotal: CGFloat = CGFloat(contactCount) / CGFloat(totalContactCount)
         body.applyImpulse(
-          CGVector(dx: 0, dy: 1600 * fractionOfTotal),
+          CGVector(dx: 0, dy: -30 * DDPlayerNode.JUMP_SCALE * fractionOfTotal),
           at: positionInScene)
       }
     }
@@ -448,9 +489,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
 
     jumpsSinceLastGroundTouch += 1
-    mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 800))
+    mainCircle.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 1.6 * DDPlayerNode.JUMP_SCALE))
     for wetChild in wetChildren {
-      wetChild.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 600))
+      wetChild.physicsBody?.applyImpulse(CGVector(dx: 0, dy: 0.5 * DDPlayerNode.JUMP_SCALE))
     }
   }
 
