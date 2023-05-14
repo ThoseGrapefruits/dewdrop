@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		02231A3729E2FF270015A59F /* TestLevel.sks in Resources */ = {isa = PBXBuildFile; fileRef = DCC29BA1269223ED0023D58E /* TestLevel.sks */; };
+		0263C56D2A0C055400C738D7 /* DDWeatherCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */; };
+		0263C56E2A0C055400C738D7 /* DDSceneEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125292A03F4E700818A3B /* DDSceneEffect.swift */; };
+		0263C5702A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */; };
+		0263C5712A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */; };
+		0263C5732A0C170E00C738D7 /* DDPhysicsNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */; };
+		0263C5742A0C170E00C738D7 /* DDPhysicsNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */; };
 		026AD55629B6745100947BE2 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC3BB91026AC870F0097A9AA /* GameKit.framework */; };
 		026AD56029B686C800947BE2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 026AD55F29B686C800947BE2 /* AppDelegate.swift */; };
 		026AD56229B686C800947BE2 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 026AD56129B686C800947BE2 /* GameScene.sks */; };
@@ -149,6 +155,8 @@
 
 /* Begin PBXFileReference section */
 		0258850928936C310017898B /* Dewdrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dewdrop.entitlements; sourceTree = "<group>"; };
+		0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneEffectSceneAddable.swift; sourceTree = "<group>"; };
+		0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPhysicsNode.swift; sourceTree = "<group>"; };
 		026AD55D29B686C800947BE2 /* DewdropTV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DewdropTV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		026AD55F29B686C800947BE2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		026AD56129B686C800947BE2 /* GameScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = GameScene.sks; sourceTree = "<group>"; };
@@ -308,6 +316,7 @@
 			children = (
 				02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */,
 				02A125292A03F4E700818A3B /* DDSceneEffect.swift */,
+				0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */,
 			);
 			path = SceneEffects;
 			sourceTree = "<group>";
@@ -439,6 +448,7 @@
 				DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */,
 				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
 				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
+				0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -773,6 +783,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0263C56D2A0C055400C738D7 /* DDWeatherCycle.swift in Sources */,
+				0263C56E2A0C055400C738D7 /* DDSceneEffect.swift in Sources */,
 				02B9BE8F29CF420200ED31A6 /* DDNetworkDelegate.swift in Sources */,
 				02B9BE9029CF420200ED31A6 /* SKNodeCapturedFields.swift in Sources */,
 				02B9BE9129CF420200ED31A6 /* DDFieldChange.swift in Sources */,
@@ -790,6 +802,7 @@
 				02B9BE9D29CF420200ED31A6 /* DDRPC.swift in Sources */,
 				02B9BE9E29CF420200ED31A6 /* DDMatchmaking.swift in Sources */,
 				02B9BE9F29CF420200ED31A6 /* DDNetworkMatch.swift in Sources */,
+				0263C5742A0C170E00C738D7 /* DDPhysicsNode.swift in Sources */,
 				02B9BEA029CF420200ED31A6 /* DDNetworkMatchClient.swift in Sources */,
 				02B9BEA129CF420200ED31A6 /* DDNetworkMatchHost.swift in Sources */,
 				02B9BEA229CF420200ED31A6 /* DDNetworkActivityTracker.swift in Sources */,
@@ -811,6 +824,7 @@
 				02B9BE8529CF41D200ED31A6 /* DDCameraNode.swift in Sources */,
 				02B9BE8629CF41D200ED31A6 /* DDScene.swift in Sources */,
 				02B9BE8729CF41D200ED31A6 /* DDView.swift in Sources */,
+				0263C5712A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift in Sources */,
 				02B9BE8829CF41D200ED31A6 /* DDHUD.swift in Sources */,
 				026AD56829B686C800947BE2 /* DDViewController.swift in Sources */,
 				026AD56029B686C800947BE2 /* AppDelegate.swift in Sources */,
@@ -857,6 +871,7 @@
 				DC04E8E9268F83850040F7A9 /* DDScene.swift in Sources */,
 				DC882C8F26DC508300E80E7B /* DDNetworkStatsNode.swift in Sources */,
 				DCCD192E2693DABB002F5585 /* PIDController.swift in Sources */,
+				0263C5732A0C170E00C738D7 /* DDPhysicsNode.swift in Sources */,
 				DC018D1D269EA7260087A835 /* CGPoint.swift in Sources */,
 				02B9BE7729CF3C4B00ED31A6 /* DDViewControllerNetwork.swift in Sources */,
 				DC0E80BB26C99C0800A37917 /* DDMatchmaking.swift in Sources */,
@@ -878,6 +893,7 @@
 				DCF9815726983FD400430005 /* DDBitmask.swift in Sources */,
 				DC9C1F3926E9B95A00733995 /* DDRPC.swift in Sources */,
 				DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */,
+				0263C5702A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift in Sources */,
 				DC04E8E3268F83840040F7A9 /* AppDelegate.swift in Sources */,
 				DC9C1F3326E9A82600733995 /* DDNetworkMatchClient.swift in Sources */,
 				DCEBE05B26FCD27F00F3F916 /* DDHUD.swift in Sources */,

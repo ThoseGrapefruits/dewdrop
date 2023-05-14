@@ -11,9 +11,13 @@ import GameController
 
 class DDGun : SKShapeNode {
   static let LAUNCH_FORCE: CGFloat = 400.0
+  #if os(iOS)
   static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi / 6
+  #else
+  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi / 4
+  #endif
 
-  let aimPID = PIDController(kP: 1.0, kI: 0, kD: 0.05)
+  let aimPID = PIDController(kP: 1.5, kI: 0.05, kD: 0.1)
 
   // MARK: Audio nodes
 
@@ -77,6 +81,8 @@ class DDGun : SKShapeNode {
     guard chambered == nil else {
       return
     }
+    
+    droplet.lock = .chambering
 
     chambered = droplet
     strokeColor = .white
@@ -96,6 +102,7 @@ class DDGun : SKShapeNode {
     droplet.position = CGPoint(x: 24.0, y: 0.0)
 
     audioChamber.playRandom()
+    droplet.lock = .none
   }
 
   func launchDroplet() {

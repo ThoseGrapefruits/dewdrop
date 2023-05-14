@@ -6,10 +6,9 @@
 //
 
 import Foundation
+import SpriteKit
 
-protocol DDSceneEffect {
-  init(scene: DDScene)
-  
+protocol DDSceneEffect: DDSceneAddable, SKNode {
   func start()
   
   func stop()

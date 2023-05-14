@@ -8,7 +8,7 @@
 import Foundation
 import SpriteKit
 
-class DDHUD: SKNode, DDSceneAddable {
+class DDHUD: SKNode, DDPhysicsNode, DDSceneAddable {
   // MARK: Constants
   let TICK_TRACKING: CGFloat = 0.1
 
@@ -50,14 +50,6 @@ class DDHUD: SKNode, DDSceneAddable {
     return self
   }
 
-  func initPhysics() {
-    physicsBody = SKPhysicsBody()
-    physicsBody!.mass = 3.0
-    physicsBody!.affectedByGravity = false
-    physicsBody!.allowsRotation = false
-    physicsBody!.linearDamping = 3
-  }
-
   // MARK: Game loops
 
   func track(_ node: SKNode,
@@ -82,4 +74,15 @@ class DDHUD: SKNode, DDSceneAddable {
       self?.track(node, pidX: pidX, pidY: pidY)
     }
   }
+  
+  // MARK: DDPhysicsNode
+  
+  func initPhysics() {
+    physicsBody = SKPhysicsBody()
+    physicsBody!.mass = 3.0
+    physicsBody!.affectedByGravity = false
+    physicsBody!.allowsRotation = false
+    physicsBody!.linearDamping = 3
+  }
+
 }

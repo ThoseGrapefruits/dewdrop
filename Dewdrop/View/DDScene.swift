@@ -7,11 +7,10 @@
 
 import SpriteKit
 import GameplayKit
-import Combine
 
 class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var graphs = [String : GKGraph]()
-  
+
   #if os(iOS)
   var moveTouch: UITouch? = .none
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
@@ -23,7 +22,9 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   #endif
 
   var spawnPointParent: SKNode? = .none
-  var spawnPointIndex: Int = 0;
+  var spawnPointIndex: Int = 0
+  var sceneEffects: [DDSceneEffect] = []
+
   // MARK: Initialization
 
   func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
@@ -34,10 +35,14 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     collectSpawnPoints()
     vivifyBouncyLeaves()
     
+    setupSceneEffects()
+    
     return self
   }
 
   func start() {
+    // TOUCH INPUT
+    
     #if os(iOS)
     aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
@@ -46,8 +51,16 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     addChild(moveTouchNode)
     #endif
 
+    // PHYSICS
+
     physicsWorld.contactDelegate = self
     physicsWorld.gravity.dy = -15
+    
+    // SCENE EFFECTS
+    
+    for effect in sceneEffects {
+      effect.start()
+    }
   }
 
   // MARK: Spawn points
@@ -139,6 +152,13 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       physicsWorld.add(springJointPrimary)
       physicsWorld.add(springJointAntirotation)
     }
+  }
+  
+  // MARK: Scene effects
+
+  func setupSceneEffects() {
+    sceneEffects.append(DDWeatherCycle()
+      .addToScene(scene: scene as! DDScene, position: CGPoint(x: 0, y: 0)))
   }
   
   // MARK: Controller input
