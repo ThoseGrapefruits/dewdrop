@@ -32,7 +32,7 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
 
   func onRelease() {
     lastOwner = owner
-    owner = nil
+    owner = .none
     lock = .none
   }
   

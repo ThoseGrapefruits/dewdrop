@@ -58,11 +58,11 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
       case .neutral:
         break;
       case .rain:
-        self.applyRainUpdates()
+        self.applyRainUpdates(isFirstRun: true)
         cycleNext = .sun
         break;
       case .sun:
-        self.applySunUpdates()
+        self.applySunUpdates(isFirstRun: true)
         cycleNext = .rain
         break
       case .stop:
@@ -79,7 +79,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
   
   // MARK: API & helpers
   
-  private func applyRainUpdates() {
+  private func applyRainUpdates(isFirstRun: Bool) {
     guard case .rain = cycle, let scene = scene as? DDScene else {
       return
     }
@@ -92,16 +92,17 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
     droplet.position = CGPoint(x: xRandom, y: yTop)
     
     run(DDWeatherCycle.WAIT_RAIN) { [weak self] in
-      self?.applyRainUpdates()
+      self?.applyRainUpdates(isFirstRun: false)
     }
   }
   
-  private func applySunUpdates(isFirstRun: Bool = true) {
+  private func applySunUpdates(isFirstRun: Bool) {
     guard case .sun = cycle else {
       return
     }
     
     #if !os(iOS)
+
     guard let scene = scene as? DDScene else {
       return
     }
@@ -131,7 +132,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
     node.lock = .evaporating
     node.run(DDWeatherCycle.ACTION_SCALE_TO_0) {
       node.lock = .none
-      node.owner?.banishWetChild(wetChild: node)
+      node.owner?.disown(wetChild: node)
       node.onRelease()
       node.removeFromParent()
     }

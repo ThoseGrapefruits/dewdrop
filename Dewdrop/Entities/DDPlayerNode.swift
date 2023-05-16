@@ -23,6 +23,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   ]
 
   static let AIM_OFFSET: CGFloat       =    20.0
+  static let DETACH_DISTANCE: CGFloat  =   50.0;
   static let TOUCH_FORCE_JUMP: CGFloat =     3.5
   static let JUMP_SCALE: CGFloat       = 2_000.0;
   static let PLAYER_RADIUS: CGFloat    =    12.0
@@ -32,6 +33,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   static let WAIT_AIM         = SKAction.wait(forDuration: 0.05)
   static let WAIT_CHARGE_SHOT = SKAction.wait(forDuration: 0.5)
   static let WAIT_FOLLOW      = SKAction.wait(forDuration: 0.1)
+  static let WAIT_CHECK       = SKAction.wait(forDuration: 0.5)
 
   let GUN_MASS: CGFloat = 2.0
   let PD_COUNT_INIT = 22
@@ -201,7 +203,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     updateGunPosition()
   }
 
-  func banishWetChild(wetChild: DDPlayerDroplet) {
+  func disown(wetChild: DDPlayerDroplet) {
     guard wetChild.lock == .none else {
       return
     }
@@ -264,8 +266,31 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       trackInputTouch()
       #endif
     }
+    
+    trackChildren()
+    
     gun.start(playerNode: self)
   }
+  
+  private func trackChildren() {
+    for child in wetChildren {
+      let distance = mainCircle.position.distance(to: child.position)
+
+      if (distance > DDPlayerNode.DETACH_DISTANCE) {
+        print("--child strayed too far-- \(child.lock) \(child)")
+        disown(wetChild: child)
+        child.onRelease()
+        child.removeFromParent()
+        scene?.addChild(child)
+      }
+    }
+    
+    run(DDPlayerNode.WAIT_CHECK) { [weak self] in
+      self?.trackChildren()
+    }
+  }
+  
+  // MARK: Touch handling
 
   #if os(iOS)
   private func trackInputTouch() {
@@ -518,7 +543,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
 
-    banishWetChild(wetChild: closestChild)
+    disown(wetChild: closestChild)
     gun.chamberDroplet(closestChild)
   }
 
