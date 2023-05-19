@@ -47,9 +47,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
 
   // MARK: Runners
   
-  private func runCycle() {
-    print("--cycle-bef-- \(cycle) \(cycleNext)")
-    
+  private func runCycle() {    
     if let cycleNext = cycleNext {
       cycle = cycleNext;
       self.cycleNext = nil
@@ -69,8 +67,6 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
         return
       }
     }
-    
-    print("--cycle-aft-- \(cycle) \(cycleNext)")
 
     scene?.run(DDWeatherCycle.WAIT_CYCLE) { [weak self] in
       self?.runCycle()
@@ -132,9 +128,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
     node.lock = .evaporating
     node.run(DDWeatherCycle.ACTION_SCALE_TO_0) {
       node.lock = .none
-      node.owner?.disown(wetChild: node)
-      node.onRelease()
-      node.removeFromParent()
+      node.destroy()
     }
   }
 }

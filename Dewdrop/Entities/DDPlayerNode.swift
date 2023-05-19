@@ -35,9 +35,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   static let WAIT_FOLLOW      = SKAction.wait(forDuration: 0.1)
   static let WAIT_CHECK       = SKAction.wait(forDuration: 0.5)
 
-  let GUN_MASS: CGFloat = 2.0
-  let PD_COUNT_INIT = 22
-  let PD_COUNT_MAX = 40
+  static let GUN_MASS: CGFloat = 2.0
+  static let PD_COUNT_INIT = 22
+  static let PD_COUNT_MAX = 40
 
   // MARK: Child nodes
 
@@ -66,38 +66,12 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     super.init(coder: coder)
     name = "Player"
   }
-
-  // MARK: protocol SceneAddable
-  func addToScene(scene: DDScene) -> Self {
-    return addToScene(scene: scene, position: .none)
-  }
-
-  func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
-    scene.addChild(self)
-    ddScene = scene
-
-    #if !os(iOS)
-    ddScene!.playerNodes.append(self)
-    #endif
-
-    physicsBody = SKPhysicsBody()
-
-    physicsBody!.allowsRotation = false
-    physicsBody!.isDynamic = false
-    physicsBody!.pinned = true
-
-    initMainCircle(position: position)
-    initGun()
-    initWetChildren()
-    
-    return self
-  }
-
-  func initWetChildren() {
-    for i in 0..<PD_COUNT_INIT {
+  
+  func initWetChildren(toCount count: Int = DDPlayerNode.PD_COUNT_INIT) {
+    for i in wetChildren.count...count {
       let wetChild = DDPlayerDroplet(circleOfRadius: DDPlayerDroplet.RADIUS)
 
-      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(PD_COUNT_INIT)
+      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(DDPlayerNode.PD_COUNT_INIT)
       let offsetX = cos(angle) * DDPlayerNode.PLAYER_RADIUS
       let offsetY = sin(angle) * DDPlayerNode.PLAYER_RADIUS
 
@@ -110,7 +84,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
-  func initGun() {
+  func initGun() {   
     gunAnchor.name = "\(name ?? "unnamed") gun joint"
 
     gunAnchor.physicsBody = SKPhysicsBody(circleOfRadius: 10)
@@ -118,8 +92,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gunAnchor.physicsBody!.angularDamping = 200
     gunAnchor.physicsBody!.pinned = true
     gunAnchor.physicsBody!.mass = 4
-    gunAnchor.physicsBody!.categoryBitMask = DDBitmask.playerGun
-    gunAnchor.physicsBody!.collisionBitMask = DDBitmask.NONE
+    gunAnchor.physicsBody!.categoryBitMask = DDBitmask.playerGun.rawValue
+    gunAnchor.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
 
     gun.name = "\(name ?? "unnamed") gun"
 
@@ -129,9 +103,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
-    gun.physicsBody!.categoryBitMask = DDBitmask.playerGun
-    gun.physicsBody!.collisionBitMask = DDBitmask.NONE
-    gun.physicsBody!.mass = GUN_MASS
+    gun.physicsBody!.categoryBitMask = DDBitmask.playerGun.rawValue
+    gun.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
+    gun.physicsBody!.mass = DDPlayerNode.GUN_MASS
 
     gunAnchor.addChild(gun)
     mainCircle.addChild(gunAnchor)
@@ -149,15 +123,62 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.affectedByGravity = false
     mainCircle.physicsBody!.linearDamping = 0.8
     mainCircle.physicsBody!.mass = 14.0
-    mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet
+    mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet.rawValue
     mainCircle.physicsBody!.collisionBitMask =
-      DDBitmask.ALL ^ DDBitmask.playerGun ^ DDBitmask.playerDroplet
+      DDBitmask.ALL.rawValue ^
+      DDBitmask.playerGun.rawValue ^
+      DDBitmask.playerDroplet.rawValue
 
     addChild(mainCircle)
 
     if let position = position {
       mainCircle.position = position
     }
+  }
+
+  // MARK: protocol SceneAddable
+
+  func addToScene(scene: DDScene) -> Self {
+    return addToScene(scene: scene, position: .none)
+  }
+
+  func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
+    scene.addChild(self)
+    ddScene = scene
+
+    #if !os(iOS)
+    ddScene!.playerNodes.append(self)
+    #endif
+
+    if physicsBody == nil {
+      physicsBody = SKPhysicsBody()
+
+      physicsBody!.allowsRotation = false
+      physicsBody!.isDynamic = false
+      physicsBody!.pinned = true
+    }
+
+    initMainCircle(position: position)
+    initGun()
+    initWetChildren()
+    
+    return self
+  }
+  
+  func respawn() {
+    guard let scene = scene as? DDScene else {
+      return
+    }
+    
+    while !wetChildren.isEmpty {
+      wetChildren.first?.destroy()
+    }
+
+    mainCircle.physicsBody!.velocity = .zero
+    mainCircle.physicsBody!.angularVelocity = .zero
+    mainCircle.position = scene.getRandomSpawnPoint()
+    
+    initWetChildren()
   }
 
   // MARK: Helpers
@@ -204,11 +225,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func disown(wetChild: DDPlayerDroplet) {
-    guard wetChild.lock == .none else {
+    guard case .none = wetChild.lock else {
       return
     }
     
-    wetChild.lock = .banishing
+    wetChild.lock = .disowning
     guard wetChildren.remove(wetChild) != nil else {
       return
     }
@@ -277,7 +298,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       let distance = mainCircle.position.distance(to: child.position)
 
       if (distance > DDPlayerNode.DETACH_DISTANCE) {
-        print("--child strayed too far-- \(child.lock) \(child)")
         disown(wetChild: child)
         child.onRelease()
         child.removeFromParent()
@@ -390,8 +410,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     
     let sizeScaleFactor = log(CGFloat(wetChildren.count))
     
-    print("--size-- \(wetChildren.count) \(sizeScaleFactor)")
-    
     let direction = CGVector(
       dx: (CGFloat(x) * 10_000 * sizeScaleFactor),
       dy: (CGFloat(y) * 6_000 * sizeScaleFactor)
@@ -440,7 +458,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     return wetChildren
       .compactMap { wetChild in wetChild.physicsBody }
       .flatMap { wetBody in wetBody.allContactedBodies() }
-      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground }
+      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground.rawValue }
       .reduce(into: [SKPhysicsBody: Int]()) { counts, groundBody in
         counts[groundBody] = (counts[groundBody] ?? 0) + 1
       }
@@ -457,9 +475,13 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       sum + n
     }
   }
+
+  func handleCollision(withDeath: SKNode) {
+    respawn()
+  }
   
   func handleCollision(withGround: SKNode) {
-    self.resetJumps()
+    resetJumps()
   }
   
   func handleForceTouch(force: CGFloat) {
@@ -467,7 +489,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
   
   func resetJumps() {
-    self.resetJumps(withContacts: self.getGroundContacts())
+    resetJumps(withContacts: self.getGroundContacts())
   }
   
   func resetJumps(withContacts groundContacts: [SKPhysicsBody: Int]) {
@@ -475,7 +497,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
 
-    let contactCount = self.getGroundContactsTotalCount(withContacts: groundContacts)
+    let contactCount = getGroundContactsTotalCount(withContacts: groundContacts)
 
     if contactCount >= 4 {
       jumpsSinceLastGroundTouch = 0
@@ -493,8 +515,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
     
-    let groundContacts = self.getGroundContacts()
-    let totalContactCount = self.getGroundContactsTotalCount(withContacts: groundContacts)
+    let groundContacts = getGroundContacts()
+    let totalContactCount = getGroundContactsTotalCount(withContacts: groundContacts)
     
     self.resetJumps(withContacts: groundContacts)
 

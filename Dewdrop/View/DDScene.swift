@@ -41,18 +41,20 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   }
 
   func start() {
+    initBoundaries()
+    
     // TOUCH INPUT
     
-    #if os(iOS)
+#if os(iOS)
     aimTouchNode.name = "Aim touch"
     addChild(aimTouchNode)
-
+    
     moveTouchNode.name = "Movement touch"
     addChild(moveTouchNode)
-    #endif
-
+#endif
+    
     // PHYSICS
-
+    
     physicsWorld.contactDelegate = self
     physicsWorld.gravity.dy = -15
     
@@ -60,6 +62,30 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     
     for effect in sceneEffects {
       effect.start()
+    }
+  }
+
+  // MARK: Death & respawn
+
+  func initBoundaries() {
+    guard let scene = scene else {
+      fatalError("No scene")
+    }
+    
+    for deathsRect in frame.getBorderRects(ofWidth: 100) {
+      print("--dr-- \(deathsRect)")
+      
+      let deathsHead = SKShapeNode(rect: deathsRect)
+
+      scene.addChild(deathsHead)
+      deathsHead.position = deathsRect.origin
+      
+      deathsHead.physicsBody = SKPhysicsBody(rectangleOf: deathsRect.size)
+      deathsHead.physicsBody!.affectedByGravity = false
+      deathsHead.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
+      deathsHead.physicsBody!.categoryBitMask = DDBitmask.death.rawValue
+      deathsHead.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet.rawValue
+      deathsHead.physicsBody!.pinned = true
     }
   }
 
@@ -74,10 +100,16 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       fatalError("Scene has no spawnPointParent")
     }
   }
+  
+  func getRandomSpawnPoint() -> CGPoint {
+    guard let spawnPointParent = spawnPointParent, scene != nil else {
+      fatalError("No scene or spawnPointParent")
+    }
+    
+    return spawnPointParent.children.randomElement()!.position
+  }
 
   func getNextSpawnPoint() -> CGPoint {
-    spawnPointIndex += 1
-    
     guard let scene = scene, let spawnPointParent = spawnPointParent else {
       fatalError("No scene or spawnPointParent")
     }
@@ -85,6 +117,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     if spawnPointIndex == spawnPointParent.children.endIndex {
       spawnPointIndex = 0
     }
+    
+    spawnPointIndex += 1
 
     return spawnPointParent.children[spawnPointIndex].getPosition(within: scene)
   }
@@ -99,10 +133,10 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       let leaf = leafAnchor.children.first!
 
       leafAnchor.physicsBody = SKPhysicsBody()
-      leafAnchor.physicsBody?.pinned = true
+      leafAnchor.physicsBody!.pinned = true
 
-      leaf.physicsBody!.categoryBitMask = DDBitmask.ground
-      leaf.physicsBody!.collisionBitMask = DDBitmask.ALL ^ DDBitmask.ground
+      leaf.physicsBody!.categoryBitMask = DDBitmask.ground.rawValue
+      leaf.physicsBody!.collisionBitMask = DDBitmask.ALL.rawValue ^ DDBitmask.ground.rawValue
 
       let leafAnchorScenePosition = leafAnchor.getPosition(within: scene!)
       let leafScenePosition = leaf.getPosition(within: scene!)
@@ -262,15 +296,29 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       return false
     }
 
-    if nodeA.physicsBody?.categoryBitMask == DDBitmask.ground {
-      droplet.owner?.handleCollision(withGround: nodeA)
-    } else if nodeB.physicsBody?.categoryBitMask == DDBitmask.ground {
-      droplet.owner?.handleCollision(withGround: nodeB)
-    } else {
-      return false
+    for node in [ nodeA, nodeB ] {
+      guard let bitmask = node.physicsBody?.categoryBitMask,
+            let ddBitmask = DDBitmask(rawValue: bitmask) else {
+        continue
+      }
+      
+      guard ddBitmask != .playerDroplet else {
+        continue;
+      }
+      
+      switch ddBitmask {
+      case .death:
+        droplet.owner?.handleCollision(withDeath: node)
+        return true
+      case .ground:
+        droplet.owner?.handleCollision(withGround: nodeA)
+        return true
+      default:
+        continue
+      }
     }
     
-    return true
+    return false
   }
 
   // MARK: Helpers

@@ -11,8 +11,8 @@ import SpriteKit
 enum DDDropletLock {
   case none
   
-  case banishing
   case chambering
+  case disowning
   case evaporating
 }
 
@@ -25,6 +25,16 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
   
   var lock: DDDropletLock = .none
 
+  // MARK: API
+  
+  func destroy() {
+    owner?.disown(wetChild: self)
+    onRelease()
+    removeFromParent()
+  }
+  
+  // MARK: Handlers
+  
   func onCatch(by newOwner: DDPlayerNode) {
     owner = newOwner
     lock = .none
@@ -48,10 +58,13 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
     physicsBody!.affectedByGravity = true
     physicsBody!.friction = 0.5
     physicsBody!.mass = DDPlayerDroplet.MASS
-    physicsBody!.categoryBitMask = DDBitmask.playerDroplet
+    physicsBody!.categoryBitMask = DDBitmask.playerDroplet.rawValue
     physicsBody!.collisionBitMask =
-      DDBitmask.ALL ^ DDBitmask.playerGun
+      DDBitmask.ALL.rawValue ^
+      DDBitmask.playerGun.rawValue
     physicsBody!.contactTestBitMask =
-      DDBitmask.playerDroplet ^ DDBitmask.ground
+      DDBitmask.playerDroplet.rawValue ^
+      DDBitmask.ground.rawValue ^
+      DDBitmask.death.rawValue
   }
 }

@@ -8,11 +8,15 @@
 import Foundation
 import SceneKit
 
-class DDBitmask {
-  static let ALL:  UInt32 = 0b11111111111111111111111111111111
-  static let NONE: UInt32 = 0b00000000000000000000000000000000
+enum DDBitmask: UInt32 {
+  typealias RawValue = UInt32
+  
+ 
+  case ALL  = 0b11111111111111111111111111111111
+  case NONE = 0b00000000000000000000000000000000
 
-  static let ground:        UInt32 = 0x1 << 0
-  static let playerGun:     UInt32 = 0x1 << 1
-  static let playerDroplet: UInt32 = 0x1 << 2
+  case ground        = 0b1
+  case death         = 0b10
+  case playerGun     = 0b100
+  case playerDroplet = 0b1000
 }

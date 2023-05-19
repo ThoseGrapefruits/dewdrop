@@ -91,8 +91,8 @@ class DDGun : SKShapeNode {
       chamberedCategoryBitmask = dropletPhysicsBody.categoryBitMask
       chamberedCollisionBitmask = dropletPhysicsBody.collisionBitMask
 
-      dropletPhysicsBody.categoryBitMask = DDBitmask.NONE
-      dropletPhysicsBody.collisionBitMask = DDBitmask.NONE
+      dropletPhysicsBody.categoryBitMask = DDBitmask.NONE.rawValue
+      dropletPhysicsBody.collisionBitMask = DDBitmask.NONE.rawValue
     }
 
     droplet.removeFromParent()
