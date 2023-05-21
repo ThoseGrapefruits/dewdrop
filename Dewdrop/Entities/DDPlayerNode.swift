@@ -33,11 +33,19 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   static let WAIT_AIM         = SKAction.wait(forDuration: 0.05)
   static let WAIT_CHARGE_SHOT = SKAction.wait(forDuration: 0.5)
   static let WAIT_FOLLOW      = SKAction.wait(forDuration: 0.1)
-  static let WAIT_CHECK       = SKAction.wait(forDuration: 0.5)
+  static let WAIT_RESIZE      = SKAction.wait(forDuration: 0.1)
+  static let WAIT_CHECK       = SKAction.wait(forDuration: 0.3)
 
   static let GUN_MASS: CGFloat = 2.0
   static let PD_COUNT_INIT = 22
   static let PD_COUNT_MAX = 40
+  
+  // MARK: Getters
+
+  func getPlayerRadius(isInit: Bool = false) -> CGFloat {
+    let count = CGFloat(isInit ? Self.PD_COUNT_INIT : wetChildren.count)
+    return count * Self.PLAYER_RADIUS_FACTOR
+  }
 
   // MARK: Child nodes
 
@@ -45,7 +53,9 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     points: &GUN_SHAPE,
     count: GUN_SHAPE.count)
   let gunAnchor = SKNode()
-  let mainCircle = SKShapeNode(circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
+  let mainCircle = SKShapeNode(
+    circleOfRadius: PLAYER_RADIUS_FACTOR * CGFloat(PD_COUNT_INIT)
+  )
 
   // MARK: State
 
@@ -71,15 +81,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     for i in wetChildren.count...count {
       let wetChild = DDPlayerDroplet(circleOfRadius: DDPlayerDroplet.RADIUS)
 
-      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(DDPlayerNode.PD_COUNT_INIT)
-      let offsetX = cos(angle) * DDPlayerNode.PLAYER_RADIUS
-      let offsetY = sin(angle) * DDPlayerNode.PLAYER_RADIUS
+      let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(Self.PD_COUNT_INIT)
+      let offsetX = cos(angle) * getPlayerRadius(isInit: true)
+      let offsetY = sin(angle) * getPlayerRadius(isInit: true)
 
-      wetChild.name = "PD \(i)"
-
-      baptiseWetChild(newChild: wetChild, position: CGPoint(
-        x: mainCircle.position.x + offsetX,
-        y: mainCircle.position.y + offsetY)
+      baptiseWetChild(
+        newChild: wetChild,
+        position: CGPoint(
+          x: mainCircle.position.x + offsetX,
+          y: mainCircle.position.y + offsetY),
+        isInit: true
       )
     }
   }
@@ -116,7 +127,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.strokeColor = .blue
 
     mainCircle.physicsBody = SKPhysicsBody(
-      circleOfRadius: DDPlayerNode.PLAYER_RADIUS)
+      circleOfRadius: getPlayerRadius(isInit: true))
 
     mainCircle.physicsBody!.angularDamping = 3
     mainCircle.physicsBody!.isDynamic = true
@@ -183,7 +194,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   // MARK: Helpers
 
-  func baptiseWetChild(newChild: DDPlayerDroplet, position: CGPoint? = .none) {
+  func baptiseWetChild(
+    newChild: DDPlayerDroplet,
+    position: CGPoint? = .none,
+    isInit: Bool = false
+  ) {
     if wetChildren.contains(newChild) {
       return;
     }
@@ -210,8 +225,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
       // Fake initial position to set the joint in the right place
       newChild.position = CGPoint(
-        x: mainCircle.position.x + cos(angle) * DDPlayerNode.PLAYER_RADIUS,
-        y: mainCircle.position.y + sin(angle) * DDPlayerNode.PLAYER_RADIUS)
+        x: mainCircle.position.x + cos(angle) * getPlayerRadius(isInit: isInit),
+        y: mainCircle.position.y + sin(angle) * getPlayerRadius(isInit: isInit))
 
       linkArms(wetChild: newChild)
 
@@ -222,6 +237,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     wetChildren.insert(newChild)
     updateGunPosition()
+    updateMainCircleSize()
   }
 
   func disown(wetChild: DDPlayerDroplet) {
@@ -235,6 +251,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
 
     updateGunPosition()
+    updateMainCircleSize()
 
     guard let jointsForWetChild = joints.removeValue(forKey: wetChild) else {
       return
@@ -273,7 +290,14 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func updateGunPosition() {
-    gun.position = CGPoint(x: CGFloat(wetChildren.count) / 2.0, y: 0)
+    gun.position = CGPoint(x: getPlayerRadius(), y: 0)
+  }
+  
+  func updateMainCircleSize() {
+    mainCircle.run(SKAction.scale(
+      to: getPlayerRadius() / getPlayerRadius(isInit: true),
+      duration: Self.WAIT_RESIZE.duration
+    ))
   }
 
   // MARK: Game loops
