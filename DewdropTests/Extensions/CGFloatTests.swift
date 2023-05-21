@@ -12,8 +12,6 @@ import XCTest
 import SpriteKit
 
 class CGFloatTests: XCTestCase {
-
-
   func testClampAboveRange() {
     let clamped = CGFloat(8).clamp(above: 0, below: 7)
     XCTAssertEqual(clamped, 7, accuracy: 0.001)
@@ -44,14 +42,48 @@ class CGFloatTests: XCTestCase {
     XCTAssertEqual(clamped, CGFloat.zero, accuracy: 0.001)
   }
 
-  func testWrapSimple() throws {
-    let difference = 0.7
-    let result = (CGFloat.pi * 2 + difference).wrap(around: CGFloat.pi)
-    XCTAssertEqual(result, difference, accuracy: 0.0000001)
+  func testWrapCirclePositiveOutside() throws {
+    let result = (CGFloat.pi * 2 + 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, 2, accuracy: 0.0000001)
+  }
+
+  func testWrapCirclePositiveBetween() throws {
+    let result = (CGFloat.pi * 2 + 4).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, -2.283, accuracy: 0.001)
+  }
+  
+  func testWrapCirclePositiveOutsideFar() throws {
+    let result = (CGFloat.pi * 4 + 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, 2, accuracy: 0.0000001)
+  }
+
+  func testWrapCirclePositiveInside() throws {
+    let result = (CGFloat.pi * 2 + 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, 2, accuracy: 0.0000001)
+  }
+  
+  func testWrapCircleNegativeBetween() throws {
+    let result = (-CGFloat.pi * 2 - 4).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, 2.283, accuracy: 0.001)
+  }
+  
+  func testWrapCircleNegativeOutside() throws {
+    let result = (-CGFloat.pi * 2 - 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, -2, accuracy: 0.0000001)
+  }
+
+  func testWrapCircleNegativeInside() throws {
+    let result = (-CGFloat.pi * 2 + 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, 2, accuracy: 0.0000001)
+  }
+  
+  func testWrapCircleNegativeOutsideFar() throws {
+    let result = (-CGFloat.pi * 4 - 2).wrap(around: CGFloat.pi)
+    XCTAssertEqual(result, -2, accuracy: 0.0000001)
   }
 
   func testWrapOverload() throws {
-    let result = CGFloat(10000000).wrap(around: 1)
+    let result = CGFloat(10e14).wrap(around: 1)
     XCTAssertEqual(result, 0, accuracy: 0.0000001)
   }
 }
