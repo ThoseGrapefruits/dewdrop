@@ -16,7 +16,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var moveTouchNode: DDMoveTouchNode = DDMoveTouchNode()
   var aimTouch: UITouch? = .none
   var aimTouchNode: DDAimTouchNode = DDAimTouchNode()
-  var playerNode: DDPlayerNode? = .nil
+  var playerNode: DDPlayerNode? = .none
   #else
   var playerNodes: [DDPlayerNode] = []
   #endif
@@ -73,19 +73,19 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     }
     
     for deathsRect in frame.getBorderRects(ofWidth: 100) {
-      print("--dr-- \(deathsRect)")
-      
       let deathsHead = SKShapeNode(rect: deathsRect)
 
       scene.addChild(deathsHead)
       deathsHead.position = deathsRect.origin
+      let deathsBody = SKPhysicsBody(rectangleOf: deathsRect.size)
       
-      deathsHead.physicsBody = SKPhysicsBody(rectangleOf: deathsRect.size)
-      deathsHead.physicsBody!.affectedByGravity = false
-      deathsHead.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
-      deathsHead.physicsBody!.categoryBitMask = DDBitmask.death.rawValue
-      deathsHead.physicsBody!.contactTestBitMask = DDBitmask.playerDroplet.rawValue
-      deathsHead.physicsBody!.pinned = true
+      deathsBody.affectedByGravity = false
+      deathsBody.collisionBitMask = DDBitmask.NONE.rawValue
+      deathsBody.categoryBitMask = DDBitmask.death.rawValue
+      deathsBody.contactTestBitMask = DDBitmask.playerDroplet.rawValue
+      deathsBody.pinned = true
+      
+      deathsHead.physicsBody = deathsBody
     }
   }
 
@@ -191,8 +191,10 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   // MARK: Scene effects
 
   func setupSceneEffects() {
-    sceneEffects.append(DDWeatherCycle()
-      .addToScene(scene: scene as! DDScene, position: CGPoint(x: 0, y: 0)))
+    sceneEffects.append(DDWeatherCycle().addToScene(
+      scene: scene as! DDScene,
+      position: CGPoint(x: 0, y: 0)
+    ))
   }
   
   // MARK: Controller input

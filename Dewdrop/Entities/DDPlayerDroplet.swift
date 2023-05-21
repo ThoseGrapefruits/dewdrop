@@ -24,17 +24,24 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
   weak private(set) var owner:     DDPlayerNode? = .none
   
   var lock: DDDropletLock = .none
+  
+  // MARK: SKNode
+
+  override var name: String? {
+    get { "DDPlayerDroplet (\(owner?.name ?? "ownerless"))" }
+    set {}
+  }
 
   // MARK: API
-  
+
   func destroy() {
     owner?.disown(wetChild: self)
     onRelease()
     removeFromParent()
   }
-  
+
   // MARK: Handlers
-  
+
   func onCatch(by newOwner: DDPlayerNode) {
     owner = newOwner
     lock = .none
@@ -57,6 +64,7 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
     physicsBody!.isDynamic = true
     physicsBody!.affectedByGravity = true
     physicsBody!.friction = 0.5
+    physicsBody!.restitution = 0
     physicsBody!.mass = DDPlayerDroplet.MASS
     physicsBody!.categoryBitMask = DDBitmask.playerDroplet.rawValue
     physicsBody!.collisionBitMask =

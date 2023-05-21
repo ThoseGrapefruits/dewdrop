@@ -39,4 +39,11 @@ class DDAimTouchNode : SKNode {
 
     addChild(touchPosition)
   }
+  
+  // MARK: SKNode
+  
+  override var name: String? {
+    get { "DDAimTouchNode \(touchPosition.position.debugDescription)" }
+    set {}
+  }
 }

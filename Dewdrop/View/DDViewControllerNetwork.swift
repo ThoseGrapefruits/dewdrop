@@ -28,7 +28,7 @@ class DDViewControllerNetwork: UIViewController, DDSpawnDelegate {
     self.findMatch()
 
     self.scene = DDScene(fileNamed: "TestLevel")!
-    self.scene!.addToScene(scene: self.scene!)
+    self.scene = self.scene!.addToScene(scene: self.scene!)
   }
   
   func findMatch() {
@@ -50,7 +50,7 @@ class DDViewControllerNetwork: UIViewController, DDSpawnDelegate {
       match.delegate = DDNetworkMatch.singleton
 
       self.scene = DDScene(fileNamed: "TestLevel")!
-      self.scene!.addToScene(scene: self.scene!)
+      self.scene = self.scene!.addToScene(scene: self.scene!)
       DDNetworkMatch.singleton.scene = self.scene
 
       self.startLocalGame()

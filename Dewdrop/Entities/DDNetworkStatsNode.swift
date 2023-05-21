@@ -10,6 +10,14 @@ import SceneKit
 import SpriteKit
 
 class DDNetworkStatsNode : SKNode {
+  
+  // MARK: SKNode
+  
+  override var name: String? {
+    get { "DDNetworkStatsNode" }
+    set {}
+  }
+  
   var tracker: DDNetworkActivityTracker? = .none
 
   let intervalSeconds: TimeInterval = 1

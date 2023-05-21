@@ -131,4 +131,11 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
       node.destroy()
     }
   }
+  
+  // MARK: SKNode
+  
+  override var name: String? {
+    get { "DDWeatherCycle \(cycle)" }
+    set {}
+  }
 }

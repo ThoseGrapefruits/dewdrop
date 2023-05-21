@@ -9,6 +9,8 @@ import Foundation
 import SpriteKit
 
 extension CGVector {
+
+  /// Euclidean distance, treating this and the target vectors as (x, y) coordinates
   func distance(to: CGVector) -> CGFloat {
     return sqrt(pow(to.dx - dx, 2) + pow(to.dy - dy, 2))
   }

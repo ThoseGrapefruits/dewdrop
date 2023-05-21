@@ -9,6 +9,14 @@ import Foundation
 import SpriteKit
 
 class DDMoveTouchNode : SKNode {
+  
+  // MARK: SKNode
+  
+  override var name: String? {
+    get { "DDMoveTouchNode \(touchPosition.position.debugDescription)" }
+    set {}
+  }
+  
   let touchPosition = SKShapeNode(circleOfRadius: 20)
 
   private var _fingerDown = false

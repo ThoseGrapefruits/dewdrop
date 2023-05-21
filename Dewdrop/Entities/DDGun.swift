@@ -221,4 +221,11 @@ class DDGun : SKShapeNode {
     
     return .none
   }
+
+  // MARK: SKNode
+  
+  override var name: String? {
+    get { "DDGun of \(playerNode?.name ?? "no player")" }
+    set {}
+  }
 }
