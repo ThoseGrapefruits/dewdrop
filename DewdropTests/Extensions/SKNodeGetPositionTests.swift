@@ -89,7 +89,7 @@ class SKNodeGetPositionTests: XCTestCase {
   func testGetPositionAndRotationPerformance() throws {
     let elderNode = SKNode()
     var node = elderNode
-    let count = 2500
+    let count = 5000
     for i in 0..<count {
       node.position = CGPoint(x: i, y: i)
       node.zRotation = (CGFloat.pi * 2 / CGFloat(count)) * CGFloat(i)
@@ -100,8 +100,8 @@ class SKNodeGetPositionTests: XCTestCase {
 
     measure {
       let (position, rotation) = node.getPositionAndRotation(within: elderNode)
-      XCTAssertEqual(position.x, 1676.81,     accuracy: 0.01)
-      XCTAssertEqual(position.y, -85092.24,   accuracy: 0.01)
+      XCTAssertEqual(position.x, 3369.63,     accuracy: 0.01)
+      XCTAssertEqual(position.y, -243408.14,   accuracy: 0.01)
       XCTAssertEqual(rotation,   -CGFloat.pi, accuracy: 0.00001)
     }
   }

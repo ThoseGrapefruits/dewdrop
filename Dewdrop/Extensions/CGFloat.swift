@@ -28,7 +28,7 @@ extension CGFloat {
     return self
   }
 
-  /// Seeks to truncate a value back into the `[-boundary,boundary]` range, modulo `boundary * 2`. This is mainly useful for pulling things back into the unit circle with `boundary: CGFloat.pi`.
+  /// Seeks to truncate a value back into the `[-boundary,boundary]` range, modulo `boundary * 2`. This is mainly useful for pulling things back into their closest-to-zero representation within the unit circle with `boundary: CGFloat.pi`.
   func wrap(around boundary: CGFloat) -> CGFloat {
     let doubleBoundary = boundary * 2
     let remainder = truncatingRemainder(dividingBy: doubleBoundary)

@@ -36,25 +36,27 @@ extension SKNode {
     position childPosition: CGPoint,
     rotation childRotation: CGFloat
   ) -> (CGPoint, CGFloat) {
-    guard let parent = parent, self != ancestor else {
-      return (childPosition, childRotation)
-    }
+    var node = self
+    var childPosition = CGPoint.zero
+    var childRotation = CGFloat.zero
 
-    let cosZ = cos(zRotation)
-    let sinZ = sin(zRotation)
+    while let nodeParent = node.parent, node != ancestor {
+      let cosZ = cos(node.zRotation)
+      let sinZ = sin(node.zRotation)
 
-    let position = CGPoint(
-        x: position.x
+      childPosition = CGPoint(
+        x: node.position.x
            + cosZ * childPosition.x
            - sinZ * childPosition.y,
-        y: position.y
+        y: node.position.y
            + sinZ * childPosition.x
            + cosZ * childPosition.y)
+      childRotation = (childRotation + node.zRotation).wrap(around: CGFloat.pi)
 
-    let rotation = (childRotation + zRotation).wrap(around: CGFloat.pi)
+      node = nodeParent
+    }
 
-    return parent.getPositionAndRotation(
-      within: ancestor, position: position, rotation: rotation)
+    return (childPosition, childRotation)
   }
 
   func getPositionAndRotation(within ancestor: SKNode) -> (CGPoint, CGFloat) {
