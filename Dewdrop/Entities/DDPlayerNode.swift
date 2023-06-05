@@ -191,11 +191,23 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       wetChildren.first?.destroy()
     }
 
+    updateGunPosition()
     mainCircle.physicsBody!.velocity = .zero
     mainCircle.physicsBody!.angularVelocity = .zero
-    mainCircle.position = scene.getRandomSpawnPoint()
     
-    initWetChildren()
+    run(SKAction.wait(forDuration: 0.1)) { [weak self] in
+      self?.mainCircle.position = scene.getRandomSpawnPoint()
+      self?.updateGunPosition()
+      self?.mainCircle.physicsBody!.velocity = .zero
+      self?.mainCircle.physicsBody!.angularVelocity = .zero
+      
+      self?.run(SKAction.wait(forDuration: 0.1)) { [weak self] in
+        self?.mainCircle.physicsBody!.velocity = .zero
+        self?.mainCircle.physicsBody!.angularVelocity = .zero
+        self?.initWetChildren()
+        self?.updateGunPosition()
+      }
+    }
   }
 
   // MARK: Helpers
