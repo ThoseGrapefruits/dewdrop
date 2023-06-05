@@ -16,7 +16,7 @@ enum DDDropletLock {
   case evaporating
 }
 
-class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
+class DDDroplet : SKShapeNode, DDPhysicsNode {
   static let MASS: CGFloat = 0.5
   static let RADIUS: CGFloat = 4.2
 
@@ -45,19 +45,27 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
   func onCatch(by newOwner: DDPlayerNode) {
     owner = newOwner
     lock = .none
+
+    physicsBody!.categoryBitMask = DDBitmask.dropletPlayer.rawValue
+    physicsBody!.contactTestBitMask ^= DDBitmask.dropletPlayer.rawValue
+    physicsBody!.contactTestBitMask |= DDBitmask.dropletFree.rawValue
   }
 
   func onRelease() {
     lastOwner = owner
     owner = .none
     lock = .none
+
+    physicsBody!.categoryBitMask = DDBitmask.dropletFree.rawValue
+    physicsBody!.contactTestBitMask ^= DDBitmask.dropletFree.rawValue
+    physicsBody!.contactTestBitMask |= DDBitmask.dropletPlayer.rawValue
   }
   
   // MARK: DDPhysicsNode
 
   func initPhysics() {
     if physicsBody == nil {
-      physicsBody = SKPhysicsBody(circleOfRadius: DDPlayerDroplet.RADIUS)
+      physicsBody = SKPhysicsBody(circleOfRadius: DDDroplet.RADIUS)
     }
 
     physicsBody!.linearDamping = 1
@@ -65,14 +73,14 @@ class DDPlayerDroplet : SKShapeNode, DDPhysicsNode {
     physicsBody!.affectedByGravity = true
     physicsBody!.friction = 0.5
     physicsBody!.restitution = 0
-    physicsBody!.mass = DDPlayerDroplet.MASS
-    physicsBody!.categoryBitMask = DDBitmask.playerDroplet.rawValue
+    physicsBody!.mass = DDDroplet.MASS
+    physicsBody!.categoryBitMask = DDBitmask.dropletFree.rawValue
     physicsBody!.collisionBitMask =
       DDBitmask.ALL.rawValue ^
-      DDBitmask.playerGun.rawValue
+      DDBitmask.gunPlayer.rawValue
     physicsBody!.contactTestBitMask =
-      DDBitmask.playerDroplet.rawValue ^
-      DDBitmask.ground.rawValue ^
+      DDBitmask.dropletPlayer.rawValue |
+      DDBitmask.GROUND_ANY.rawValue |
       DDBitmask.death.rawValue
   }
 }

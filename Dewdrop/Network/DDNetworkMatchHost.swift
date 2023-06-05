@@ -42,11 +42,14 @@ extension DDNetworkMatch {
       fatalError("Cannot handle spawn request as non-host")
     }
 
-    let instance = spawnRequest.type.instantiate()
-    (instance as! DDSceneAddable?)?.addToScene(
+    let instance: DDSceneAddable? = (spawnRequest.type.instantiate() as? DDSceneAddable)?.addToScene(
       scene: scene!,
       position: scene!.getNextSpawnPoint()
     )
+    
+    guard let instance = instance else {
+      fatalError("bad instance \(String(describing: instance))")
+    }
 
     let parent = instance.parent
 

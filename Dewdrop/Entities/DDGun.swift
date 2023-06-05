@@ -28,7 +28,7 @@ class DDGun : SKShapeNode {
 
   // MARK: State
 
-  var chambered: DDPlayerDroplet? = .none
+  var chambered: DDDroplet? = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
   var cravesLaunch = false
@@ -77,7 +77,7 @@ class DDGun : SKShapeNode {
 
   // MARK: Actions
 
-  func chamberDroplet(_ droplet: DDPlayerDroplet) {
+  func chamberDroplet(_ droplet: DDDroplet) {
     guard chambered == nil else {
       return
     }
@@ -217,9 +217,9 @@ class DDGun : SKShapeNode {
       x: targetPosition.x,
       y: targetPosition.y + DDPlayerNode.AIM_OFFSET)
     return selfPosition.angle(to: targetPositionOffset)
-    #endif
-    
+    #else
     return .none
+    #endif
   }
 
   // MARK: SKNode

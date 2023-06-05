@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		0202D1AD2A16BCBF000BFD12 /* CGRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0202D1AC2A16BCBF000BFD12 /* CGRect.swift */; };
 		0202D1AE2A16BCBF000BFD12 /* CGRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0202D1AC2A16BCBF000BFD12 /* CGRect.swift */; };
+		021838FA2A2CF47500633499 /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021838F92A2CF47500633499 /* UInt32.swift */; };
+		021838FB2A2CF47500633499 /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021838F92A2CF47500633499 /* UInt32.swift */; };
+		021838FC2A2CF91E00633499 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
+		021838FD2A2CF91E00633499 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */; };
 		02231A3729E2FF270015A59F /* TestLevel.sks in Resources */ = {isa = PBXBuildFile; fileRef = DCC29BA1269223ED0023D58E /* TestLevel.sks */; };
 		0263C56D2A0C055400C738D7 /* DDWeatherCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */; };
 		0263C56E2A0C055400C738D7 /* DDSceneEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125292A03F4E700818A3B /* DDSceneEffect.swift */; };
@@ -34,7 +38,7 @@
 		02B9BE7929CF41D200ED31A6 /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
 		02B9BE7A29CF41D200ED31A6 /* DDMoveTouchNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */; };
 		02B9BE7B29CF41D200ED31A6 /* DDNetworkStatsNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC882C8E26DC508300E80E7B /* DDNetworkStatsNode.swift */; };
-		02B9BE7C29CF41D200ED31A6 /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
+		02B9BE7C29CF41D200ED31A6 /* DDDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDDroplet.swift */; };
 		02B9BE7D29CF41D200ED31A6 /* DDPlayerNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29B98269206720023D58E /* DDPlayerNode.swift */; };
 		02B9BE7E29CF41D200ED31A6 /* DDSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC29BA3269226690023D58E /* DDSceneAddable.swift */; };
 		02B9BE7F29CF41D200ED31A6 /* SKNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCFE14E9269B4EE200896428 /* SKNode.swift */; };
@@ -48,8 +52,6 @@
 		02B9BE8729CF41D200ED31A6 /* DDView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCD192F2693E026002F5585 /* DDView.swift */; };
 		02B9BE8829CF41D200ED31A6 /* DDHUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCEBE05A26FCD27F00F3F916 /* DDHUD.swift */; };
 		02B9BE8C29CF41E000ED31A6 /* DDAudioNodeGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */; };
-		02B9BE8D29CF41EA00ED31A6 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
-		02B9BE8E29CF41EA00ED31A6 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */; };
 		02B9BE8F29CF420200ED31A6 /* DDNetworkDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC0E80B826C9955700A37917 /* DDNetworkDelegate.swift */; };
 		02B9BE9029CF420200ED31A6 /* SKNodeCapturedFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */; };
 		02B9BE9129CF420200ED31A6 /* DDFieldChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC49820626D47B93000359FE /* DDFieldChange.swift */; };
@@ -107,7 +109,7 @@
 		DCAE32CE26A66A4D0079BCC7 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
 		DCB42DE926DDD5A900866ACF /* CGVector.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB42DE826DDD5A900866ACF /* CGVector.swift */; };
 		DCB6530C26A901E60097839C /* DDAudioNodeGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */; };
-		DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */; };
+		DCB9A97C2698F0E700B396CC /* DDDroplet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97B2698F0E700B396CC /* DDDroplet.swift */; };
 		DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9A97D2698F28F00B396CC /* DDGun.swift */; };
 		DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */; };
 		DCB9B6D426D84C30007627EF /* SKNodeCapturedFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */; };
@@ -157,6 +159,7 @@
 
 /* Begin PBXFileReference section */
 		0202D1AC2A16BCBF000BFD12 /* CGRect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRect.swift; sourceTree = "<group>"; };
+		021838F92A2CF47500633499 /* UInt32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt32.swift; sourceTree = "<group>"; };
 		0258850928936C310017898B /* Dewdrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dewdrop.entitlements; sourceTree = "<group>"; };
 		0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneEffectSceneAddable.swift; sourceTree = "<group>"; };
 		0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPhysicsNode.swift; sourceTree = "<group>"; };
@@ -219,7 +222,7 @@
 		DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */ = {isa = PBXFileReference; lastKnownFileType = file; path = FSLaunchDroplet.aif; sourceTree = "<group>"; };
 		DCB42DE826DDD5A900866ACF /* CGVector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGVector.swift; sourceTree = "<group>"; };
 		DCB6530B26A901E60097839C /* DDAudioNodeGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDAudioNodeGroup.swift; sourceTree = "<group>"; };
-		DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPlayerDroplet.swift; sourceTree = "<group>"; };
+		DCB9A97B2698F0E700B396CC /* DDDroplet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDDroplet.swift; sourceTree = "<group>"; };
 		DCB9A97D2698F28F00B396CC /* DDGun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDGun.swift; sourceTree = "<group>"; };
 		DCB9B6CF26D83A0D007627EF /* DDRPCLastSeen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDRPCLastSeen.swift; sourceTree = "<group>"; };
 		DCB9B6D326D84C30007627EF /* SKNodeCapturedFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SKNodeCapturedFields.swift; sourceTree = "<group>"; };
@@ -448,7 +451,7 @@
 				DCB9A97D2698F28F00B396CC /* DDGun.swift */,
 				DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */,
 				DC882C8E26DC508300E80E7B /* DDNetworkStatsNode.swift */,
-				DCB9A97B2698F0E700B396CC /* DDPlayerDroplet.swift */,
+				DCB9A97B2698F0E700B396CC /* DDDroplet.swift */,
 				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
 				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
 				0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */,
@@ -518,6 +521,7 @@
 				DC018D1C269EA7260087A835 /* CGPoint.swift */,
 				DCB42DE826DDD5A900866ACF /* CGVector.swift */,
 				0202D1AC2A16BCBF000BFD12 /* CGRect.swift */,
+				021838F92A2CF47500633499 /* UInt32.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -731,13 +735,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				02231A3729E2FF270015A59F /* TestLevel.sks in Resources */,
-				02B9BE8D29CF41EA00ED31A6 /* FSLaunchDroplet.aif in Resources */,
-				02B9BE8E29CF41EA00ED31A6 /* FSChamberDroplet.aif in Resources */,
 				026AD56B29B686C800947BE2 /* Main.storyboard in Resources */,
 				026AD56229B686C800947BE2 /* GameScene.sks in Resources */,
 				026AD56D29B686C900947BE2 /* Assets.xcassets in Resources */,
 				026AD57029B686C900947BE2 /* LaunchScreen.storyboard in Resources */,
 				026AD56429B686C800947BE2 /* Actions.sks in Resources */,
+				021838FC2A2CF91E00633499 /* FSLaunchDroplet.aif in Resources */,
+				021838FD2A2CF91E00633499 /* FSChamberDroplet.aif in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -817,8 +821,9 @@
 				02B9BE7829CF41D200ED31A6 /* DDAimTouchNode.swift in Sources */,
 				02B9BE7929CF41D200ED31A6 /* DDGun.swift in Sources */,
 				02B9BE7A29CF41D200ED31A6 /* DDMoveTouchNode.swift in Sources */,
+				021838FB2A2CF47500633499 /* UInt32.swift in Sources */,
 				02B9BE7B29CF41D200ED31A6 /* DDNetworkStatsNode.swift in Sources */,
-				02B9BE7C29CF41D200ED31A6 /* DDPlayerDroplet.swift in Sources */,
+				02B9BE7C29CF41D200ED31A6 /* DDDroplet.swift in Sources */,
 				02B9BE7D29CF41D200ED31A6 /* DDPlayerNode.swift in Sources */,
 				02B9BE7E29CF41D200ED31A6 /* DDSceneAddable.swift in Sources */,
 				02B9BE7F29CF41D200ED31A6 /* SKNode.swift in Sources */,
@@ -869,7 +874,7 @@
 				DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */,
 				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,
 				DC09EC1126D0273500CCDE49 /* DDNetworkMatch.swift in Sources */,
-				DCB9A97C2698F0E700B396CC /* DDPlayerDroplet.swift in Sources */,
+				DCB9A97C2698F0E700B396CC /* DDDroplet.swift in Sources */,
 				02A1252A2A03F4E700818A3B /* DDSceneEffect.swift in Sources */,
 				DCC29BA4269226690023D58E /* DDSceneAddable.swift in Sources */,
 				DCB9A97E2698F28F00B396CC /* DDGun.swift in Sources */,
@@ -887,6 +892,7 @@
 				DC0754B22697EF2700C9F376 /* DDAimTouchNode.swift in Sources */,
 				DC9C1F3726E9AD7300733995 /* DDNetworkMatchHost.swift in Sources */,
 				DCCD19302693E026002F5585 /* DDView.swift in Sources */,
+				021838FA2A2CF47500633499 /* UInt32.swift in Sources */,
 				02A125282A03F4DD00818A3B /* DDWeatherCycle.swift in Sources */,
 				DC2AB31A26DDF583005838D2 /* DDRPCSyncNodes.swift in Sources */,
 				DCE10DDA26DACF09001229CB /* DDRPCSpawnNodes.swift in Sources */,

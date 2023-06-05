@@ -10,7 +10,7 @@ import SpriteKit
 
 let ddNodeTypeRegistry: [ DDNodeType: SKNode.Type ] = [
   .ddGun: DDGun.self,
-  .ddPlayerDroplet: DDPlayerDroplet.self,
+  .ddPlayerDroplet: DDDroplet.self,
   .ddPlayerNode: DDPlayerNode.self,
   .ddScene: DDScene.self,
   .skNode: SKNode.self
@@ -33,7 +33,7 @@ enum DDNodeType : UInt8, Codable {
     switch node {
       case is DDGun:
         return .ddGun
-      case is DDPlayerDroplet:
+      case is DDDroplet:
         return .ddPlayerDroplet
       case is DDPlayerNode:
         return .ddPlayerNode

@@ -69,7 +69,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   var ddScene: Optional<DDScene> = .none
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
-  var wetChildren = Set<DDPlayerDroplet>()
+  var wetChildren = Set<DDDroplet>()
 
   var chamberDropletAction: Optional<SKAction> = .none
 
@@ -85,7 +85,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   
   func initWetChildren(toCount count: Int = DDPlayerNode.PD_COUNT_INIT) {
     for i in wetChildren.count...count {
-      let wetChild = DDPlayerDroplet(circleOfRadius: DDPlayerDroplet.RADIUS)
+      let wetChild = DDDroplet(circleOfRadius: DDDroplet.RADIUS)
 
       let angle = CGFloat(i) * CGFloat.pi * 2 / CGFloat(Self.PD_COUNT_INIT)
       let offsetX = cos(angle) * getPlayerRadius(isInit: true)
@@ -109,7 +109,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     gunAnchor.physicsBody!.angularDamping = 200
     gunAnchor.physicsBody!.pinned = true
     gunAnchor.physicsBody!.mass = 4
-    gunAnchor.physicsBody!.categoryBitMask = DDBitmask.playerGun.rawValue
+    gunAnchor.physicsBody!.categoryBitMask = DDBitmask.gunPlayer.rawValue
     gunAnchor.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
 
     gun.name = "\(name ?? "unnamed") gun"
@@ -120,7 +120,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
     gun.physicsBody!.pinned = true
     gun.physicsBody!.allowsRotation = false
-    gun.physicsBody!.categoryBitMask = DDBitmask.playerGun.rawValue
+    gun.physicsBody!.categoryBitMask = DDBitmask.gunPlayer.rawValue
     gun.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
     gun.physicsBody!.mass = Self.GUN_MASS
 
@@ -140,11 +140,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.affectedByGravity = false
     mainCircle.physicsBody!.linearDamping = 0.8
     mainCircle.physicsBody!.mass = 14.0
-    mainCircle.physicsBody!.categoryBitMask = DDBitmask.playerDroplet.rawValue
+    mainCircle.physicsBody!.categoryBitMask = DDBitmask.dropletPlayer.rawValue
     mainCircle.physicsBody!.collisionBitMask =
       DDBitmask.ALL.rawValue ^
-      DDBitmask.playerGun.rawValue ^
-      DDBitmask.playerDroplet.rawValue
+      DDBitmask.gunPlayer.rawValue ^
+      DDBitmask.dropletPlayer.rawValue
 
     addChild(mainCircle)
 
@@ -201,7 +201,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   // MARK: Helpers
 
   func baptiseWetChild(
-    newChild: DDPlayerDroplet,
+    newChild: DDDroplet,
     position: CGPoint? = .none,
     isInit: Bool = false
   ) {
@@ -213,10 +213,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
 
-    newChild.onCatch(by: self)
     newChild.initPhysics()
 
     if newChild.parent == nil {
+      newChild.onCatch(by: self)
       addChild(newChild)
 
       if let position = position {
@@ -227,16 +227,16 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     } else {
       let childPosition = newChild.getPosition(within: scene)
       let mainCirclePosition = mainCircle.getPosition(within: scene)
-      let angle = mainCirclePosition.angle(to: childPosition)
+      let holyAngle = mainCirclePosition.angle(to: childPosition)
 
       newChild.removeFromParent()
-
+      newChild.onCatch(by: self)
       addChild(newChild)
 
       // Fake initial position to set the joint in the right place
       newChild.position = CGPoint(
-        x: mainCircle.position.x + cos(angle) * getPlayerRadius(isInit: isInit),
-        y: mainCircle.position.y + sin(angle) * getPlayerRadius(isInit: isInit))
+        x: mainCircle.position.x + cos(holyAngle) * getPlayerRadius(isInit: isInit),
+        y: mainCircle.position.y + sin(holyAngle) * getPlayerRadius(isInit: isInit))
 
       linkArms(wetChild: newChild)
 
@@ -250,7 +250,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     updateMainCircleSize()
   }
 
-  func disown(wetChild: DDPlayerDroplet) {
+  func disown(wetChild: DDDroplet) {
     guard case .none = wetChild.lock else {
       return
     }
@@ -281,7 +281,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     wetChild.lock = .none
   }
 
-  func linkArms(wetChild: DDPlayerDroplet) {
+  func linkArms(wetChild: DDDroplet) {
     let joint = SKPhysicsJointSpring.joint(
       withBodyA: mainCircle.physicsBody!,
       bodyB: wetChild.physicsBody!,
@@ -488,11 +488,11 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   var jumpsSinceLastGroundTouch: Int8 = 0
   var holdingJump = false
   
-  func getGroundContacts() -> [SKPhysicsBody: Int] {
+  func getGroundContacts(withMask mask: DDBitmask = DDBitmask.GROUND_ANY) -> [SKPhysicsBody: Int] {
     return wetChildren
       .compactMap { wetChild in wetChild.physicsBody }
       .flatMap { wetBody in wetBody.allContactedBodies() }
-      .filter { contactBody in contactBody.categoryBitMask == DDBitmask.ground.rawValue }
+      .filter { contactBody in (contactBody.categoryBitMask & mask.rawValue) != 0 }
       .reduce(into: [SKPhysicsBody: Int]()) { counts, groundBody in
         counts[groundBody] = (counts[groundBody] ?? 0) + 1
       }
@@ -510,12 +510,26 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
-  func handleCollision(withDeath: SKNode) {
+  func handleCollision(on: DDDroplet, withDeath: SKNode) {
     respawn()
   }
   
-  func handleCollision(withGround: SKNode) {
+  func handleCollision(on: DDDroplet, withGround ground: SKNode) {
+    guard let pbGround = ground.physicsBody else {
+      return
+    }
+
+    guard 0 != (DDBitmask.GROUND_ANY.rawValue & pbGround.categoryBitMask) else {
+      fatalError("alleged ground contact with non-ground: \(ground)")
+    }
+    
     resetJumps()
+    
+    let isUppies = 0 != (DDBitmask.groundUppies.rawValue & pbGround.categoryBitMask)
+    
+    if isUppies {
+      updateUppieability()
+    }
   }
   
   func handleForceTouch(force: CGFloat) {
@@ -576,10 +590,68 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
+  func updateUppieability(canUppie shouldPassthrough: Bool) {
+    guard let mcpb = mainCircle.physicsBody else {
+      return
+    }
+
+    let uppiesBitmask = DDBitmask.groundUppies.rawValue
+    let canPassthrough = (mcpb.collisionBitMask & uppiesBitmask) == 0
+
+    guard shouldPassthrough != canPassthrough else {
+      return
+    }
+
+    print("--canUppie-- \(shouldPassthrough) \(canPassthrough)")
+    print("\(uppiesBitmask.debugDescription)\n\(mcpb.collisionBitMask.debugDescription)")
+
+    print("--cub-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldPassthrough)")
+
+    if shouldPassthrough {
+      let notUppiesBitmask = ~uppiesBitmask
+      mcpb.collisionBitMask &= notUppiesBitmask
+      for child in wetChildren {
+        child.physicsBody!.collisionBitMask &= notUppiesBitmask
+      }
+    } else {
+      let groundContacts = getGroundContacts(withMask: DDBitmask.groundUppies)
+      let isBelowLeaf = groundContacts.keys
+        .contains { groundPB in
+          mainCircle.getPosition(within: scene!).y + getPlayerRadius() <
+          groundPB.node!.getPosition(within: scene!).y
+        }
+
+      guard !isBelowLeaf else {
+        return
+      }
+
+      mcpb.collisionBitMask |= uppiesBitmask
+      for child in wetChildren {
+        child.physicsBody!.collisionBitMask |= uppiesBitmask
+      }
+    }
+
+    print("--cua-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldPassthrough)")
+  }
+
+  func updateUppieability() {
+    guard let mcpb = mainCircle.physicsBody else {
+      return
+    }
+    
+    guard mcpb.velocity.dy <= 0 || 10 < mcpb.velocity.dy else {
+      return
+    }
+
+    print("--uu-- \( mcpb.velocity.dy )")
+    
+    updateUppieability(canUppie: mcpb.velocity.dy > 0)
+  }
+
   // MARK: Combat
 
   func chamberDroplet() {
-    let closest: Optional<(DDPlayerDroplet, CGFloat)> = wetChildren
+    let closest: Optional<(DDDroplet, CGFloat)> = wetChildren
       .filter { child in child.lock == .none }
       .reduce(.none) { closest, child in
         guard let (_, closestDistance) = closest else {

@@ -29,7 +29,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
   func addToScene(scene: DDScene, position: CGPoint? = .none) -> Self {
     if (scene != self) {
-      fatalError("no")
+      fatalError("adding scene to a different scene? no")
     }
 
     collectSpawnPoints()
@@ -72,8 +72,13 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       fatalError("No scene")
     }
     
+    var index = 0
+    let fillColors: [SKColor] = [.cyan, .magenta, .yellow, .black]
     for deathsRect in frame.getBorderRects(ofWidth: 100) {
-      let deathsHead = SKShapeNode(rect: deathsRect)
+      print("--dr-- \( deathsRect )")
+      let deathsHead = SKShapeNode(rectOf: deathsRect.size)
+
+      deathsHead.fillColor = fillColors[index]
 
       scene.addChild(deathsHead)
       deathsHead.position = deathsRect.origin
@@ -82,10 +87,12 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       deathsBody.affectedByGravity = false
       deathsBody.collisionBitMask = DDBitmask.NONE.rawValue
       deathsBody.categoryBitMask = DDBitmask.death.rawValue
-      deathsBody.contactTestBitMask = DDBitmask.playerDroplet.rawValue
+      deathsBody.contactTestBitMask = DDBitmask.dropletPlayer.rawValue
       deathsBody.pinned = true
       
       deathsHead.physicsBody = deathsBody
+                              
+      index += 1
     }
   }
 
@@ -131,12 +138,23 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
     for leafAnchor in leafAnchors {
       let leaf = leafAnchor.children.first!
+      let isUppies = leaf.userData?["isUppies"] as? Bool ?? false
+
+      print("--setup-uppies-- \(isUppies)")
 
       leafAnchor.physicsBody = SKPhysicsBody()
       leafAnchor.physicsBody!.pinned = true
 
-      leaf.physicsBody!.categoryBitMask = DDBitmask.ground.rawValue
-      leaf.physicsBody!.collisionBitMask = DDBitmask.ALL.rawValue ^ DDBitmask.ground.rawValue
+      leaf.physicsBody!.categoryBitMask = isUppies
+        ? DDBitmask.groundUppies.rawValue
+        : DDBitmask.ground.rawValue
+      leaf.physicsBody!.collisionBitMask =
+        DDBitmask.ALL.rawValue ^
+        DDBitmask.GROUND_ANY.rawValue
+      leaf.physicsBody!.contactTestBitMask =
+        DDBitmask.dropletPlayer.rawValue
+
+      print("--leafuppie-ctbm-- \( leaf.physicsBody!.contactTestBitMask.debugDescription )")
 
       let leafAnchorScenePosition = leafAnchor.getPosition(within: scene!)
       let leafScenePosition = leaf.getPosition(within: scene!)
@@ -196,9 +214,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       position: CGPoint(x: 0, y: 0)
     ))
   }
-  
-  // MARK: Controller input
-  
 
   #if os(iOS)
   // MARK: Touch input
@@ -268,8 +283,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   }
   
   func handleContactDropletDroplet(_ contact: SKPhysicsContact) -> Bool {
-    guard let dropletA = contact.bodyA.node as? DDPlayerDroplet,
-          let dropletB = contact.bodyB.node as? DDPlayerDroplet else {
+    guard let dropletA = contact.bodyA.node as? DDDroplet,
+          let dropletB = contact.bodyB.node as? DDDroplet else {
       return false
     }
 
@@ -292,31 +307,25 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       return false
     }
 
-    let droplet = nodeA as? DDPlayerDroplet ?? nodeB as? DDPlayerDroplet
+    let droplet = nodeA as? DDDroplet ?? nodeB as? DDDroplet
 
     guard let droplet = droplet else {
       return false
     }
 
     for node in [ nodeA, nodeB ] {
-      guard let bitmask = node.physicsBody?.categoryBitMask,
-            let ddBitmask = DDBitmask(rawValue: bitmask) else {
+      guard let bitmask = node.physicsBody?.categoryBitMask else {
         continue
       }
-      
-      guard ddBitmask != .playerDroplet else {
-        continue;
+              
+      if 0 != (bitmask & DDBitmask.death.rawValue) {
+        droplet.owner?.handleCollision(on: droplet, withDeath: node)
+        return true
       }
       
-      switch ddBitmask {
-      case .death:
-        droplet.owner?.handleCollision(withDeath: node)
-        return true
-      case .ground:
-        droplet.owner?.handleCollision(withGround: nodeA)
-        return true
-      default:
-        continue
+      if 0 != (bitmask & DDBitmask.GROUND_ANY.rawValue) {
+        droplet.owner?.handleCollision(on: droplet, withGround: nodeA)
+        return true;
       }
     }
     

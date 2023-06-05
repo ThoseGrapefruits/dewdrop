@@ -80,7 +80,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
       return
     }
 
-    let droplet = DDPlayerDroplet(circleOfRadius: DDPlayerDroplet.RADIUS);
+    let droplet = DDDroplet(circleOfRadius: DDDroplet.RADIUS);
     droplet.initPhysics()
     let xRandom = CGFloat.random(in: scene.frame.minX..<scene.frame.maxX)
     let yTop = scene.frame.maxY + 100
@@ -105,7 +105,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
     
     if isFirstRun {
       scene.children
-        .compactMap { node in node as? DDPlayerDroplet }
+        .compactMap { node in node as? DDDroplet }
         .filter { droplet in droplet.owner == nil }
         .forEach { droplet in evaporate(droplet) }
     }
@@ -124,7 +124,7 @@ class DDWeatherCycle: SKNode, DDSceneEffect {
     }
   }
   
-  private func evaporate(_ node: DDPlayerDroplet) {
+  private func evaporate(_ node: DDDroplet) {
     node.lock = .evaporating
     node.run(DDWeatherCycle.ACTION_SCALE_TO_0) {
       node.lock = .none
