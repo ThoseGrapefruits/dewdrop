@@ -24,6 +24,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var spawnPointParent: SKNode? = .none
   var spawnPointIndex: Int = 0
   var sceneEffects: [DDSceneEffect] = []
+  
+  var uppieLeaves: [SKNode] = [];
 
   // MARK: Initialization
 
@@ -75,7 +77,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     var index = 0
     let fillColors: [SKColor] = [.cyan, .magenta, .yellow, .black]
     for deathsRect in frame.getBorderRects(ofWidth: 100) {
-      print("--dr-- \( deathsRect )")
       let deathsHead = SKShapeNode(rectOf: deathsRect.size)
 
       deathsHead.fillColor = fillColors[index]
@@ -91,7 +92,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       deathsBody.pinned = true
       
       deathsHead.physicsBody = deathsBody
-                              
       index += 1
     }
   }
@@ -146,11 +146,12 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       leafAnchor.physicsBody!.pinned = true
 
       leaf.physicsBody!.categoryBitMask = isUppies
-        ? DDBitmask.groundUppies.rawValue
+        ? DDBitmask.uppies.rawValue
         : DDBitmask.ground.rawValue
-      leaf.physicsBody!.collisionBitMask =
-        DDBitmask.ALL.rawValue ^
-        DDBitmask.GROUND_ANY.rawValue
+      leaf.physicsBody!.collisionBitMask = isUppies
+        ? DDBitmask.uppies.rawValue
+        : DDBitmask.ALL.rawValue ^
+          DDBitmask.GROUND_ANY.rawValue
       leaf.physicsBody!.contactTestBitMask =
         DDBitmask.dropletPlayer.rawValue
 

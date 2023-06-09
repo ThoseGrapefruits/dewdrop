@@ -26,16 +26,19 @@ class DDGun : SKShapeNode {
   let audioLaunch = DDAudioNodeGroup()
     .add(fileNamed: "FSLaunchDroplet.aif")
 
+  // MARK: Refs
+
+  weak private(set) var chambered: DDDroplet? = .none
+  weak private(set) var playerNode: DDPlayerNode? = .none
+
   // MARK: State
 
-  var chambered: DDDroplet? = .none
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
   var cravesLaunch = false
   var dpadAim: GCControllerDirectionPad? = .none;
   var lastLaunchTarget: CGPoint? = .none
   var lastTargetAngle: CGFloat = 0
-  var playerNode: DDPlayerNode? = .none
 
   // MARK: Initialisation
 
@@ -87,18 +90,16 @@ class DDGun : SKShapeNode {
     chambered = droplet
     strokeColor = .white
 
-    if let dropletPhysicsBody = droplet.physicsBody {
-      chamberedCategoryBitmask = dropletPhysicsBody.categoryBitMask
-      chamberedCollisionBitmask = dropletPhysicsBody.collisionBitMask
+    chamberedCategoryBitmask = droplet.physicsBody!.categoryBitMask
+    chamberedCollisionBitmask = droplet.physicsBody!.collisionBitMask
 
-      dropletPhysicsBody.categoryBitMask = DDBitmask.NONE.rawValue
-      dropletPhysicsBody.collisionBitMask = DDBitmask.NONE.rawValue
-    }
+    droplet.physicsBody!.categoryBitMask = DDBitmask.NONE.rawValue
+    droplet.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
 
     droplet.removeFromParent()
     addChild(droplet)
 
-    droplet.physicsBody?.pinned = true
+    droplet.physicsBody!.pinned = true
     droplet.position = CGPoint(x: 24.0, y: 0.0)
 
     audioChamber.playRandom()
@@ -128,7 +129,7 @@ class DDGun : SKShapeNode {
     // Reparent to scene but keep scene-relative position
     chambered.removeFromParent()
     chambered.onRelease()
-    scene?.addChild(chambered)
+    scene!.addChild(chambered)
     chambered.position = scenePosition
 
     guard let chamberedPhysicsBody = chambered.physicsBody else {

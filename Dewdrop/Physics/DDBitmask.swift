@@ -19,7 +19,7 @@ enum DDBitmask: UInt32 {
   // CATEGORIES — INDIVIDUAL ////////////////////////////
 
   case ground        =                                0b1
-  case groundUppies  =                               0b10
+  case uppies        =                               0b10
   case death         =                              0b100
   case gunPlayer     =                             0b1000
   case dropletPlayer =                            0b10000

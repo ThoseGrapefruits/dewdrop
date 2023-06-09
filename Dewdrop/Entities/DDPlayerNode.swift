@@ -142,9 +142,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.mass = 14.0
     mainCircle.physicsBody!.categoryBitMask = DDBitmask.dropletPlayer.rawValue
     mainCircle.physicsBody!.collisionBitMask =
-      DDBitmask.ALL.rawValue ^
-      DDBitmask.gunPlayer.rawValue ^
-      DDBitmask.dropletPlayer.rawValue
+      DDBitmask.GROUND_ANY.rawValue |
+      DDBitmask.death.rawValue
 
     addChild(mainCircle)
 
@@ -195,6 +194,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     mainCircle.physicsBody!.velocity = .zero
     mainCircle.physicsBody!.angularVelocity = .zero
     
+    // Staggered because it seems to help things not go crazy. Should reassess
+    // whether this stuff is necessary at some point.
     run(SKAction.wait(forDuration: 0.1)) { [weak self] in
       self?.mainCircle.position = scene.getRandomSpawnPoint()
       self?.updateGunPosition()
@@ -537,7 +538,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     
     resetJumps()
     
-    let isUppies = 0 != (DDBitmask.groundUppies.rawValue & pbGround.categoryBitMask)
+    let isUppies = 0 != (DDBitmask.ground.rawValue & pbGround.categoryBitMask)
     
     if isUppies {
       updateUppieability()
@@ -602,31 +603,31 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     }
   }
 
-  func updateUppieability(canUppie shouldPassthrough: Bool) {
-    guard let mcpb = mainCircle.physicsBody else {
+  func updateUppieability(canUppie shouldUppie: Bool) {
+    guard let mcpb = mainCircle.physicsBody,
+          let ddScene = ddScene else {
       return
     }
 
-    let uppiesBitmask = DDBitmask.groundUppies.rawValue
-    let canPassthrough = (mcpb.collisionBitMask & uppiesBitmask) == 0
+    let canUppie = 0 == (mcpb.collisionBitMask & DDBitmask.uppies.rawValue)
 
-    guard shouldPassthrough != canPassthrough else {
+    guard shouldUppie != canUppie else {
       return
     }
 
-    print("--canUppie-- \(shouldPassthrough) \(canPassthrough)")
-    print("\(uppiesBitmask.debugDescription)\n\(mcpb.collisionBitMask.debugDescription)")
+    print("--canUppie-- \(shouldUppie) \(canUppie)")
+    print("\(DDBitmask.uppies.rawValue.debugDescription)\n\(mcpb.collisionBitMask.debugDescription)")
 
-    print("--cub-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldPassthrough)")
+    print("--cub-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldUppie)")
 
-    if shouldPassthrough {
-      let notUppiesBitmask = ~uppiesBitmask
+    if shouldUppie {
+      let notUppiesBitmask = ~DDBitmask.uppies.rawValue
       mcpb.collisionBitMask &= notUppiesBitmask
       for child in wetChildren {
         child.physicsBody!.collisionBitMask &= notUppiesBitmask
       }
     } else {
-      let groundContacts = getGroundContacts(withMask: DDBitmask.groundUppies)
+      let groundContacts = getGroundContacts(withMask: DDBitmask.uppies)
       let isBelowLeaf = groundContacts.keys
         .contains { groundPB in
           mainCircle.getPosition(within: scene!).y + getPlayerRadius() <
@@ -637,13 +638,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         return
       }
 
-      mcpb.collisionBitMask |= uppiesBitmask
+      mcpb.collisionBitMask |= DDBitmask.uppies.rawValue
       for child in wetChildren {
-        child.physicsBody!.collisionBitMask |= uppiesBitmask
+        child.physicsBody!.collisionBitMask |= DDBitmask.uppies.rawValue
       }
     }
 
-    print("--cua-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldPassthrough)")
+    // ddScene.updatePassthrough(canUppie)
+
+    print("--cua-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldUppie)")
   }
 
   func updateUppieability() {
