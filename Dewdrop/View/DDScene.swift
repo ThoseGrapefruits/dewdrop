@@ -140,8 +140,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       let leaf = leafAnchor.children.first!
       let isUppies = leaf.userData?["isUppies"] as? Bool ?? false
 
-      print("--setup-uppies-- \(isUppies)")
-
       leafAnchor.physicsBody = SKPhysicsBody()
       leafAnchor.physicsBody!.pinned = true
 
@@ -154,8 +152,6 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
           DDBitmask.GROUND_ANY.rawValue
       leaf.physicsBody!.contactTestBitMask =
         DDBitmask.dropletPlayer.rawValue
-
-      print("--leafuppie-ctbm-- \( leaf.physicsBody!.contactTestBitMask.debugDescription )")
 
       let leafAnchorScenePosition = leafAnchor.getPosition(within: scene!)
       let leafScenePosition = leaf.getPosition(within: scene!)

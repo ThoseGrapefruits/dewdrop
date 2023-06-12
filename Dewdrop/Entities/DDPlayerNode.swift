@@ -536,10 +536,10 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       fatalError("alleged ground contact with non-ground: \(ground)")
     }
     
+    let isUppies = 0 != (DDBitmask.uppies.rawValue & pbGround.categoryBitMask)
+
     resetJumps()
-    
-    let isUppies = 0 != (DDBitmask.ground.rawValue & pbGround.categoryBitMask)
-    
+
     if isUppies {
       updateUppieability()
     }
@@ -604,8 +604,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
 
   func updateUppieability(canUppie shouldUppie: Bool) {
-    guard let mcpb = mainCircle.physicsBody,
-          let ddScene = ddScene else {
+    guard let mcpb = mainCircle.physicsBody else {
       return
     }
 
@@ -615,11 +614,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       return
     }
 
-    print("--canUppie-- \(shouldUppie) \(canUppie)")
-    print("\(DDBitmask.uppies.rawValue.debugDescription)\n\(mcpb.collisionBitMask.debugDescription)")
-
-    print("--cub-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldUppie)")
-
     if shouldUppie {
       let notUppiesBitmask = ~DDBitmask.uppies.rawValue
       mcpb.collisionBitMask &= notUppiesBitmask
@@ -628,13 +622,13 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       }
     } else {
       let groundContacts = getGroundContacts(withMask: DDBitmask.uppies)
-      let isBelowLeaf = groundContacts.keys
+      let isBelowOrInsideLeaf = groundContacts.keys
         .contains { groundPB in
-          mainCircle.getPosition(within: scene!).y + getPlayerRadius() <
-          groundPB.node!.getPosition(within: scene!).y
+          groundPB.node!.getPosition(within: scene!).y >
+          mainCircle.getPosition(within: scene!).y + getPlayerRadius()
         }
 
-      guard !isBelowLeaf else {
+      guard !isBelowOrInsideLeaf else {
         return
       }
 
@@ -643,22 +637,24 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         child.physicsBody!.collisionBitMask |= DDBitmask.uppies.rawValue
       }
     }
-
-    // ddScene.updatePassthrough(canUppie)
-
-    print("--cua-- \(mcpb.collisionBitMask.debugDescription) \(wetChildren.first!.physicsBody!.collisionBitMask.debugDescription) \(shouldUppie)")
   }
 
   func updateUppieability() {
     guard let mcpb = mainCircle.physicsBody else {
       return
     }
+
+    // Weight the main circle body as 5 children in the average
+    let totalCount = CGFloat(wetChildren.count + 5)
+    let avgVelocity = wetChildren
+      .compactMap { child in child.physicsBody?.velocity.dy }
+      .reduce(mcpb.velocity.dy / totalCount) { avg, v in avg + v / totalCount }
     
-    guard mcpb.velocity.dy <= 0 || 10 < mcpb.velocity.dy else {
+    guard avgVelocity < 0 || 50 < avgVelocity else {
       return
     }
-
-    print("--uu-- \( mcpb.velocity.dy )")
+    
+    print("--avg-velocity-- \( avgVelocity )")
     
     updateUppieability(canUppie: mcpb.velocity.dy > 0)
   }
