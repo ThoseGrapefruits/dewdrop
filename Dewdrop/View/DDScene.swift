@@ -134,7 +134,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
 
   func vivifyBouncyLeaves() {
     let leafAnchors = children
-      .filter { child in child.userData?["isLeafAnchor"] as? Bool ?? false }
+      .compactMap { child in child as? DDLeafAnchor }
 
     for leafAnchor in leafAnchors {
       let leaf = leafAnchor.children.first!
@@ -167,8 +167,8 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       // TODO(logan): there are some assumptions being made around leaf neutral
       // positions being horizontal. This isn't a terrible idea, but I think in
       // reality it will look better to have the true angles varied a bit. Might
-      // never vary enough to actually matter. It'd be worth testing with angled
-      // leaves to see what breaks.
+      // never vary enough to actually matter. Worth testing with angled leaves
+      // to see what breaks.
       let springJointPrimary = SKPhysicsJointSpring.joint(
         withBodyA: leaf.physicsBody!,
         bodyB: physicsBody!,
@@ -298,32 +298,34 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     return true
   }
   
+  func handleContactDropletWorld(droplet: DDDroplet, other: SKNode) -> Bool {
+    guard let bitmask = other.physicsBody?.categoryBitMask else {
+      return false
+    }
+
+    if 0 != (bitmask & DDBitmask.GROUND_ANY.rawValue) {
+      droplet.owner?.handleCollision(on: droplet, withGround: other)
+      return true;
+    }
+
+    if 0 != (bitmask & DDBitmask.death.rawValue) {
+      droplet.owner?.handleCollision(on: droplet, withDeath: other)
+      return true
+    }
+
+    return false
+  }
+  
   func handleContactDropletWorld(_ contact: SKPhysicsContact) -> Bool {
     guard let nodeA = contact.bodyA.node,
           let nodeB = contact.bodyB.node else {
       return false
     }
-
-    let droplet = nodeA as? DDDroplet ?? nodeB as? DDDroplet
-
-    guard let droplet = droplet else {
-      return false
-    }
-
-    for node in [ nodeA, nodeB ] {
-      guard let bitmask = node.physicsBody?.categoryBitMask else {
-        continue
-      }
-              
-      if 0 != (bitmask & DDBitmask.death.rawValue) {
-        droplet.owner?.handleCollision(on: droplet, withDeath: node)
-        return true
-      }
-      
-      if 0 != (bitmask & DDBitmask.GROUND_ANY.rawValue) {
-        droplet.owner?.handleCollision(on: droplet, withGround: nodeA)
-        return true;
-      }
+    
+    if let droplet = nodeA as? DDDroplet {
+      return handleContactDropletWorld(droplet: droplet, other: nodeB)
+    } else if let droplet = nodeB as? DDDroplet {
+      return handleContactDropletWorld(droplet: droplet, other: nodeA)
     }
     
     return false
