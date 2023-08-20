@@ -37,7 +37,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   static let WAIT_RESIZE      = SKAction.wait(forDuration: 0.1)
   static let WAIT_CHECK       = SKAction.wait(forDuration: 0.3)
 
-  static let GUN_MASS: CGFloat = 2.0
+  static let GUN_MASS: CGFloat = 1.0
   static let PD_COUNT_INIT = 22
   static let PD_COUNT_MAX = 40
   
@@ -653,8 +653,6 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard avgVelocity < 0 || 50 < avgVelocity else {
       return
     }
-    
-    print("--avg-velocity-- \( avgVelocity )")
     
     updateUppieability(canUppie: mcpb.velocity.dy > 0)
   }

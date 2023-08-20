@@ -14,10 +14,10 @@ class DDGun : SKShapeNode {
   #if os(iOS)
   static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi / 6
   #else
-  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi / 4
+  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi
   #endif
 
-  let aimPID = PIDController(kP: 1.5, kI: 0.05, kD: 0.1)
+  let aimPID = PIDController(kP: 0.5, kI: 0.02, kD: 0.05)
 
   // MARK: Audio nodes
 
@@ -35,6 +35,7 @@ class DDGun : SKShapeNode {
 
   var chamberedCollisionBitmask: UInt32 = UInt32.zero
   var chamberedCategoryBitmask: UInt32 = UInt32.zero
+  var chamberedMass: CGFloat = CGFloat.zero
   var cravesLaunch = false
   var dpadAim: GCControllerDirectionPad? = .none;
   var lastLaunchTarget: CGPoint? = .none
@@ -92,9 +93,11 @@ class DDGun : SKShapeNode {
 
     chamberedCategoryBitmask = droplet.physicsBody!.categoryBitMask
     chamberedCollisionBitmask = droplet.physicsBody!.collisionBitMask
+    chamberedMass = droplet.physicsBody!.mass
 
     droplet.physicsBody!.categoryBitMask = DDBitmask.NONE.rawValue
     droplet.physicsBody!.collisionBitMask = DDBitmask.NONE.rawValue
+    droplet.physicsBody!.mass = 0.0000001
 
     droplet.removeFromParent()
     addChild(droplet)
@@ -143,6 +146,10 @@ class DDGun : SKShapeNode {
 
     if (chamberedCategoryBitmask != UInt32.zero) {
       chamberedPhysicsBody.categoryBitMask = chamberedCategoryBitmask
+    }
+
+    if chamberedMass != CGFloat.zero {
+      chamberedPhysicsBody.mass = chamberedMass
     }
 
     chamberedCategoryBitmask = UInt32.zero

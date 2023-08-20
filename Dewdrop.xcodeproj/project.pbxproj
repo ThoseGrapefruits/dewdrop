@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0202D1AD2A16BCBF000BFD12 /* CGRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0202D1AC2A16BCBF000BFD12 /* CGRect.swift */; };
 		0202D1AE2A16BCBF000BFD12 /* CGRect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0202D1AC2A16BCBF000BFD12 /* CGRect.swift */; };
+		02135D6E2A3CD2C900E7BAEF /* DDLeafAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02135D6D2A3CD2C900E7BAEF /* DDLeafAnchor.swift */; };
+		02135D6F2A3CD2C900E7BAEF /* DDLeafAnchor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02135D6D2A3CD2C900E7BAEF /* DDLeafAnchor.swift */; };
 		021838FA2A2CF47500633499 /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021838F92A2CF47500633499 /* UInt32.swift */; };
 		021838FB2A2CF47500633499 /* UInt32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 021838F92A2CF47500633499 /* UInt32.swift */; };
 		021838FC2A2CF91E00633499 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
@@ -159,6 +161,7 @@
 
 /* Begin PBXFileReference section */
 		0202D1AC2A16BCBF000BFD12 /* CGRect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRect.swift; sourceTree = "<group>"; };
+		02135D6D2A3CD2C900E7BAEF /* DDLeafAnchor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDLeafAnchor.swift; sourceTree = "<group>"; };
 		021838F92A2CF47500633499 /* UInt32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt32.swift; sourceTree = "<group>"; };
 		0258850928936C310017898B /* Dewdrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dewdrop.entitlements; sourceTree = "<group>"; };
 		0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneEffectSceneAddable.swift; sourceTree = "<group>"; };
@@ -448,13 +451,14 @@
 			isa = PBXGroup;
 			children = (
 				DC0754B12697EF2700C9F376 /* DDAimTouchNode.swift */,
+				DCB9A97B2698F0E700B396CC /* DDDroplet.swift */,
 				DCB9A97D2698F28F00B396CC /* DDGun.swift */,
+				02135D6D2A3CD2C900E7BAEF /* DDLeafAnchor.swift */,
 				DC78A7F326966DD0000FFCFD /* DDMoveTouchNode.swift */,
 				DC882C8E26DC508300E80E7B /* DDNetworkStatsNode.swift */,
-				DCB9A97B2698F0E700B396CC /* DDDroplet.swift */,
+				0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */,
 				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
 				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
-				0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -832,6 +836,7 @@
 				02B9BE8229CF41D200ED31A6 /* CGVector.swift in Sources */,
 				02B9BE8329CF41D200ED31A6 /* DDBitmask.swift in Sources */,
 				02B9BE8429CF41D200ED31A6 /* PIDController.swift in Sources */,
+				02135D6F2A3CD2C900E7BAEF /* DDLeafAnchor.swift in Sources */,
 				02B9BE8529CF41D200ED31A6 /* DDCameraNode.swift in Sources */,
 				02B9BE8629CF41D200ED31A6 /* DDScene.swift in Sources */,
 				02B9BE8729CF41D200ED31A6 /* DDView.swift in Sources */,
@@ -903,6 +908,7 @@
 				DCB9B6D026D83A0D007627EF /* DDRPCLastSeen.swift in Sources */,
 				DCE10DD826DA8975001229CB /* DDNodeType.swift in Sources */,
 				DC0E80B926C9955700A37917 /* DDNetworkDelegate.swift in Sources */,
+				02135D6E2A3CD2C900E7BAEF /* DDLeafAnchor.swift in Sources */,
 				DCF9815726983FD400430005 /* DDBitmask.swift in Sources */,
 				DC9C1F3926E9B95A00733995 /* DDRPC.swift in Sources */,
 				DC49820726D47B93000359FE /* DDFieldChange.swift in Sources */,
