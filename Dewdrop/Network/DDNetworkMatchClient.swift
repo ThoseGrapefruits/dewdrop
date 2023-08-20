@@ -70,8 +70,6 @@ extension DDNetworkMatch {
       fatalError("Cannot sync nodes without scene")
     }
 
-    print("--syncnodes--", data.nodes[1]);
-
     let parentSyncNode = data.nodes[0]
 
     if let parentDelegate = getDelegateFor(id: parentSyncNode.id) {

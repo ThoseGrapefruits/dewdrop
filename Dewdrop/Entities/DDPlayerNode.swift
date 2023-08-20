@@ -317,8 +317,13 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
   }
   
   func updateMainCircleSize() {
+    let ratio = getPlayerRadius() / getPlayerRadius(isInit: true)
     mainCircle.run(SKAction.scale(
-      to: getPlayerRadius() / getPlayerRadius(isInit: true),
+      to: ratio,
+      duration: Self.WAIT_RESIZE.duration
+    ))
+    gunAnchor.run(SKAction.scale(
+      to: 1 / ratio,
       duration: Self.WAIT_RESIZE.duration
     ))
   }
