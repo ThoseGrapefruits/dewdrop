@@ -43,19 +43,24 @@ class DDViewController: GCEventViewController {
       object: nil,
       queue: .main
     ) { notification in
-      guard let controller = notification.object as? GCController else {
-        return
-      }
-      
       guard playerIndices.count != 0 else {
         fatalError("2 many controllers")
       }
 
-      if controller.extendedGamepad != nil {
-        controller.playerIndex = playerIndices.removeFirst()
-      }
+      let controllers = GCController.controllers()
 
-      self.spawnLocalPlayerObject(withController: controller)
+      for controller in controllers {
+        let alreadyAttached = self.scene!.children
+          .compactMap { child in child as? DDPlayerNode }
+          .contains { player in player.controller == controller }
+
+        if (alreadyAttached) {
+          continue
+        }
+
+        controller.playerIndex = playerIndices.removeFirst()
+        self.spawnLocalPlayerObject(withController: controller)
+      }
     }
   }
 

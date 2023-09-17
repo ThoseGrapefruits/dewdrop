@@ -11,10 +11,13 @@ import GameController
 
 class DDGun : SKShapeNode {
   static let LAUNCH_FORCE: CGFloat = 400.0
+  
+  // Had these before, but settign them to their max possible value because I
+  // don't think they're necessary but I also don't want to remove the logic.
   #if os(iOS)
-  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi / 6
+  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi * 2
   #else
-  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi
+  static let LAUNCH_MAX_ERROR: CGFloat = CGFloat.pi * 2
   #endif
 
   let aimPID = PIDController(kP: 0.5, kI: 0.02, kD: 0.05)
