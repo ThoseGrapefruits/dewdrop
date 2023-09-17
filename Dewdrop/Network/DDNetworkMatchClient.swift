@@ -84,7 +84,7 @@ extension DDNetworkMatch {
               fatalError("Cannot sync DDSceneAddable into non-scene parent")
             }
 
-            node.addToScene(scene: scene, position: data.targetPosition)
+            let _ = node.addToScene(scene: scene, position: data.targetPosition)
           } else {
             node.move(toParent: parentDelegate.node!)
           }

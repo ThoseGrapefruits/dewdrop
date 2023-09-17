@@ -67,6 +67,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   // MARK: State
 
+  var damageLast: CGFloat = CGFloat.zero
   var ddScene: Optional<DDScene> = .none
   var joints: [SKNode: Set<SKPhysicsJointSpring>] = [:]
   var wetChildren = Set<DDDroplet>()
@@ -221,8 +222,8 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     if wetChildren.contains(newChild) {
       return;
     }
-    
-    guard let scene = scene else {
+
+    guard let scene = scene as? DDScene else {
       return
     }
 
@@ -236,8 +237,23 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         newChild.position = position
       }
 
-      linkArms(wetChild: newChild)
+      linkArms(with: newChild)
+      let (damage, angle) = getDamage(from: newChild) ?? (0, 0)
+
+      if damage > 0 {
+        self.damageLast = damage
+        // smaller angle as velocity increases
+        let coneOfDamage = DDDamage(
+          arcWithBerth: CGFloat.pi / max(log(damage), 1.5),
+          andLength: 15.0)
+
+        scene.rememberedDamage = coneOfDamage
+        mainCircle.addChild(coneOfDamage)
+        coneOfDamage.zRotation = angle
+        coneOfDamage.position = newChild.position
+      }
     } else {
+      // TODO figure out if this branch is actually used
       let childPosition = newChild.getPosition(within: scene)
       let mainCirclePosition = mainCircle.getPosition(within: scene)
       let holyAngle = mainCirclePosition.angle(to: childPosition)
@@ -251,7 +267,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         x: mainCircle.position.x + cos(holyAngle) * getPlayerRadius(isInit: isInit),
         y: mainCircle.position.y + sin(holyAngle) * getPlayerRadius(isInit: isInit))
 
-      linkArms(wetChild: newChild)
+      linkArms(with: newChild)
 
       // Previous position, so it can be pulled in by the joint. We assume that
       // the actual DDPlayerNode is still at (0,0) [invariant]
@@ -267,7 +283,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard case .none = wetChild.lock else {
       return
     }
-    
+
     wetChild.lock = .disowning
     guard wetChildren.remove(wetChild) != nil else {
       return
@@ -294,12 +310,13 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     wetChild.lock = .none
   }
 
-  func linkArms(wetChild: DDDroplet) {
+  func linkArms(with newChild: DDDroplet) {
+    // INVARIANT: do not change wetChild velocity in this method
     let joint = SKPhysicsJointSpring.joint(
       withBodyA: mainCircle.physicsBody!,
-      bodyB: wetChild.physicsBody!,
+      bodyB: newChild.physicsBody!,
       anchorA: mainCircle.position,
-      anchorB: wetChild.position)
+      anchorB: newChild.position)
 
     joint.damping = 1.5
     joint.frequency = 4.0
@@ -308,14 +325,14 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     
     joints[mainCircle] = joints[mainCircle] ?? Set();
     joints[mainCircle]!.insert(joint)
-    joints[wetChild] = joints[wetChild] ?? Set()
-    joints[wetChild]!.insert(joint)
+    joints[newChild] = joints[newChild] ?? Set()
+    joints[newChild]!.insert(joint)
   }
 
   func updateGunPosition() {
     gun.position = CGPoint(x: getPlayerRadius(), y: 0)
   }
-  
+
   func updateMainCircleSize() {
     let ratio = getPlayerRadius() / getPlayerRadius(isInit: true)
     mainCircle.run(SKAction.scale(
@@ -361,7 +378,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
       self?.trackChildren()
     }
   }
-  
+
   // MARK: Touch handling
 
   #if os(iOS)
@@ -485,15 +502,15 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     let clampX =
     force.dx.sign == physicsBody.velocity.dx.sign &&
     physicsBody.velocity.dx.magnitude > Self.MOVEMENT_SPEED_LIMIT.dx;
-    
+
     let clampY =
     force.dy.sign == physicsBody.velocity.dy.sign &&
     physicsBody.velocity.dy.magnitude > Self.MOVEMENT_SPEED_LIMIT.dy;
-    
+
     let forceClamped = CGVector(
       dx: force.dx.clamp(within: clampX ? 0 : .infinity),
       dy: force.dy.clamp(within: clampY ? 0 : .infinity))
-      
+
     self.mainCircle.run(
       SKAction.applyForce(
         forceClamped,
@@ -505,7 +522,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
 
   var jumpsSinceLastGroundTouch: Int8 = 0
   var holdingJump = false
-  
+
   func getGroundContacts(withMask mask: DDBitmask = DDBitmask.GROUND_ANY) -> [SKPhysicsBody: Int] {
     return wetChildren
       .compactMap { wetChild in wetChild.physicsBody }
@@ -515,23 +532,29 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
         counts[groundBody] = (counts[groundBody] ?? 0) + 1
       }
   }
-  
+
   func getGroundContactsTotalCount() -> Int {
     return self.getGroundContactsTotalCount(withContacts: self.getGroundContacts())
   }
-  
+
   func getGroundContactsTotalCount(
     withContacts groundContacts: [SKPhysicsBody: Int]
   ) -> Int {
-    groundContacts.values.reduce(0) { sum, n in
-      sum + n
-    }
+    groundContacts.values.reduce(0) { sum, n in sum + n }
   }
 
-  func handleCollision(on: DDDroplet, withDeath: SKNode) {
+  func handleCollision(on: DDDroplet, withDeath death: SKNode) {
     respawn()
   }
-  
+
+  func handleCollision(on droplet: DDDroplet, withDamage damage: DDDamage) {
+    disown(wetChild: droplet)
+  }
+
+  func handleCollision(on: DDDroplet, withDroplet foreignDroplet: DDDroplet) {
+    baptiseWetChild(newChild: foreignDroplet)
+  }
+
   func handleCollision(on: DDDroplet, withGround ground: SKNode) {
     guard let pbGround = ground.physicsBody else {
       return
@@ -540,7 +563,7 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     guard 0 != (DDBitmask.GROUND_ANY.rawValue & pbGround.categoryBitMask) else {
       fatalError("alleged ground contact with non-ground: \(ground)")
     }
-    
+
     let isUppies = 0 != (DDBitmask.uppies.rawValue & pbGround.categoryBitMask)
 
     resetJumps()
@@ -548,6 +571,17 @@ class DDPlayerNode: SKEffectNode, SKSceneDelegate, DDSceneAddable {
     if isUppies {
       updateUppieability()
     }
+  }
+
+  func getDamage(from droplet: DDDroplet) -> (CGFloat, CGFloat)? {
+    guard droplet.ownerLast != nil,
+          droplet.ownerLast != self,
+          let pb = droplet.physicsBody else {
+      return .none
+    }
+    
+    let magnitude = pb.velocity.magnitude
+    return magnitude > 10 ? (magnitude, pb.velocity.angle) : .none
   }
   
   func handleForceTouch(force: CGFloat) {

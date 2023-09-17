@@ -31,11 +31,7 @@ extension SKNode {
     return position
   }
 
-  private func getPositionAndRotation(
-    within ancestor: SKNode,
-    position childPosition: CGPoint,
-    rotation childRotation: CGFloat
-  ) -> (CGPoint, CGFloat) {
+  private func getPositionAndRotation(within ancestor: SKNode) -> (CGPoint, CGFloat) {
     var node = self
     var childPosition = CGPoint.zero
     var childRotation = CGFloat.zero
@@ -57,14 +53,6 @@ extension SKNode {
     }
 
     return (childPosition, childRotation)
-  }
-
-  func getPositionAndRotation(within ancestor: SKNode) -> (CGPoint, CGFloat) {
-    return getPositionAndRotation(
-      within: ancestor,
-      position: CGPoint.zero,
-      rotation: CGFloat.zero
-    )
   }
 
   func getRotation(within ancestor: SKNode) -> CGFloat {

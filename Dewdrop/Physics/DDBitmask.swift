@@ -24,6 +24,7 @@ enum DDBitmask: UInt32 {
   case gunPlayer     =                             0b1000
   case dropletPlayer =                            0b10000
   case dropletFree   =                           0b100000
+  case damage        =                          0b1000000
 
   // CATEGORIES — COMBINATIONS //////////////////////////
   

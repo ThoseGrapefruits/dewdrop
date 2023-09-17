@@ -21,6 +21,7 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   var playerNodes: [DDPlayerNode] = []
   #endif
 
+  var rememberedDamage: SKNode? = .none
   var spawnPointParent: SKNode? = .none
   var spawnPointIndex: Int = 0
   var sceneEffects: [DDSceneEffect] = []
@@ -68,6 +69,15 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
   }
 
   // MARK: Death & respawn
+
+  func clearDamageCone() {
+    guard let rememberedDamage = self.rememberedDamage else {
+      return
+    }
+
+    rememberedDamage.removeFromParent()
+    self.rememberedDamage = .none
+  }
 
   func initBoundaries() {
     guard let scene = scene else {
@@ -266,6 +276,12 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     }
   }
   #endif
+  
+  // MARK: SKScene
+  
+  override func didSimulatePhysics() {
+    clearDamageCone()
+  }
 
   // MARK: SKPhysicsContactDelegate
 
@@ -273,12 +289,27 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
     guard !self.handleContactDropletDroplet(contact) else {
       return
     }
-    
+
     guard !self.handleContactDropletWorld(contact) else {
       return
     }
+
+    guard !self.handleContactDropletDamage(contact) else {
+      return
+    }
   }
-  
+
+  func handleContactDropletDamage(_ contact: SKPhysicsContact) -> Bool {
+    guard let droplet = contact.bodyA.node as? DDDroplet ?? contact.bodyB.node as? DDDroplet,
+          let owner = droplet.owner,
+          let damage = contact.bodyA.node as? DDDamage ?? contact.bodyB.node as? DDDamage else {
+      return false
+    }
+    
+    owner.handleCollision(on: droplet, withDamage: damage)
+    return true
+  }
+
   func handleContactDropletDroplet(_ contact: SKPhysicsContact) -> Bool {
     guard let dropletA = contact.bodyA.node as? DDDroplet,
           let dropletB = contact.bodyB.node as? DDDroplet else {
@@ -291,13 +322,12 @@ class DDScene: SKScene, SKPhysicsContactDelegate, DDSceneAddable {
       return false
     }
 
-    let ownerless = dropletA.owner == nil ? dropletA : dropletB
+    let (owned, unowned) = dropletA.owner == nil ? (dropletB, dropletA) : (dropletA, dropletB)
 
-    newOwner.baptiseWetChild(newChild: ownerless)
-
+    newOwner.handleCollision(on: owned, withDroplet: unowned)
     return true
   }
-  
+
   func handleContactDropletWorld(droplet: DDDroplet, other: SKNode) -> Bool {
     guard let bitmask = other.physicsBody?.categoryBitMask else {
       return false

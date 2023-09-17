@@ -20,7 +20,7 @@ class DDDroplet : SKShapeNode, DDPhysicsNode {
   static let MASS: CGFloat = 0.5
   static let RADIUS: CGFloat = 4.2
 
-  weak private(set) var lastOwner: DDPlayerNode? = .none
+  weak private(set) var ownerLast: DDPlayerNode? = .none
   weak private(set) var owner:     DDPlayerNode? = .none
   
   var lock: DDDropletLock = .none
@@ -52,7 +52,7 @@ class DDDroplet : SKShapeNode, DDPhysicsNode {
   }
 
   func onRelease() {
-    lastOwner = owner
+    ownerLast = owner
     owner = .none
     lock = .none
 
@@ -81,6 +81,7 @@ class DDDroplet : SKShapeNode, DDPhysicsNode {
     physicsBody!.contactTestBitMask =
       DDBitmask.dropletPlayer.rawValue |
       DDBitmask.GROUND_ANY.rawValue |
-      DDBitmask.death.rawValue
+      DDBitmask.death.rawValue |
+      DDBitmask.damage.rawValue
   }
 }

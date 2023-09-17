@@ -16,6 +16,8 @@
 		021838FC2A2CF91E00633499 /* FSLaunchDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DCAE32CD26A66A4D0079BCC7 /* FSLaunchDroplet.aif */; };
 		021838FD2A2CF91E00633499 /* FSChamberDroplet.aif in Resources */ = {isa = PBXBuildFile; fileRef = DC5347EC26A69E62004DF564 /* FSChamberDroplet.aif */; };
 		02231A3729E2FF270015A59F /* TestLevel.sks in Resources */ = {isa = PBXBuildFile; fileRef = DCC29BA1269223ED0023D58E /* TestLevel.sks */; };
+		0225281D2AB604D900F444AF /* DDDamage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0225281C2AB604D900F444AF /* DDDamage.swift */; };
+		0225281E2AB604D900F444AF /* DDDamage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0225281C2AB604D900F444AF /* DDDamage.swift */; };
 		0263C56D2A0C055400C738D7 /* DDWeatherCycle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125272A03F4DD00818A3B /* DDWeatherCycle.swift */; };
 		0263C56E2A0C055400C738D7 /* DDSceneEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02A125292A03F4E700818A3B /* DDSceneEffect.swift */; };
 		0263C5702A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */; };
@@ -163,6 +165,7 @@
 		0202D1AC2A16BCBF000BFD12 /* CGRect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGRect.swift; sourceTree = "<group>"; };
 		02135D6D2A3CD2C900E7BAEF /* DDLeafAnchor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDLeafAnchor.swift; sourceTree = "<group>"; };
 		021838F92A2CF47500633499 /* UInt32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UInt32.swift; sourceTree = "<group>"; };
+		0225281C2AB604D900F444AF /* DDDamage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDDamage.swift; sourceTree = "<group>"; };
 		0258850928936C310017898B /* Dewdrop.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Dewdrop.entitlements; sourceTree = "<group>"; };
 		0263C56F2A0C0EF100C738D7 /* DDSceneEffectSceneAddable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDSceneEffectSceneAddable.swift; sourceTree = "<group>"; };
 		0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DDPhysicsNode.swift; sourceTree = "<group>"; };
@@ -459,6 +462,7 @@
 				0263C5722A0C170E00C738D7 /* DDPhysicsNode.swift */,
 				DCC29B98269206720023D58E /* DDPlayerNode.swift */,
 				DCC29BA3269226690023D58E /* DDSceneAddable.swift */,
+				0225281C2AB604D900F444AF /* DDDamage.swift */,
 			);
 			path = Entities;
 			sourceTree = "<group>";
@@ -804,6 +808,7 @@
 				02B9BE9229CF420200ED31A6 /* DDNodeDelta.swift in Sources */,
 				02B9BE9329CF420200ED31A6 /* DDNodeSnapshot.swift in Sources */,
 				02B9BE9429CF420200ED31A6 /* DDNodeType.swift in Sources */,
+				0225281E2AB604D900F444AF /* DDDamage.swift in Sources */,
 				02B9BE9529CF420200ED31A6 /* DDRPCPlayerUpdate.swift in Sources */,
 				02B9BE9629CF420200ED31A6 /* DDRPCSceneSnapshot.swift in Sources */,
 				02B9BE9729CF420200ED31A6 /* DDRPCLastSeen.swift in Sources */,
@@ -876,6 +881,7 @@
 				DCDF5C3926DEFCDA00C312A7 /* DDRPCSpawnRequest.swift in Sources */,
 				DC882C8D26DC436900E80E7B /* DDNetworkActivityTracker.swift in Sources */,
 				DC49820326D46D85000359FE /* DDNodeSnapshot.swift in Sources */,
+				0225281D2AB604D900F444AF /* DDDamage.swift in Sources */,
 				DCC29B99269206720023D58E /* DDPlayerNode.swift in Sources */,
 				DC82AC94269B9AC60076CB92 /* CGFloat.swift in Sources */,
 				DC09EC1126D0273500CCDE49 /* DDNetworkMatch.swift in Sources */,
